@@ -1,0 +1,127 @@
+.side-status-history > h5 {
+    color: grey;
+    display: flex;
+}
+.side-status-history > h5:before, h5:after {
+    content:'';
+    flex:1;
+    border-bottom: 1px solid lightgrey;
+    margin:auto 0.25em;
+}
+.side-status-history .log {
+    position: relative;
+    margin: 30px 0;
+    min-height: 40px;
+}
+.side-status-history .log:first-of-type .status-log .status {
+    color: #00bfa5;
+}
+.side-status-history .log:not(:last-child):before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 27px;
+    width: 1px;
+    height: 100%;
+    background: #e8e8e8;
+}
+.side-status-history .legend {
+    margin-top: 4px;
+    position: absolute;
+    left: 0;
+}
+.side-status-history .log:first-of-type .legend {
+    color: #00bfa5;
+}
+.side-status-history .status-log {
+    padding-left: 40px;
+}
+.side-status-history .description {
+    color: #8c8c8c;
+}
+.side-status-history .time {
+    color: #bababa;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.dataTables_filter {
+    display: none;
+}
+
+.listing-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-start;
+}
+
+.detailpage-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-start;
+}
+
+.click-action {
+    cursor: pointer;
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.dt-bootstrap5 .dataTable td {
+    font-size: 13px;
+}
+.dt-bootstrap5 .table-action {
+    cursor: pointer;
+}
+
+.page-link {
+    color: #6c757d;
+}
+.page-link:hover {
+    color: #343a40;
+    text-decoration: none;
+}
+.page-item.active .page-link {
+    background-color: #3b7ddd;
+    border-color: #3b7ddd;
+}
+
+.offcanvas-button-group {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.rating {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    stroke-width: 1.25px;
+}
+
+.noline-td {
+    border-color: rgba(0, 0, 0, 0) !important;
+    vertical-align: top !important;
+}
+
+@media only screen and (max-width: 600px) {
+    .offcanvas-right {
+        width: 100%;
+        border-left: unset;
+    }
+
+    .offcanvas-image-preview {
+        display: flex;
+        justify-content: center;
+    }
+}
+
+@media only screen and (min-width: 1366px) {
+    .offcanvas-right {
+        width: 25%;
+    }
+}

@@ -10,4 +10,14 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    public $data = [];
+
+    public function __construct() {
+        $routeArray = app( 'request' )->route()->getAction();
+        list( $controller, $action ) = explode( '@', class_basename( $routeArray['controller'] ) );
+
+        $this->data['controller'] = $controller;
+        $this->data['action'] = $action;
+    }
 }
