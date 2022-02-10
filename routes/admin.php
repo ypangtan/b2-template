@@ -3,12 +3,36 @@
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 use App\Http\Controllers\Admin\{
+    AdministratorController,
     DashboardController
 };
 
 Route::prefix( 'base2_admin' )->group( function() {
 
     Route::middleware( 'auth:admin' )->group( function() {
+
+        Route::prefix( 'administrators' )->group( function() {
+
+            Route::group( [ 'middleware' => [ 'permission:add admins|view admins|edit admins|delete admins' ] ], function() {
+                Route::get( '/', [ AdministratorController::class, 'index' ] );
+                Route::get( 'roles', [ AdministratorController::class, 'role' ] );
+                Route::get( 'modules', [ AdministratorController::class, 'module' ] );
+            } );
+
+            Route::post( 'create_admin', [ AdministratorController::class, 'createAdmin' ] );
+            Route::post( 'all_admins', [ AdministratorController::class, 'getAdmins' ] );
+            Route::post( 'one_admin', [ AdministratorController::class, 'getAdmin' ] );
+            Route::post( 'update_admin', [ AdministratorController::class, 'updateAdmin' ] );
+    
+            Route::post( 'create_module', [ AdministratorController::class, 'createModule' ] );
+            Route::post( 'all_modules', [ AdministratorController::class, 'getModules' ] );
+            Route::post( 'one_module', [ AdministratorController::class, 'getModule' ] );
+
+            Route::post( 'create_role', [ AdministratorController::class, 'createRole' ] );
+            Route::post( 'all_roles', [ AdministratorController::class, 'getRoles' ] );
+            Route::post( 'one_role', [ AdministratorController::class, 'getRole' ] );
+            Route::post( 'update_role', [ AdministratorController::class, 'updateRole' ] );
+        } );
 
         Route::prefix( 'dashboard' )->group( function() {
             Route::get( '/', [ DashboardController::class, 'index' ] );
