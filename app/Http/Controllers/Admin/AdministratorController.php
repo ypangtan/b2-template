@@ -31,7 +31,7 @@ class AdministratorController extends Controller {
         return view( 'admin.main' )->with( $this->data );
     }
 
-    public function getAdmins(  Request $request, AdminService $adminService ) {
+    public function getAdmins( Request $request, AdminService $adminService ) {
 
         return response()->json( $adminService->all( $request ) );
     }
@@ -60,7 +60,7 @@ class AdministratorController extends Controller {
         return view( 'admin.main' )->with( $this->data );
     }
 
-    public function getModules(  Request $request, ModuleService $moduleService ) {
+    public function getModules( Request $request, ModuleService $moduleService ) {
 
         return response()->json( $moduleService->all( $request ) );
     }
@@ -79,7 +79,7 @@ class AdministratorController extends Controller {
         return view( 'admin.main' )->with( $this->data );
     }
 
-    public function getRoles(  Request $request, RoleService $roleService ) {
+    public function getRoles( Request $request, RoleService $roleService ) {
 
         return response()->json( $roleService->all( $request ) );
     }
