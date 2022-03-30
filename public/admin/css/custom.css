@@ -57,6 +57,21 @@
     align-items: flex-start;
 }
 
+.password-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center; 
+}
+.password-wrapper > svg {
+    position: absolute;
+    margin-right: 10px;
+}
+
+.login-language-switcher {
+    display: flex;
+    justify-content: space-evenly;
+}
+
 .detailpage-header {
     display: flex; 
     justify-content: space-between; 

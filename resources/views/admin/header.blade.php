@@ -59,6 +59,7 @@
     <link href="{{ asset( 'admin/css/lightgallery.css' ) . Helper::assetVersion() }}" rel="stylesheet">
     <link href="{{ asset( 'admin/css/image-uploader.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
 @endif
+    <link href="{{ asset( 'admin/css/custom.css' ) . Helper::assetVersion() }}" rel="stylesheet">
     <link href="{{ asset( 'admin/css/font.css' ) . Helper::assetVersion() }}" rel="stylesheet">
 </head>
 

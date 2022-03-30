@@ -5,7 +5,7 @@ namespace App\Helpers;
 class Helper {
 
     public static function websiteName() {
-        return 'AKC';
+        return 'Starter';
     }
 
     public static function baseUrl() {
@@ -18,6 +18,10 @@ class Helper {
 
     public static function adminPath() {
         return 'base2_admin';
+    }
+
+    public static function baseMerchantUrl() {
+        return url( '/' ).'/base2_merchant';
     }
 
     public static function assetVersion() {

@@ -17,4 +17,16 @@ return [
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
 
+    'welcome' => 'Welcome back',
+    'sign_in_continue' => 'Sign in to your <strong>:type</strong> account to continue',
+    'admin' => 'admin',
+    'merchant' => 'merchant',
+    'email' => 'Email',
+    'password_' => 'Password',
+    'enter_your_x' => 'Enter your :type',
+    'remember_me' => 'Remember me next time',
+    'sign_in' => 'Sign in',
+    'not_type' => 'Not :website :type?',
+    'go_to_dashboard' => 'Go to :type Dashboard',
+    'choose_language' => 'Choose Language'
 ];
