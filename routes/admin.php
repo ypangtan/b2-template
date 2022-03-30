@@ -41,6 +41,15 @@ Route::prefix( 'base2_admin' )->group( function() {
 
     } );
 
+    Route::get( 'lang/{lang}', function( $lang ) {
+
+        if( array_key_exists( $lang, Config::get( 'languages' ) ) ) {
+            Session::put( 'appLocale', $lang );
+        }
+        
+        return Redirect::back();
+    } );
+
     Route::get( '/login', function() {
 
         $data['basic'] = true;
