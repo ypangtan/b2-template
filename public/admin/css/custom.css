@@ -57,21 +57,6 @@
     align-items: flex-start;
 }
 
-.password-wrapper {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center; 
-}
-.password-wrapper > svg {
-    position: absolute;
-    margin-right: 10px;
-}
-
-.login-language-switcher {
-    display: flex;
-    justify-content: space-evenly;
-}
-
 .detailpage-header {
     display: flex; 
     justify-content: space-between; 
@@ -121,6 +106,39 @@
 .noline-td {
     border-color: rgba(0, 0, 0, 0) !important;
     vertical-align: top !important;
+}
+
+.password-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center; 
+}
+.password-wrapper > svg {
+    position: absolute;
+    margin-right: 10px;
+}
+
+.login-language-switcher {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.choices__inner.bs-5 {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.2rem;
+    padding: 7.5px 0.85rem 3.75px;
+}
+.choices__inner.bs-5 .choices__input {
+    background-color: #fff;
+    color: #495057;
+    margin-bottom: 0px;
+}
+.choices__inner.bs-5 .choices__list--multiple .choices__item {
+    border: unset;
+}
+.choices__inner.bs-5 .choices__list--multiple .choices__item.is-highlighted {
+    border: unset;
 }
 
 @media only screen and (max-width: 600px) {
