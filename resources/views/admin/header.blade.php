@@ -8,21 +8,23 @@
     <meta name="description" content="{{ Helper::websiteName() }} Admin Dashboard">
     <meta name="author" content="AdminKit">
     <meta name="keywords" content="adminkit, bootstrap, bootstrap 5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
-	<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="shortcut icon" href="{{ asset( 'admin/img/icons/128px.png' ) . Helper::assetVersion() }}" />
     <link rel="apple-touch-icon" href="{{ asset( 'admin/img/icons/512px.png' ) . Helper::assetVersion() }}" />
+    @if( 1 == 2 ) 
     <link href="{{ asset( 'admin/splashscreens/iphone5_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="{{ asset( 'admin/splashscreens/iphone6_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="{{ asset( 'admin/splashscreens/iphoneplus_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
-	<link href="{{ asset( 'admin/splashscreens/iphonex_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
-	<link href="{{ asset( 'admin/splashscreens/iphonexr_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="{{ asset( 'admin/splashscreens/iphonexsmax_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
-	<link href="{{ asset( 'admin/splashscreens/ipad_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="{{ asset( 'admin/splashscreens/ipadpro1_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="{{ asset( 'admin/splashscreens/ipadpro3_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="{{ asset( 'admin/splashscreens/ipadpro2_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="{{ asset( 'admin/splashscreens/iphone6_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="{{ asset( 'admin/splashscreens/iphoneplus_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+    <link href="{{ asset( 'admin/splashscreens/iphonex_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+    <link href="{{ asset( 'admin/splashscreens/iphonexr_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="{{ asset( 'admin/splashscreens/iphonexsmax_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+    <link href="{{ asset( 'admin/splashscreens/ipad_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="{{ asset( 'admin/splashscreens/ipadpro1_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="{{ asset( 'admin/splashscreens/ipadpro3_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    <link href="{{ asset( 'admin/splashscreens/ipadpro2_splash.png' ) . Helper::assetVersion() }}" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+    @endif
     <link rel="manifest" href="{{ asset( 'manifest.json' ) . Helper::assetVersion() }}" />
     <script>
         window.addEventListener( 'load', () => {

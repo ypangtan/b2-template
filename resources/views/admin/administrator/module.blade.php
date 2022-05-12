@@ -36,7 +36,7 @@ $columns = [
 
 <div class="card">
     <div class="card-body">
-        <x-data-tables id="module_table" enableFilter="true" columns="{{ json_encode( $columns ) }}" />
+        <x-data-tables id="module_table" enableFilter="true" enableFooter="false" columns="{{ json_encode( $columns ) }}" />
     </div>
 </div>
 

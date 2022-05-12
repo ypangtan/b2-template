@@ -49,7 +49,7 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#" data-bs-toggle="dropdown">
-                                <i class="align-middle" data-feather="settings"></i>
+                                <i class="align-middle feather" icon-name="settings"></i>
                             </a>
                             <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
                                 <span class="text-dark"><?=auth()->user()->username?></span>

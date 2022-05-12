@@ -11,11 +11,12 @@ class DataTables extends Component
      *
      * @return void
      */
-    public $enableFilter, $columns;
+    public $enableFilter, $enableFooter, $columns;
 
-    public function __construct( $enableFilter, $columns )
+    public function __construct( $enableFilter, $enableFooter, $columns )
     {
         $this->enableFilter = $enableFilter;
+        $this->enableFooter = $enableFooter;
         $this->columns = $columns;
     }
 

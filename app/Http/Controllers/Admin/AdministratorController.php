@@ -17,8 +17,6 @@ class AdministratorController extends Controller {
 
     public function index() {
 
-        $this->data['controller'];
-        $this->data['action'];
         $this->data['content'] = 'admin.administrator.index';
 
         $roles = [];
@@ -53,8 +51,6 @@ class AdministratorController extends Controller {
 
     public function module() {
 
-        $this->data['controller'];
-        $this->data['action'];
         $this->data['content'] = 'admin.administrator.module';
 
         return view( 'admin.main' )->with( $this->data );
@@ -72,8 +68,6 @@ class AdministratorController extends Controller {
 
     public function role() {
         
-        $this->data['controller'];
-        $this->data['action'];
         $this->data['content'] = 'admin.administrator.role';
 
         return view( 'admin.main' )->with( $this->data );

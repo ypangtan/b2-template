@@ -27,11 +27,13 @@ $columns = [
         'type' => 'input',
         'placeholder' =>  __( 'administrator.search_x', [ 'title' => __( 'administrator.username' ) ] ),
         'title' => __( 'administrator.username' ),
+        // 'preAmount' => true,
     ],
     [
         'type' => 'input',
         'placeholder' =>  __( 'administrator.search_x', [ 'title' => __( 'administrator.email' ) ] ),
         'title' => __( 'administrator.email' ),
+        // 'amount' => true,
     ],
     [
         'type' => 'select',
@@ -47,7 +49,7 @@ $columns = [
 
 <div class="card">
     <div class="card-body">
-        <x-data-tables id="admin_table" enableFilter="true" columns="{{ json_encode( $columns ) }}" />
+        <x-data-tables id="admin_table" enableFilter="true" enableFooter="false" columns="{{ json_encode( $columns ) }}" />
     </div>
 </div>
 
@@ -180,13 +182,15 @@ array_push( $contents, [
             toast = new bootstrap.Toast( document.getElementById( 'toast' ) );
 
         document.getElementById( 'admin_create_canvas' ).addEventListener( 'hidden.bs.offcanvas', function() {
-            $( 'input.form-control' ).removeClass( 'is-invalid' ).val( '' );
+            $( '.offcanvas-body .form-control' ).removeClass( 'is-invalid' ).val( '' );
             $( '.invalid-feedback' ).text( '' );
+            $( '.offcanvas-body .form-select' ).removeClass( 'is-invalid' ).val( '' );
         } );
 
         document.getElementById( 'admin_edit_canvas' ).addEventListener( 'hidden.bs.offcanvas', function() {
-            $( 'input.form-control' ).removeClass( 'is-invalid' ).val( '' );
+            $( '.offcanvas-body .form-control' ).removeClass( 'is-invalid' ).val( '' );
             $( '.invalid-feedback' ).text( '' );
+            $( '.offcanvas-body .form-select' ).removeClass( 'is-invalid' ).val( '' );
         } );
 
         $( '#search_date' ).flatpickr( {
@@ -279,6 +283,17 @@ array_push( $contents, [
                 }
             } )
             
+        } );
+
+        $( '.form-control' ).focus( function() {
+            if( $( this ).hasClass( 'is-invalid' ) ) {
+                $( this ).removeClass( 'is-invalid' ).next().text( '' );
+            }
+        } );
+        $( '.form-select' ).focus( function() {
+            if( $( this ).hasClass( 'is-invalid' ) ) {
+                $( this ).removeClass( 'is-invalid' ).next().text( '' );
+            }
         } );
     } );
 

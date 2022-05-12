@@ -22,13 +22,36 @@
         </tr>
     </thead>
     <tbody></tbody>
+    @if( $enableFooter == 'true' )
     <tfoot>
         <tr>
-            @foreach( $columns as $column )
-            <th>{{ $column->title }}</th>
+            @foreach( $columns as $key => $column )
+            @if( @$column->preAmount )
+            <th class="text-end">{{ __( 'datatables.sub_total' ) }}</th>
+            @continue
+            @endif
+            @if( @$column->amount )
+            <th class="subtotal text-end"></th>
+            @continue
+            @endif
+            <th></th>
+            @endforeach
+        </tr>
+        <tr>
+            @foreach( $columns as $key => $column )
+            @if( @$column->preAmount )
+            <th class="text-end">{{ __( 'datatables.grand_total' ) }}</th>
+            @continue
+            @endif
+            @if( @$column->amount )
+            <th class="grandtotal text-end"></th>
+            @continue
+            @endif
+            <th></th>
             @endforeach
         </tr>
     </tfoot>
+    @endif
 </table>
 
 <?php

@@ -14,8 +14,6 @@ class DashboardController extends Controller {
 
     public function index() {
 
-        $this->data['controller'];
-        $this->data['action'];
         $this->data['content'] = 'admin.dashboard.index';
 
         // $today = date( 'Y-m-d' );

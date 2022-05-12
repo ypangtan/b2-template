@@ -78,6 +78,9 @@
 .dt-bootstrap5 .table-action {
     cursor: pointer;
 }
+.dt-bootstrap5 > .row:nth-last-child(1) {
+    margin-top: 1rem;
+}
 
 .page-link {
     color: #6c757d;

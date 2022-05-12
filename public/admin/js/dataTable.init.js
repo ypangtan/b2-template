@@ -24,8 +24,17 @@ document.addEventListener( 'DOMContentLoaded', function() {
         initComplete: function() {
             $( dt_table_name + '_filter' ).remove();
         },
-        drawCallback: function() {
+        drawCallback: function( response ) {
             feather.replace();
+
+            if( response.json.subTotal != undefined ) {
+                if( Array.isArray( response.json.subTotal ) ) {
+                    $.each( response.json.subTotal, function( i, v ) {
+                        $( '.dataTables_scrollFoot .subtotal' ).eq(i).html( v );
+                        $( '.dataTables_scrollFoot .grandtotal' ).eq(i).html( response.json.grandTotal[i] );
+                    } );
+                }
+            }
         }
     } );
 

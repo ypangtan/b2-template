@@ -61,17 +61,24 @@ class AdminService {
             }
         }
 
-        $count_admin = $admin->count();
+        $adminCount = $admin->count();
         
-        $admins = $admin->skip( $offset )->take( $limit )->get();
+        $adminObject = $admin->skip( $offset )->take( $limit );
+        $admins = $adminObject->get();
 
-        $total = Admin::count();
+        $admin = Admin::select( \DB::raw( 'COUNT(id) as total' ) )->first();
 
         $data = array(
             'admins' => $admins,
             'draw' => $request->input( 'draw' ),
-            'recordsFiltered' => $filter ? $count_admin : $total,
-            'recordsTotal' => $total,
+            'recordsFiltered' => $filter ? $adminCount : $admin->total,
+            'recordsTotal' => $admin->total,
+            // 'subTotal' => [
+            //     number_format( $adminObject->sum( 'amount' ), 4 )
+            // ],
+            // 'grandTotal' => [
+            //     number_format( $admin->sum( 'grandTotal1' ), 4 )
+            // ],
         );
 
         return $data;
@@ -86,12 +93,12 @@ class AdminService {
 
         $request->validate( [
             'username' => 'required|max:25|unique:admins,username',
-            'email' => 'required|max:25|unique:admins,email',
+            'email' => 'required|max:25|unique:admins,email|email|regex:/(.+)@(.+)\.(.+)/i',
             'role' => 'required',
             'password' => 'required|min:8|max:255',
         ] );
 
-        $admin = Admin::create( [
+        $createAdmin = Admin::create( [
             'username' => $request->username,
             'email' => $request->email,
             'role' => $request->role,
@@ -100,7 +107,7 @@ class AdminService {
 
         $role_model = RoleModel::find( $request->role );
 
-        $admin->syncRoles( [ $role_model->name ] );
+        $createAdmin->syncRoles( [ $role_model->name ] );
 
         return $admin;
     }
@@ -109,24 +116,24 @@ class AdminService {
 
         $request->validate( [
             'username' => 'required|max:25|unique:admins,username,' . $request->id,
-            'email' => 'required|max:25|unique:admins,email,' . $request->id,
+            'email' => 'required|max:25|unique:admins,email,' . $request->id.'|email|regex:/(.+)@(.+)\.(.+)/i',
             'role' => 'required',
             'password' => 'min:8|max:25',
         ] );
 
-        $admin = Admin::find( $request->id );
-        $admin->id = $request->id;
-        $admin->username = $request->username;
-        $admin->email = $request->email;
-        $admin->role = $request->role;
+        $updateAdmin = Admin::find( $request->id );
+        $updateAdmin->id = $request->id;
+        $updateAdmin->username = $request->username;
+        $updateAdmin->email = $request->email;
+        $updateAdmin->role = $request->role;
 
         if( !empty( $request->password ) ) {
-            $admin->password = \Hash::make( $request->password );
+            $updateAdmin->password = \Hash::make( $request->password );
         }
 
         $role_model = RoleModel::find( $request->role );
-        $admin->syncRoles( [ $role_model->name ] );
-        $admin->save();
+        $updateAdmin->syncRoles( [ $role_model->name ] );
+        $updateAdmin->save();
 
         return $admin;
     }
