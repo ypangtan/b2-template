@@ -41,6 +41,26 @@ $columns = [
         'title' => __( 'administrator.role' ),
     ],
     [
+        'type' => 'select',
+        'options' => $data['roles'],
+        'title' => __( 'administrator.role' ),
+    ],
+    [
+        'type' => 'select',
+        'options' => $data['roles'],
+        'title' => __( 'administrator.role' ),
+    ],
+    [
+        'type' => 'select',
+        'options' => $data['roles'],
+        'title' => __( 'administrator.role' ),
+    ],
+    [
+        'type' => 'select',
+        'options' => $data['roles'],
+        'title' => __( 'administrator.role' ),
+    ],
+    [
         'type' => 'default',
         'title' => __( 'administrator.action' ),
     ],
@@ -139,6 +159,10 @@ array_push( $contents, [
                 { data: 'username' },
                 { data: 'email' },
                 { data: 'role_name' },
+                { data: 'role_name' },
+                { data: 'role_name' },
+                { data: 'role_name' },
+                { data: 'role_name' },
                 { data: 'id' },
             ],
             columnDefs: [
@@ -156,7 +180,7 @@ array_push( $contents, [
                     },
                 },
                 {
-                    targets: 5,
+                    targets: 9,
                     orderable: false,
                     width: '10%',
                     className: 'text-center',

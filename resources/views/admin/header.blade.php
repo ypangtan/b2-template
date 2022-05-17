@@ -48,21 +48,17 @@
  
     <title>{{ Helper::websiteName() }} Admin Panel</title>
 
-@if( !@$basic )
     <link href="{{ asset( 'admin/css/bootstrap.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
     <link href="{{ asset( 'admin/css/dataTables.bootstrap5.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
-@endif
     <link href="{{ asset( 'admin/css/app.css' ) . Helper::assetVersion() }}" rel="stylesheet">
-@if( !@$basic )
-    <link href="{{ asset( 'admin/css/custom.css' ) . Helper::assetVersion() }}" rel="stylesheet">
-    <link href="{{ asset( 'admin/css/template_extended.css' ) . Helper::assetVersion() }}" rel="stylesheet">
-    <link href="{{ asset( 'admin/css/choices.css' ) . Helper::assetVersion() }}" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
-    <link href="{{ asset( 'admin/css/lightgallery.css' ) . Helper::assetVersion() }}" rel="stylesheet">
-    <link href="{{ asset( 'admin/css/image-uploader.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
-@endif
     <link href="{{ asset( 'admin/css/custom.css' ) . Helper::assetVersion() }}" rel="stylesheet">
     <link href="{{ asset( 'admin/css/font.css' ) . Helper::assetVersion() }}" rel="stylesheet">
+
+    <link href="{{ asset( 'admin/css/template_extended.css' ) . Helper::assetVersion() }}" rel="stylesheet">
+    <link href="{{ asset( 'admin/css/flatpickr.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
+    <link href="{{ asset( 'admin/css/choices.css' ) . Helper::assetVersion() }}" rel="stylesheet">
+    <link href="{{ asset( 'admin/css/lightgallery.css' ) . Helper::assetVersion() }}" rel="stylesheet">
+    <link href="{{ asset( 'admin/css/image-uploader.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
 </head>
 
 <body>
