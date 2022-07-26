@@ -69,7 +69,7 @@ class ModuleService {
     public function create( $request ) {
 
         $request->validate( [
-            'name' => 'required|max:15|unique:modules,name',
+            'name' => 'required|unique:modules,name',
         ] );
 
         Module::create( [
