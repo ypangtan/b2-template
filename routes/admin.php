@@ -11,6 +11,12 @@ Route::prefix( 'base2_admin' )->group( function() {
 
     Route::middleware( 'auth:admin' )->group( function() {
 
+        Route::prefix( 'dashboard' )->group( function() {
+            Route::get( '/', [ DashboardController::class, 'index' ] );
+            Route::post( 'total_datas', [ DashboardController::class, 'totalDatas' ] );
+            Route::post( 'monthly_sales', [ DashboardController::class, 'monthlySales' ] );
+        } );
+        
         Route::prefix( 'administrators' )->group( function() {
 
             Route::group( [ 'middleware' => [ 'permission:add admins|view admins|edit admins|delete admins' ] ], function() {
@@ -32,11 +38,6 @@ Route::prefix( 'base2_admin' )->group( function() {
             Route::post( 'all_roles', [ AdministratorController::class, 'getRoles' ] );
             Route::post( 'one_role', [ AdministratorController::class, 'getRole' ] );
             Route::post( 'update_role', [ AdministratorController::class, 'updateRole' ] );
-        } );
-
-        Route::prefix( 'dashboard' )->group( function() {
-            Route::get( '/', [ DashboardController::class, 'index' ] );
-            Route::post( 'monthly_sales', [ DashboardController::class, 'monthlySales' ] );
         } );
 
     } );

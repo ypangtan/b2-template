@@ -46,7 +46,11 @@
         }
     </script>
  
+    @if( @$header )
+    <title>{{ @$header['title'] }} - {{ Helper::websiteName() }}</title>
+    @else
     <title>{{ Helper::websiteName() }} Admin Panel</title>
+    @endif
 
     <link href="{{ asset( 'admin/css/bootstrap.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
     <link href="{{ asset( 'admin/css/dataTables.bootstrap5.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">

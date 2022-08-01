@@ -17,17 +17,11 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <h1 class="mt-1 mb-3">{{ $data['users_this'] }}</h1>
-                                                    <div class="mb-0">
-                                                        @if( $data['new_user_percent'] <= -1 )
-                                                        <span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['new_user_percent'] }}%</span>
-                                                        @elseif( $data['new_user_percent'] == 0 )
-                                                        <span class="text-secondary"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['new_user_percent'] }}%</span>
-                                                        @else
-                                                        <span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['new_user_percent'] }}%</span>
-                                                        @endif
-                                                        <span class="text-muted">{{ __( 'dashboard.compare_last_month' ) }}</span>
-                                                    </div>
+                                                    <h1 class="mt-1 mb-3 card-value" id="nu">
+                                                        <div class="spinner-border" style="border-width: 0.05em" role="status">
+                                                            <span class="visually-hidden">{{ __( 'template.loading' ) }}</span>
+                                                        </div>
+                                                    </h1>
                                                     <a href="{{ Helper::baseAdminUrl() }}/customers" class="stretched-link"></a>
                                                 </div>
                                             </div>
@@ -44,17 +38,11 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <h1 class="mt-1 mb-3">{{ $data['orders_today'] }}</h1>
-                                                <div class="mb-0">
-                                                    @if( $data['today_order_percent'] <= -1 )
-                                                    <span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['today_order_percent'] }}%</span>
-                                                    @elseif( $data['today_order_percent'] == 0 )
-                                                    <span class="text-secondary"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['today_order_percent'] }}%</span>
-                                                    @else
-                                                    <span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['today_order_percent'] }}%</span>
-                                                    @endif
-                                                    <span class="text-muted">{{ __( 'dashboard.compare_yesterday' ) }}</span>
-                                                </div>
+                                                <h1 class="mt-1 mb-3 card-value" id="to">
+                                                    <div class="spinner-border" style="border-width: 0.05em" role="status">
+                                                        <span class="visually-hidden">{{ __( 'template.loading' ) }}</span>
+                                                    </div>
+                                                </h1>
                                             </div>
                                         </div>
                                     </div>
@@ -71,17 +59,11 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <h1 class="mt-1 mb-3">MYR {{ Helper::numberFormat( $data['earnings_this'], 2 ) }}</h1>
-                                                <div class="mb-0">
-                                                    @if( $data['new_earning_percent'] <= -1 )
-                                                    <span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['new_earning_percent'] }}%</span>
-                                                    @elseif( $data['new_earning_percent'] == 0 )
-                                                    <span class="text-secondary"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['new_earning_percent'] }}%</span>
-                                                    @else
-                                                    <span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['new_earning_percent'] }}%</span>
-                                                    @endif
-                                                    <span class="text-muted">{{ __( 'dashboard.compare_last_month' ) }}</span>
-                                                </div>
+                                                <h1 class="mt-1 mb-3 card-value" id="en">
+                                                    <div class="spinner-border" style="border-width: 0.05em" role="status">
+                                                        <span class="visually-hidden">{{ __( 'template.loading' ) }}</span>
+                                                    </div>
+                                                </h1>
                                             </div>
                                         </div>
                                         <div class="card">
@@ -96,17 +78,11 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <h1 class="mt-1 mb-3">{{ $data['orders_this_month'] }}</h1>
-                                                <div class="mb-0">
-                                                    @if( $data['this_month_order_percent'] <= -1 )
-                                                    <span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['this_month_order_percent'] }}%</span>
-                                                    @elseif( $data['this_month_order_percent'] == 0 )
-                                                    <span class="text-secondary"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['this_month_order_percent'] }}%</span>
-                                                    @else
-                                                    <span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i>{{ $data['this_month_order_percent'] }}%</span>
-                                                    @endif
-                                                    <span class="text-muted">{{ __( 'dashboard.compare_last_month' ) }}</span>
-                                                </div>
+                                                <h1 class="mt-1 mb-3 card-value" id="tmo">
+                                                    <div class="spinner-border" style="border-width: 0.05em" role="status">
+                                                        <span class="visually-hidden">{{ __( 'template.loading' ) }}</span>
+                                                    </div>
+                                                </h1>
                                             </div>
                                         </div>
                                     </div>
@@ -327,5 +303,32 @@
                                     });
                                 }
                             } );
+
+                            let loadingHTML = 
+                            `
+                            <div class="spinner-border" style="border-width: 0.05em" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            `;
+
+                            getDashboardData();
+                            function getDashboardData( date = '' ) {
+
+                                $( '.card-value' ).html( loadingHTML );
+
+                                $.ajax( {
+                                    url: '{{ Helper::baseAdminUrl() }}/dashboard/total_datas',
+                                    type: 'POST',
+                                    data: { search_date: date, _token: '{{ csrf_token() }}' },
+                                    success: function( response ) {
+                                        console.log( response );
+
+                                        $( '#nu' ).html( response.users_this );
+                                        $( '#to' ).html( response.orders_today );
+                                        $( '#en' ).html( response.earnings_this );
+                                        $( '#tmo' ).html( response.orders_this_month );
+                                    },
+                                } );
+                            }
                         });
                     </script>

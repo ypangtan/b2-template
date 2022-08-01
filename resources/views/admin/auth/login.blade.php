@@ -1,5 +1,5 @@
                         <div class="text-center mt-4">
-                            <img src="{{ asset( 'admin/img/icons/128px.png' ) }}" />
+                            <img src="{{ asset( 'admin/img/icons/128.png' ) }}" />
                             <br>
                             <br>
                             <h1 class="h2">{{ __( 'auth.welcome' ) }}</h1>
@@ -42,11 +42,11 @@
                                                 <span class="form-check-label">{{ __( 'auth.remember_me' ) }}</span>
                                             </label>
                                         </div>
-                                        <div class="text-center mt-3 mb-5">
+                                        <div class="text-center mt-3">
                                             <button type="submit" class="btn btn-lg btn-primary" style="width: 100%;">{{ __( 'auth.sign_in' ) }}</button>
                                         </div>
-                                        @if( 1 == 1 )
-                                        <small>{{ __( 'auth.not_type', [ 'website' => Helper::websiteName(), 'type' => ucfirst( __( 'auth.admin' ) ) ] ) }} <a href="{{ Helper::baseAdminUrl() }}/login">{{ __( 'auth.go_to_dashboard', [ 'type' => ucfirst( __( 'auth.merchant' ) ) ] ) }}</a></small>
+                                        @if( 1 == 2 )
+                                        <div class="mt-5"><small>{{ __( 'auth.not_type', [ 'website' => Helper::websiteName(), 'type' => ucfirst( __( 'auth.admin' ) ) ] ) }} <a href="{{ Helper::baseAdminUrl() }}/login">{{ __( 'auth.go_to_dashboard', [ 'type' => ucfirst( __( 'auth.merchant' ) ) ] ) }}</a></small></div>
                                         @endif
                                     </form>
                                 </div>

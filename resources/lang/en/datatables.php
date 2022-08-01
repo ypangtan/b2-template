@@ -23,6 +23,16 @@ return [
     'next' => 'Next',
     'last' => 'Last',
 
+    'search_x' => 'Search :title',
+    'select_x' => 'Select :title',
+    'all' => 'All',
+    'created_date' => 'Created Date',
+    'registered_date' => 'Registered Date',
+    'status' => 'Status',
+    'active' => 'Active',
+    'inactive' => 'Inactive',
+    'action' => 'Action',
+
     'sub_total' => 'Sub Total',
     'grand_total' => 'Grand Total',
 ];

@@ -13,6 +13,7 @@ return [
     |
     */
 
+    'search_order' => 'Search Order',
     'logout' => 'Logout',
     'operations' => 'Operations',
     'dashboard' => 'Dashboard',
@@ -23,4 +24,11 @@ return [
     'modules' => 'Modules',
     'customers' => 'Customers',
 
+    'loading' => 'Loading...',
+    'create' => 'Create',
+    'update' => 'Update',
+    'delete' => 'Delete',
+    'save_changes' => 'Save Changes',
+    'cancel' => 'Cancel',
+    'no_changes' => 'No Changes.',
 ];
