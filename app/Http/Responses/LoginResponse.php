@@ -12,7 +12,17 @@ class LoginResponse implements LoginResponseContract
      */
     public function toResponse($request)
     {
-        $home = request()->is( 'base2_admin/*' ) ? '/base2_admin/dashboard' : '/home';
+        $home = '/home';
+        if( request()->is( 'base2_admin/*' ) ) {
+            $home = '/base2_admin/dashboard';
+        }
+        if( request()->is( 'base2_branch/*' ) ) {
+            $home = '/base2_branch/dashboard';
+        }
+
+        if( \Session::get( 'redirect' ) ) {
+            $home = \Session::get( 'redirect' );
+        }
 
         return redirect()->intended( $home );
     }

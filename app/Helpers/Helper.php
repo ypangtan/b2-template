@@ -20,8 +20,8 @@ class Helper {
         return 'base2_admin';
     }
 
-    public static function baseMerchantUrl() {
-        return url( '/' ).'/base2_merchant';
+    public static function baseBranchUrl() {
+        return url( '/' ).'/base2_branch';
     }
 
     public static function assetVersion() {

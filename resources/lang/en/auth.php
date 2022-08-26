@@ -20,7 +20,7 @@ return [
     'welcome' => 'Welcome back',
     'sign_in_continue' => 'Sign in to your <strong>:type</strong> account to continue',
     'admin' => 'admin',
-    'merchant' => 'merchant',
+    'branch' => 'Branch',
     'email' => 'Email',
     'password_' => 'Password',
     'enter_your_x' => 'Enter your :type',

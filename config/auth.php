@@ -44,6 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
+        'branch' => [
+            'driver' => 'session',
+            'provider' => 'branches',
+        ],
 
         'api' => [
             'driver' => 'token',
@@ -77,6 +81,10 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
+        ],
+        'branches' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\BranchUser::class,
         ],
     ],
 

@@ -20,6 +20,11 @@ class Authenticate extends Middleware
                 \Session::put( 'redirect', \URL::full() );
                 return route( 'admin.login' );
             }
+
+            if( request()->is( 'base2_branch/*' ) ) {
+                \Session::put( 'redirect', \URL::full() );
+                return route( 'branch.login' );
+            }
             
             return route('login');
         }

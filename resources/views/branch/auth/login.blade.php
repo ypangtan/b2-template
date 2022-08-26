@@ -1,17 +1,17 @@
-                        <div class="text-center mt-4">
-                            <img src="{{ asset( 'admin/img/icons/128.png' ) }}" />
+<div class="text-center mt-4">
+                            <img class="login-logo" src="{{ asset( 'admin/img/icons/128px.png' ) }}" />
                             <br>
                             <br>
                             <h1 class="h2">{{ __( 'auth.welcome' ) }}</h1>
                             <p class="lead">
-                                {!! __( 'auth.sign_in_continue', [ 'type' => __( 'auth.admin' ) ] ) !!}
+                                {!! __( 'auth.sign_in_continue', [ 'type' => __( 'auth.branch' ) ] ) !!}
                             </p>
                         </div>
 
                         <div class="card">
                             <div class="card-body">
                                 <div class="m-sm-4">
-                                    <form method="POST" action="{{ route('admin.login') }}">
+                                    <form method="POST" action="{{ route('branch.login') }}">
                                         @csrf
                                         <div class="mb-3">
                                             <label class="form-label">{{ __('auth.email') }}</label>
@@ -42,10 +42,10 @@
                                                 <span class="form-check-label">{{ __( 'auth.remember_me' ) }}</span>
                                             </label>
                                         </div>
-                                        <div class="text-center mt-3">
+                                        <div class="text-center mt-3 mb-5">
                                             <button type="submit" class="btn btn-lg btn-primary" style="width: 100%;">{{ __( 'auth.sign_in' ) }}</button>
                                         </div>
-                                        <div class="mt-5"><small>{{ __( 'auth.not_type', [ 'website' => Helper::websiteName(), 'type' => ucfirst( __( 'auth.admin' ) ) ] ) }} <a href="{{ Helper::baseBranchUrl() }}/login">{{ __( 'auth.go_to_dashboard', [ 'type' => ucfirst( __( 'auth.branch' ) ) ] ) }}</a></small></div>
+                                        <small>{{ __( 'auth.not_type', [ 'type' => ucfirst( __( 'auth.branch' ) ) ] ) }} <a href="{{ Helper::baseAdminUrl() }}/login">{{ __( 'auth.go_to_dashboard', [ 'type' => ucfirst( __( 'auth.admin' ) ) ] ) }}</a></small>
                                     </form>
                                 </div>
                             </div>
@@ -81,6 +81,6 @@
                             }
 
                             function switchLanguage() {
-                                window.location.href = '{{ Helper::baseAdminUrl() }}/lang/' + document.getElementById( 'select_language' ).value
+                                window.location.href = '{{ Helper::baseBranchUrl() }}/lang/' + document.getElementById( 'select_language' ).value
                             }
                         </script>

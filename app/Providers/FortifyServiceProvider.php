@@ -25,6 +25,11 @@ class FortifyServiceProvider extends ServiceProvider
             config()->set( 'fortify.guard', 'admin' );
             config()->set( 'fortify.home', '/admin/home' );
         }
+
+        if( request()->is( 'base2_branch/*' ) ) {
+            config()->set( 'fortify.guard', 'branch' );
+            config()->set( 'fortify.home', '/branch/home' );
+        }
     }
 
     /**
