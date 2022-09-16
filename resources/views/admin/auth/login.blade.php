@@ -1,5 +1,5 @@
                         <div class="text-center mt-4">
-                            <img src="{{ asset( 'admin/img/icons/128.png' ) }}" />
+                            <img style="width: 50%;"src="{{ asset( 'admin/img/icons/default.png' ) }}" />
                             <br>
                             <br>
                             <h1 class="h2">{{ __( 'auth.welcome' ) }}</h1>
@@ -45,7 +45,9 @@
                                         <div class="text-center mt-3">
                                             <button type="submit" class="btn btn-lg btn-primary" style="width: 100%;">{{ __( 'auth.sign_in' ) }}</button>
                                         </div>
+                                        @if( 1 == 2 )
                                         <div class="mt-5"><small>{{ __( 'auth.not_type', [ 'website' => Helper::websiteName(), 'type' => ucfirst( __( 'auth.admin' ) ) ] ) }} <a href="{{ Helper::baseBranchUrl() }}/login">{{ __( 'auth.go_to_dashboard', [ 'type' => ucfirst( __( 'auth.branch' ) ) ] ) }}</a></small></div>
+                                        @endif
                                     </form>
                                 </div>
                             </div>

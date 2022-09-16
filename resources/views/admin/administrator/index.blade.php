@@ -4,7 +4,7 @@ $admin_edit = 'admin_edit';
 ?>
 
 <div class="listing-header">
-    <h1 class="h3 mb-3">{{ __( 'administrator.administrator' ) }}</h1>
+    <h1 class="h2 mb-3">{{ __( 'administrator.administrator' ) }}</h1>
     @can( 'add admins' )
     <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $admin_create }}_canvas" aria-controls="{{ $admin_create }}_canvas">{{ __( 'administrator.create' ) }}</button>
     @endcan

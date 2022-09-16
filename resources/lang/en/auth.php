@@ -17,6 +17,7 @@ return [
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
 
+    'login' => 'Login',
     'welcome' => 'Welcome back',
     'sign_in_continue' => 'Sign in to your <strong>:type</strong> account to continue',
     'admin' => 'admin',

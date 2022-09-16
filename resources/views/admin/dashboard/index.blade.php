@@ -1,4 +1,4 @@
-                    <h1 class="h3 mb-3"><strong>{{ __( 'dashboard.analytics' ) }}</strong>{{ __( 'dashboard.dashboard' ) }}</h1>
+                    <h1 class="h2 mb-3"><strong>{{ __( 'dashboard.analytics' ) }}</strong>{{ __( 'dashboard.dashboard' ) }}</h1>
 
                     <div class="row">
                         <div class="col-xl-6 col-xxl-5 d-flex">
@@ -115,15 +115,15 @@
                                 $properties['color'] = 'danger';
                                 $properties['params'] = '?status=pending';
                                 break;
-                            case 'processing':
-                                $properties['status'] = __( 'dashboard.processing' );
+                            case 'to_ship':
+                                $properties['status'] = __( 'dashboard.to_ship' );
                                 $properties['color'] = 'warning';
-                                $properties['params'] = '?status=processing';
+                                $properties['params'] = '?status=to_ship';
                                 break;
-                            case 'shipped':
-                                $properties['status'] = __( 'dashboard.shipped' );
+                            case 'to_receive':
+                                $properties['status'] = __( 'dashboard.to_receive' );
                                 $properties['color'] = 'success';
-                                $properties['params'] = '?status=shipped';
+                                $properties['params'] = '?status=to_receive';
                                 break;
                             case 'completed':
                                 $properties['status'] = __( 'dashboard.completed' );
@@ -132,8 +132,13 @@
                                 break;
                             case 'payment_failed':
                                 $properties['status'] = __( 'dashboard.payment_failed' );
-                                $properties['color'] = 'primary';
+                                $properties['color'] = 'danger';
                                 $properties['params'] = '?status=payment_failed';
+                                break;
+                            case 'payment_cancelled':
+                                $properties['status'] = __( 'dashboard.payment_cancelled' );
+                                $properties['color'] = 'danger';
+                                $properties['params'] = '?status=payment_cancelled';
                                 break;
                         }
 
@@ -148,7 +153,7 @@
 
                     ?>
                     <div class="row">
-                        <div class="col-12 col-lg-7 d-flex">
+                        <div class="col-12 col-lg-12 d-flex">
                             <div class="card flex-fill">
                                 <div class="card-header">
                                     <h5 class="card-title mb-0">{{ __( 'dashboard.order_by_status' ) }}</h5>
@@ -196,6 +201,7 @@
                                 </table>
                             </div>
                         </div>
+                        @if( 1 == 2 )
                         <div class="col-12 col-lg-5 d-flex">
                             <div class="card flex-fill">
                                 <div class="card-header">
@@ -222,6 +228,7 @@
                                 <a href="{{ Helper::baseAdminUrl() }}/vouchers/usage" class="stretched-link"></a>
                             </div>
                         </div>
+                        @endif
                     </div>
 
                     <script>
@@ -257,7 +264,7 @@
                                 type: 'POST',
                                 data: { _token: '{{ csrf_token() }}' },
                                 success: function( response ) {
-                                    var res = JSON.parse( response );
+                                    var res = response;
 
                                     chart_data.labels = res.months;
                                     chart_data.datasets[0].data = res.earnings;
