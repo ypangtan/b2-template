@@ -25,6 +25,7 @@ return [
     'id' => 'ID',
     'created_date' => 'Created Date',
     'module_name' => 'Module Name',
+    'guard_name' => 'Guard Name',
     'module_created' => 'New Module Created.',
     'module_updated' => 'Module Updated.',
     'no_changes' => 'No Changes.',

@@ -14,6 +14,7 @@ class Module extends Model
 
     protected $fillable = [
         'name',
+        'guard_name',
     ];
 
     protected $casts = [
@@ -23,6 +24,7 @@ class Module extends Model
 
     protected static $logAttributes = [
         'name',
+        'guard_name',
     ];
 
     protected static $logName = 'modules';

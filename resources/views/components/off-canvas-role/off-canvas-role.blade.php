@@ -15,13 +15,13 @@
     @endforeach
         <div class="card">
             <div class="card-body">
-            @forelse( \App\Models\Module::all() as $module )
-                <div class="mb-4 {{ $crud }}-modules-section" data-module="{{ $module->name }}">
-                    <h4>{{ __( 'role.module_title', [ 'module' => __( 'role.' . $module->name ) ] ) }}</h4>
+            @forelse( \App\Models\Module::orderBy( 'guard_name', 'ASC' )->get() as $module )
+                <div class="mb-4 {{ $crud }}-modules-section" data-module="{{ $module->name . '|' . $module->guard_name }}">
+                    <h4>{{ __( 'role.module_title', [ 'module' => __( 'role.' . $module->name ) ] ) }} ( {{ __( 'administrator.' . $module->guard_name ) }} )</h4>
                 @forelse( Helper::moduleActions() as $action )
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="{{ $crud . '_' . $action . '_' . $module->name }}" value="{{ $action }}">
-                        <label class="form-check-label" for="{{ $crud . '_' . $action . '_' . $module->name }}">{{ __( 'role.action_module', [ 'action' => __( 'role.' . $action ), 'module' => __( 'role.' . $module->name ) ] ) }}</label>
+                        <input class="form-check-input" type="checkbox" id="{{ $crud . '_' . $action . '_' . $module->name . '_' . $module->guard_name }}" value="{{ $action }}">
+                        <label class="form-check-label" for="{{ $crud . '_' . $action . '_' . $module->name . '_' . $module->guard_name }}">{{ __( 'role.action_module', [ 'action' => __( 'role.' . $action ), 'module' => __( 'role.' . $module->name ) ] ) }}</label>
                     </div>
                 @empty
                     <p class="text-center">No action found</p>

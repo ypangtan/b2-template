@@ -4,7 +4,7 @@ $role_edit = 'role_edit';
 ?>
 
 <div class="listing-header">
-    <h1 class="h3 mb-3">{{ __( 'role.roles' ) }}</h1>
+    <h1 class="h2 mb-3">{{ __( 'role.roles' ) }}</h1>
     @can( 'add admins' )
     <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $role_create }}_canvas" aria-controls="{{ $role_create }}_canvas">{{ __( 'role.create' ) }}</button>
     @endcan
@@ -28,6 +28,11 @@ $columns = [
         'title' => __( 'role.role_name' ),
     ],
     [
+        'type' => 'input',
+        'placeholder' =>  __( 'role.search_x', [ 'title' => __( 'role.guard_name' ) ] ),
+        'title' => __( 'role.guard_name' ),
+    ],
+    [
         'type' => 'default',
         'title' => __( 'role.action' ),
     ],
@@ -43,9 +48,16 @@ $columns = [
 <?php
 $contents = [
     [
-        'id' => '_name',
+        'id' => '_role_name',
         'title' => __( 'role.role_name' ),
         'placeholder' => __( 'role.role_name' ),
+        'type' => 'text',
+        'mandatory' => true,
+    ],
+    [
+        'id' => '_guard_name',
+        'title' => __( 'role.guard_name' ),
+        'placeholder' => __( 'role.guard_name' ),
         'type' => 'text',
         'mandatory' => true,
     ],
@@ -88,6 +100,7 @@ $contents = [
                 { data: null },
                 { data: 'created_at' },
                 { data: 'name' },
+                { data: 'guard_name' },
                 { data: 'id' },
             ],
             columnDefs: [
@@ -105,12 +118,12 @@ $contents = [
                     },
                 },
                 {
-                    targets: 3,
+                    targets: parseInt( '{{ count( $columns ) - 1 }}' ),
                     orderable: false,
                     width: '10%',
                     className: 'text-center',
                     render: function( data, type, row, meta ) {
-                        @can( 'edit admins' )
+                        @can( 'edit roles' )
                         return '<i class="dt-edit table-action" data-feather="edit-3" data-id="' + data + '"></i>';
                         @else
                         return '-';
@@ -164,10 +177,11 @@ $contents = [
                 success: function( response ) {
                     
                     $( re + '_id' ).val( response.role.id );
-                    $( re + '_name' ).val( response.role.name );
+                    $( re + '_role_name' ).val( response.role.name );
+                    $( re + '_guard_name' ).val( response.role.guard_name );
 
                     response.permissions.map( function( v, i ) {
-                        $( re + '_' + v.name.replace(/ /g,"_") ).prop( 'checked', true );
+                        $( re + '_' + v.name.replace(/ /g,"_") + '_' + v.guard_name ).prop( 'checked', true );
                     } );
 
                     role_edit_canvas.show();
@@ -199,7 +213,8 @@ $contents = [
                 url: '{{ Helper::baseAdminUrl() }}/administrators/create_role',
                 type: 'POST',
                 data: {
-                    'name': $( rc + '_name' ).val().trim().replace(/ /g,"_").toLowerCase(),
+                    'role_name': $( rc + '_role_name' ).val().trim().replace(/ /g,"_").toLowerCase(),
+                    'guard_name': $( rc + '_guard_name' ).val().trim().toLowerCase(),
                     modules,
                     '_token': '{{ csrf_token() }}',
                 },

@@ -18,12 +18,14 @@
         }
 
         document.addEventListener( 'DOMContentLoaded', function() {
-            $( '.form-control' ).focus( function() {
+            
+            $( document ).on( 'focus', '.form-control', function() {
                 if( $( this ).hasClass( 'is-invalid' ) ) {
                     $( this ).removeClass( 'is-invalid' ).next().text( '' );
                 }
             } );
-            $( '.form-select' ).focus( function() {
+
+            $( document ).on( 'focus', '.form-select', function() {
                 if( $( this ).hasClass( 'is-invalid' ) ) {
                     $( this ).removeClass( 'is-invalid' ).next().text( '' );
                 }

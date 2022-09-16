@@ -12,7 +12,7 @@ use App\Models\{
 
 class RoleService {
 
-    public function all( $request ) {
+    public static function all( $request ) {
         $filter = false;
 
         $limit = $request->input( 'length' );
@@ -63,41 +63,55 @@ class RoleService {
         return $data;
     }
 
-    public function one( $request ) {
+    public static function one( $request ) {
 
         $permission = \DB::table( 'role_has_permissions' )->where( 'role_id', $request->id )->leftJoin( 'permissions', 'role_has_permissions.permission_id', '=', 'permissions.id' )->get();
 
         return [ 'role' => RoleModel::find( $request->input( 'id' ) ), 'permissions' => $permission ];
     }
 
-    public function create( $request ) {
+    public static function create( $request ) {
 
         $request->validate( [
-            'name' => 'required|unique:roles,name',
+            'role_name' => 'required|unique:roles,name',
+            'guard_name' => 'required',
         ] );
 
-        $role = Role::create( [ 'name' => $request->name ] );
+        $role = Role::create( [ 'name' => $request->role_name, 'guard_name' => $request->guard_name ] );
 
         if( !empty( $request->modules ) ) {
             foreach( $request->modules as $key => $module ) {
+
+                $key = explode( '|', $key );
+                if( $key[1] != $role_model->guard_name ) {
+                    echo $key[1];
+                    continue;
+                }
+
                 foreach( $module as $action ) {
-                    $role->givePermissionTo( $action . ' ' . $key );
+                    $role->givePermissionTo( $action . ' ' . $key[0] );
                 }
             }
         }
     }
 
-    public function update() {
+    public static function update( $request ) {
 
         $role_model = RoleModel::find( $request->input( 'id' ) );
-        $role = Role::findByName( $role_model->name );
+        $role = Role::findByName( $role_model->name, $role_model->guard_name );
 
         $permissions = [];
         
         if( $request->modules ) {
             foreach( $request->modules as $key => $module ) {
+                var_dump($key);
+                $key = explode( '|', $key );
+                if( $key[1] != $role_model->guard_name ) {
+                    echo $key[1];
+                    continue;
+                }
                 foreach( $module as $action ) {
-                    array_push( $permissions, $action . ' ' . $key );
+                    array_push( $permissions, $action . ' ' . $key[0] );
                 }
             }
         }

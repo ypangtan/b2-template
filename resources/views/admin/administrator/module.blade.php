@@ -4,7 +4,7 @@ $module_edit = 'module_edit';
 ?>
 
 <div class="listing-header">
-    <h1 class="h3 mb-3">{{ __( 'module.module' ) }}</h1>
+    <h1 class="h2 mb-3">{{ __( 'module.module' ) }}</h1>
     @can( 'add admins' )
     <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $module_create }}_canvas" aria-controls="{{ $module_create }}_canvas">{{ __( 'module.create' ) }}</button>
     @endcan
@@ -28,6 +28,11 @@ $columns = [
         'title' => __( 'module.module_name' ),
     ],
     [
+        'type' => 'input',
+        'placeholder' =>  __( 'module.search_x', [ 'title' => __( 'module.guard_name' ) ] ),
+        'title' => __( 'module.guard_name' ),
+    ],
+    [
         'type' => 'default',
         'title' => __( 'module.action' ),
     ],
@@ -43,9 +48,16 @@ $columns = [
 <?php
 $contents = [
     [
-        'id' => '_name',
+        'id' => '_module_name',
         'title' => __( 'module.module_name' ),
         'placeholder' => __( 'module.module_name' ),
+        'type' => 'text',
+        'mandatory' => true,
+    ],
+    [
+        'id' => '_guard_name',
+        'title' => __( 'module.guard_name' ),
+        'placeholder' => __( 'module.guard_name' ),
         'type' => 'text',
         'mandatory' => true,
     ],
@@ -86,6 +98,7 @@ $contents = [
                 { data: null },
                 { data: 'created_at' },
                 { data: 'name' },
+                { data: 'guard_name' },
                 { data: 'id' },
             ],
             columnDefs: [
@@ -97,7 +110,7 @@ $contents = [
                     },
                 },
                 {
-                    targets: 3,
+                    targets: 4,
                     orderable: false,
                     width: '10%',
                     className: 'text-center',
@@ -160,7 +173,8 @@ $contents = [
                 url: '{{ Helper::baseAdminUrl() }}/administrators/create_module',
                 type: 'POST',
                 data: {
-                    'name': $( mc + '_name' ).val().trim().replace(/ /g,"_").toLowerCase(),
+                    'module_name': $( mc + '_module_name' ).val().trim().replace(/ /g,"_").toLowerCase(),
+                    'guard_name': $( mc + '_guard_name' ).val().trim().toLowerCase(),
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function( response ) {

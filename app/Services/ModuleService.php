@@ -14,7 +14,7 @@ use Helper;
 
 class ModuleService {
 
-    public function all( $request ) {
+    public static function all( $request ) {
 
         $filter = false;
 
@@ -66,18 +66,20 @@ class ModuleService {
         return $data;
     }
 
-    public function create( $request ) {
+    public static function create( $request ) {
 
         $request->validate( [
-            'name' => 'required|unique:modules,name',
+            'module_name' => 'required|max:50',
+            'guard_name' => 'required',
         ] );
 
         Module::create( [
-            'name' => $request->name
+            'name' => $request->module_name,
+            'guard_name' => $request->guard_name,
         ] );
 
         foreach( Helper::moduleActions() as $action ) {
-            Permission::create( [ 'name' => $action . ' ' . $request->name ] );
+            Permission::create( [ 'name' => $action . ' ' . $request->module_name, 'guard_name' => $request->guard_name ] );
         }
     }
 }
