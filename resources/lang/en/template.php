@@ -29,6 +29,9 @@ return [
     'update' => 'Update',
     'delete' => 'Delete',
     'save_changes' => 'Save Changes',
+    'confirm' => 'Confirm',
     'cancel' => 'Cancel',
     'no_changes' => 'No Changes.',
+    'confirmation' => 'Confirmation',
+    'error' => 'Error',
 ];

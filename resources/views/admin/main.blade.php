@@ -8,14 +8,16 @@
                 <a class="sidebar-toggle js-sidebar-toggle">
                     <i class="hamburger align-self-center"></i>
                 </a>
+                @if( 1 == 2 )
                 <form class="d-none d-sm-inline-block" onsubmit="return false;">
                     <div class="input-group input-group-navbar">
                         <input type="text" class="form-control" id="search_order" placeholder="{{ __( 'template.search_order' ) }}" aria-label="Search Order" autocomplete="off">
                         <button class="btn" id="search_order_button" type="button">
-                            <i class="align-middle" data-feather="search"></i>
+                            <i class="align-middle feather" icon-name="search"></i>
                         </button>
                     </div>
                 </form>
+                @endif
                 <script>
                     document.addEventListener( 'DOMContentLoaded', function() {
                         $( '#search_order' ).on( 'keyup', function( e ) {
@@ -94,5 +96,20 @@
             <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
         </symbol>
     </svg>
+
+    <div class="modal fade" id="confirm_modal" tabindex="-1" aria-labelledby="confirm_modal_label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{ __( 'template.confirmation' ) }}</h4>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __( 'template.cancel' ) }}</button>
+                    <button type="button" class="btn btn-success">{{ __( 'template.confirm' ) }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <?php echo view( 'admin/footer' ); ?>
