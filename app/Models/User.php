@@ -2,15 +2,25 @@
 
 namespace App\Models;
 
+use DateTimeInterface;
+
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, LogsActivity, SoftDeletes;
+
+    public function referral() {
+        return $this->hasOne( User::class, 'id', 'referral_id' );
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -18,10 +28,16 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'country_id',
+        'referral_id',
+        'username',
         'email',
-        'metamask_address',
+        'phone_number',
         'password',
+        'is_social_account',
+        'invitation_code',
+        'referral_structure',
+        'birthday',
     ];
 
     /**
@@ -42,4 +58,33 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected function serializeDate(DateTimeInterface $date) {
+        return $date->timezone( 'Asia/Kuala_Lumpur' )->format( 'Y-m-d H:i:s' );
+    }
+
+    protected static $logAttributes = [
+        'country_id',
+        'referral_id',
+        'username',
+        'email',
+        'phone_number',
+        'password',
+        'is_social_account',
+        'invitation_code',
+        'referral_structure',
+        'birthday',
+    ];
+
+    protected static $logName = 'users';
+
+    protected static $logOnlyDirty = true;
+
+    public function getActivitylogOptions(): LogOptions {
+        return LogOptions::defaults()->logFillable();
+    }
+
+    public function getDescriptionForEvent( string $eventName ): string {
+        return "{$eventName} user";
+    }
 }

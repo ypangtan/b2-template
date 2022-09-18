@@ -15,4 +15,27 @@ use App\Http\Controllers\Api\V1\{
 |
 */
 
-Route::post( 'users', [ UserController::class, 'login' ] );
+/* Start Public route */
+Route::post( 'otp', [ UserController::class, 'requestOtp' ] );
+
+Route::prefix( 'users' )->group( function() {
+    // Login & create token
+    Route::post( 'token', [ UserController::class, 'createToken' ] );
+    // Social Login
+    Route::post( 'social', [ UserController::class, 'createTokenSocial' ] );
+
+    Route::post( '/', [ UserController::class, 'createUser' ] );
+} );
+/* End Public route */
+
+/* Start Protected route */
+// Route::middleware( 'auth:sanctum' )->group( function() {
+
+//     Route::prefix( 'users' )->group( function() {
+
+//         Route::get( '/', [ UserController::class, 'getUser' ] );
+//         Route::post( 'me', [ UserController::class, 'updateUser' ] );
+//         Route::post( 'password', [ UserController::class, 'updateUserPassword' ] );
+//         Route::delete( '/', [ UserController::class, 'deleteUser' ] );
+//     } );
+// } );

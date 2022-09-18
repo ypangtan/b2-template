@@ -15,13 +15,21 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('country_id')->nullable()->constrained('countries')->onUpdate('restrict')->onDelete('cascade');
+            $table->foreignId('referral_id')->nullable()->constrained('users')->onUpdate('restrict')->onDelete('cascade');
             $table->string('name')->nullable();
+            $table->string('username')->nullable()->unique();
             $table->string('email')->nullable()->unique();
-            $table->string('metamask_address')->unique();
+            $table->string( 'phone_number', 20 )->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
+            $table->tinyInteger('is_social_account')->default(0);
+            $table->string( 'invitation_code', '6' );
+            $table->text( 'referral_structure' )->nullable();
+            $table->date( 'birthday' )->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
