@@ -6,7 +6,7 @@ $role_edit = 'role_edit';
 <div class="listing-header">
     <h1 class="h2 mb-3">{{ __( 'role.roles' ) }}</h1>
     @can( 'add admins' )
-    <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $role_create }}_canvas" aria-controls="{{ $role_create }}_canvas">{{ __( 'role.create' ) }}</button>
+    <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $role_create }}_canvas" aria-controls="{{ $role_create }}_canvas">{{ __( 'template.create' ) }}</button>
     @endcan
 </div>
 
@@ -18,23 +18,23 @@ $columns = [
     ],
     [
         'type' => 'date',
-        'placeholder' => __( 'role.search_x', [ 'title' => __( 'role.created_date' ) ] ),
+        'placeholder' => __( 'datatables.search_x', [ 'title' => __( 'datatables.created_date' ) ] ),
         'id' => 'search_date',
-        'title' => __( 'role.created_date' ),
+        'title' => __( 'datatables.created_date' ),
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'role.search_x', [ 'title' => __( 'role.role_name' ) ] ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'role.role_name' ) ] ),
         'title' => __( 'role.role_name' ),
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'role.search_x', [ 'title' => __( 'role.guard_name' ) ] ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'role.guard_name' ) ] ),
         'title' => __( 'role.guard_name' ),
     ],
     [
         'type' => 'default',
-        'title' => __( 'role.action' ),
+        'title' => __( 'datatables.action' ),
     ],
 ]
 ?>

@@ -109,7 +109,7 @@ class AdminService {
 
         $createAdmin->syncRoles( [ $role_model->name ] );
 
-        return $admin;
+        return $createAdmin;
     }
 
     public function update( $request ) {
@@ -135,6 +135,6 @@ class AdminService {
         $updateAdmin->syncRoles( [ $role_model->name ] );
         $updateAdmin->save();
 
-        return $admin;
+        return $updateAdmin;
     }
 }

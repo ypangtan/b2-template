@@ -13,16 +13,16 @@ return [
     |
     */
 
-    'administrator' => 'Administrators',
-    'admin_create' => 'Create Admin',
-    'admin_edit' => 'Edit Admin',
-    'username' => 'Username',
-    'email' => 'Email',
-    'role' => 'Role',
-    'admin' => 'Admin',
-    'password' => 'Password',
-    'leave_blank' => 'Password (leave blank to leave unchanged)',
+    'administrator' => '管理员',
+    'admin_create' => '创建管理员',
+    'admin_edit' => '编辑管理员',
+    'username' => '用户名',
+    'email' => '电子邮件',
+    'role' => '角色',
+    'admin' => '管理员',
+    'password' => '密码',
+    'leave_blank' => '密码 (留空保持不变)',
 
-    'admin_created' => 'New Admin Created.',
-    'admin_updated' => 'Admin Updated.',
+    'admin_created' => '已创建新管理员。',
+    'admin_updated' => '已更新管理员。',
 ];

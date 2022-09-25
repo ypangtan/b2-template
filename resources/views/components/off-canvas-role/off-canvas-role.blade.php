@@ -17,19 +17,19 @@
             <div class="card-body">
             @forelse( \App\Models\Module::orderBy( 'guard_name', 'ASC' )->get() as $module )
                 <div class="mb-4 {{ $crud }}-modules-section" data-module="{{ $module->name . '|' . $module->guard_name }}">
-                    <h4>{{ __( 'role.module_title', [ 'module' => __( 'role.' . $module->name ) ] ) }} ( {{ __( 'administrator.' . $module->guard_name ) }} )</h4>
+                    <h4>{{ __( 'role.module_title', [ 'module' => __( 'module.' . $module->name ) ] ) }} ( {{ __( 'administrator.' . $module->guard_name ) }} )</h4>
                 @forelse( Helper::moduleActions() as $action )
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="checkbox" id="{{ $crud . '_' . $action . '_' . $module->name . '_' . $module->guard_name }}" value="{{ $action }}">
-                        <label class="form-check-label" for="{{ $crud . '_' . $action . '_' . $module->name . '_' . $module->guard_name }}">{{ __( 'role.action_module', [ 'action' => __( 'role.' . $action ), 'module' => __( 'role.' . $module->name ) ] ) }}</label>
+                        <label class="form-check-label" for="{{ $crud . '_' . $action . '_' . $module->name . '_' . $module->guard_name }}">{{ __( 'role.action_module', [ 'action' => __( 'role.' . $action ), 'module' => __( 'module.' . $module->name ) ] ) }}</label>
                     </div>
                 @empty
-                    <p class="text-center">No action found</p>
+                    <p class="text-center">{{ __( 'role.no_action_found' ) }}</p>
 
                 @endforelse
                 </div>
             @empty
-                <h4 class="text-center mb-0">No module found</h4>
+                <h4 class="text-center mb-0">{{ __( 'role.no_module_found' ) }}</h4>
 
             @endforelse
 
@@ -40,7 +40,7 @@
         </div>
 
         <div class="offcanvas-button-group">
-            <button type="submit" class="btn btn-success" id="{{ $crud }}_submit">{{ __( 'role.save_changes' ) }}</button>&nbsp;&nbsp;<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas" aria-label="Close" id="offcanvas_close">{{ __( 'role.cancel' ) }}</button>
+            <button type="submit" class="btn btn-success" id="{{ $crud }}_submit">{{ __( 'template.save_changes' ) }}</button>&nbsp;&nbsp;<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas" aria-label="Close" id="offcanvas_close">{{ __( 'template.cancel' ) }}</button>
         </div>
     </div>
 </div>

@@ -6,7 +6,7 @@ $module_edit = 'module_edit';
 <div class="listing-header">
     <h1 class="h2 mb-3">{{ __( 'module.module' ) }}</h1>
     @can( 'add admins' )
-    <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $module_create }}_canvas" aria-controls="{{ $module_create }}_canvas">{{ __( 'module.create' ) }}</button>
+    <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $module_create }}_canvas" aria-controls="{{ $module_create }}_canvas">{{ __( 'template.create' ) }}</button>
     @endcan
 </div>
 
@@ -18,23 +18,23 @@ $columns = [
     ],
     [
         'type' => 'date',
-        'placeholder' => __( 'module.search_x', [ 'title' => __( 'module.created_date' ) ] ),
+        'placeholder' => __( 'datatables.search_x', [ 'title' => __( 'datatables.created_date' ) ] ),
         'id' => 'search_date',
-        'title' => __( 'module.created_date' ),
+        'title' => __( 'datatables.created_date' ),
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'module.search_x', [ 'title' => __( 'module.module_name' ) ] ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'module.module_name' ) ] ),
         'title' => __( 'module.module_name' ),
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'module.search_x', [ 'title' => __( 'module.guard_name' ) ] ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'module.guard_name' ) ] ),
         'title' => __( 'module.guard_name' ),
     ],
     [
         'type' => 'default',
-        'title' => __( 'module.action' ),
+        'title' => __( 'datatables.action' ),
     ],
 ]
 ?>

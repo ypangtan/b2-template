@@ -6,7 +6,7 @@ $admin_edit = 'admin_edit';
 <div class="listing-header">
     <h1 class="h2 mb-3">{{ __( 'administrator.administrator' ) }}</h1>
     @can( 'add admins' )
-    <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $admin_create }}_canvas" aria-controls="{{ $admin_create }}_canvas">{{ __( 'administrator.create' ) }}</button>
+    <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $admin_create }}_canvas" aria-controls="{{ $admin_create }}_canvas">{{ __( 'template.create' ) }}</button>
     @endcan
 </div>
 
@@ -19,19 +19,19 @@ $columns = [
     ],
     [
         'type' => 'date',
-        'placeholder' => __( 'administrator.search_x', [ 'title' => __( 'administrator.registered_date' ) ] ),
+        'placeholder' => __( 'datatables.search_x', [ 'title' => __( 'datatables.registered_date' ) ] ),
         'id' => 'search_date',
-        'title' => __( 'administrator.registered_date' ),
+        'title' => __( 'datatables.registered_date' ),
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'administrator.search_x', [ 'title' => __( 'administrator.username' ) ] ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'administrator.username' ) ] ),
         'title' => __( 'administrator.username' ),
         // 'preAmount' => true,
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'administrator.search_x', [ 'title' => __( 'administrator.email' ) ] ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'administrator.email' ) ] ),
         'title' => __( 'administrator.email' ),
         // 'amount' => true,
     ],
@@ -41,28 +41,8 @@ $columns = [
         'title' => __( 'administrator.role' ),
     ],
     [
-        'type' => 'select',
-        'options' => $data['roles'],
-        'title' => __( 'administrator.role' ),
-    ],
-    [
-        'type' => 'select',
-        'options' => $data['roles'],
-        'title' => __( 'administrator.role' ),
-    ],
-    [
-        'type' => 'select',
-        'options' => $data['roles'],
-        'title' => __( 'administrator.role' ),
-    ],
-    [
-        'type' => 'select',
-        'options' => $data['roles'],
-        'title' => __( 'administrator.role' ),
-    ],
-    [
         'type' => 'default',
-        'title' => __( 'administrator.action' ),
+        'title' => __( 'datatables.action' ),
     ],
 ];
 ?>
@@ -158,10 +138,6 @@ array_push( $contents, [
                 { data: 'created_at' },
                 { data: 'username' },
                 { data: 'email' },
-                { data: 'role_name' },
-                { data: 'role_name' },
-                { data: 'role_name' },
-                { data: 'role_name' },
                 { data: 'role_name' },
                 { data: 'id' },
             ],

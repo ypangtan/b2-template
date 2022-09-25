@@ -53,7 +53,7 @@
     @endforeach
 
         <div class="offcanvas-button-group">
-            <button type="submit" class="btn btn-success" id="{{ $crud }}_submit">{{ __( 'administrator.save_changes' ) }}</button>&nbsp;&nbsp;<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas" aria-label="Close" id="offcanvas_close">{{ __( 'administrator.cancel' ) }}</button>
+            <button type="submit" class="btn btn-success" id="{{ $crud }}_submit">{{ __( 'template.save_changes' ) }}</button>&nbsp;&nbsp;<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas" aria-label="Close" id="offcanvas_close">{{ __( 'template.cancel' ) }}</button>
         </div>
     </div>
 </div>
