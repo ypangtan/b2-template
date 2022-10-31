@@ -53,9 +53,9 @@
                     @endcan
                     
                     @if( request()->user()->role == 1 )
-                        <li class="sidebar-header">
-                            {{ __( 'template.operations' ) }}
-                        </li>
+                    <li class="sidebar-header">
+                        {{ __( 'template.operations' ) }}
+                    </li>
                     @else
                         @if( count( request()->user()->getAllPermissions() ) != 0 )
                         <li class="sidebar-header">
@@ -63,6 +63,13 @@
                         </li>
                         @endif
                     @endif
+
+                    <li class="sidebar-item {{ $controller == 'SettingController' ? 'active' : '' }}">
+                        <a class="sidebar-link" href="{{ Helper::baseAdminUrl() }}/settings">
+                            <i class="align-middle feather" icon-name="settings"></i> <span class="align-middle">{{ __( 'template.settings' ) }}</span>
+                        </a>
+                    </li>
+
                 </ul>
             </div>
         </nav>

@@ -26,6 +26,7 @@ return [
     'users' => 'Users',
     'customers' => 'Customers',
     'reports' => 'Reports',
+    'settings' => 'Settings',
 
     'loading' => 'Loading...',
     'export' => 'Export',
@@ -33,6 +34,7 @@ return [
     'update' => 'Update',
     'delete' => 'Delete',
     'add' => 'Add',
+    'submit' => 'Submit',
     'save_changes' => 'Save Changes',
     'confirm' => 'Confirm',
     'cancel' => 'Cancel',

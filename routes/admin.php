@@ -4,7 +4,8 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 use App\Http\Controllers\Admin\{
     AdministratorController,
-    DashboardController
+    DashboardController,
+    SettingController,
 };
 
 Route::prefix( 'base2_admin' )->group( function() {
@@ -12,6 +13,8 @@ Route::prefix( 'base2_admin' )->group( function() {
     Route::middleware( 'auth:admin' )->group( function() {
 
         Route::prefix( 'dashboard' )->group( function() {
+            Route::get( 'test99', [ DashboardController::class, 'test99' ] );
+            Route::get( 'test88', [ DashboardController::class, 'test88' ] );
             Route::get( '/', [ DashboardController::class, 'index' ] );
             Route::post( 'total_datas', [ DashboardController::class, 'totalDatas' ] );
             Route::post( 'monthly_sales', [ DashboardController::class, 'monthlySales' ] );
@@ -38,6 +41,16 @@ Route::prefix( 'base2_admin' )->group( function() {
             Route::post( 'all_roles', [ AdministratorController::class, 'getRoles' ] );
             Route::post( 'one_role', [ AdministratorController::class, 'getRole' ] );
             Route::post( 'update_role', [ AdministratorController::class, 'updateRole' ] );
+        } );
+
+        Route::prefix( 'settings' )->group( function() {
+
+            Route::group( [ 'middleware' => [ 'permission:add admins|view settings|edit settings|delete settings' ] ], function() {
+                Route::get( '/', [ SettingController::class, 'index' ] );
+            } );
+
+            Route::post( 'setup_mfa', [ SettingController::class, 'setupMFA' ] );
+            Route::post( 'reset_mfa', [ SettingController::class, 'resetMFA' ] );
         } );
 
     } );

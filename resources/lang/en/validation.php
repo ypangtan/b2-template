@@ -158,6 +158,8 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'one_time_password' => 'One-time password',
+    ],
 
 ];

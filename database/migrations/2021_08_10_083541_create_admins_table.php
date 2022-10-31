@@ -20,6 +20,7 @@ class CreateAdminsTable extends Migration
             $table->string( 'password' );
             $table->string( 'name', 50 )->nullable();
             $table->tinyInteger( 'role' );
+            $table->string( 'mfa_secret', 50 )->nullable();
             $table->rememberToken();
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();

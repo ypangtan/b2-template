@@ -26,6 +26,7 @@ return [
     'users' => '用户',
     'customers' => '客户',
     'reports' => '报告',
+    'settings' => '设定',
 
     'loading' => '载入中...',
     'export' => '导出',
@@ -33,6 +34,7 @@ return [
     'update' => '更新',
     'delete' => '删除',
     'add' => '添加',
+    'submit' => '提交',
     'save_changes' => '保存',
     'confirm' => '确定',
     'cancel' => '取消',
