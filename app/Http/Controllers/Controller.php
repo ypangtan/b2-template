@@ -14,10 +14,13 @@ class Controller extends BaseController
     public $data = [];
 
     public function __construct() {
-        $routeArray = app( 'request' )->route()->getAction();
-        list( $controller, $action ) = explode( '@', class_basename( $routeArray['controller'] ) );
 
-        $this->data['controller'] = $controller;
-        $this->data['action'] = $action;
+        if( !app()->runningInConsole() ) {
+            $routeArray = app( 'request' )->route()->getAction();
+            list( $controller, $action ) = explode( '@', class_basename( $routeArray['controller'] ) );
+    
+            $this->data['controller'] = $controller;
+            $this->data['action'] = $action;
+        }
     }
 }
