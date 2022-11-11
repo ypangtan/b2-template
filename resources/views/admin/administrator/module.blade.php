@@ -110,7 +110,7 @@ $contents = [
                     },
                 },
                 {
-                    targets: 4,
+                    targets: parseInt( '{{ count( $columns ) - 1 }}' ),
                     orderable: false,
                     width: '10%',
                     className: 'text-center',

@@ -156,7 +156,7 @@ array_push( $contents, [
                     },
                 },
                 {
-                    targets: 9,
+                    targets: parseInt( '{{ count( $columns ) - 1 }}' ),
                     orderable: false,
                     width: '10%',
                     className: 'text-center',
