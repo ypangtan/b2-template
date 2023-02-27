@@ -26,4 +26,13 @@ return [
 
     'mfa_setup_complete' => 'MFA Setup Complete.',
     'mfa_reset_complete' => 'MFA Reset Complete.',
+
+    'first_mfa_title' => 'Get codes from an authenticator app',
+    'first_mfa_subtitle' => 'Each time you log in, in addition to your password, you\'ll use an authenticator app to generate a one-off code.',
+    'first_mfa_step_1' => 'Step 1: Scan the QR code below in to your authenticator app.',
+    'first_mfa_step_2' => 'Step 2: Enter the 6-digit code you see in your authenticator app.',
+    'authentication_code' => 'Authentication code',
+
+    'verify_mfa_title' => 'Verify your identity',
+    'verify_mfa_subtitle' => 'Use an authentication code from your authenticator app.',
 ];

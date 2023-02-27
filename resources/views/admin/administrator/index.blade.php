@@ -1,47 +1,45 @@
 <?php
 $admin_create = 'admin_create';
 $admin_edit = 'admin_edit';
+
+$multiSelect = 0;
 ?>
 
-<div class="listing-header">
-    <h1 class="h2 mb-3">{{ __( 'administrator.administrator' ) }}</h1>
-    @can( 'add admins' )
-    <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $admin_create }}_canvas" aria-controls="{{ $admin_create }}_canvas">{{ __( 'template.create' ) }}</button>
-    @endcan
-</div>
-
 <?php
-array_unshift( $data['roles'],[ 'title' => __( 'administrator.all' ), 'value' => '' ] );
+array_unshift( $data['roles'],[ 'title' => __( 'datatables.all_x', [ 'title' => __( 'administrator.role' ) ] ), 'value' => '' ] );
 $columns = [
     [
         'type' => 'default',
+        'id' => 'dt_no',
         'title' => 'No.',
     ],
     [
         'type' => 'date',
         'placeholder' => __( 'datatables.search_x', [ 'title' => __( 'datatables.registered_date' ) ] ),
-        'id' => 'search_date',
+        'id' => 'registered_date',
         'title' => __( 'datatables.registered_date' ),
     ],
     [
         'type' => 'input',
         'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'administrator.username' ) ] ),
+        'id' => 'username',
         'title' => __( 'administrator.username' ),
-        // 'preAmount' => true,
     ],
     [
         'type' => 'input',
         'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'administrator.email' ) ] ),
+        'id' => 'email',
         'title' => __( 'administrator.email' ),
-        // 'amount' => true,
     ],
     [
         'type' => 'select',
         'options' => $data['roles'],
+        'id' => 'role',
         'title' => __( 'administrator.role' ),
     ],
     [
         'type' => 'default',
+        'id' => 'dt_action',
         'title' => __( 'datatables.action' ),
     ],
 ];
@@ -49,6 +47,11 @@ $columns = [
 
 <div class="card">
     <div class="card-body">
+        <div class="mb-3 text-end">
+            @can( 'add admins' )
+            <button class="btn btn-sm btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $admin_create }}_canvas" aria-controls="{{ $admin_create }}_canvas">{{ __( 'template.create' ) }}</button>
+            @endcan
+        </div>
         <x-data-tables id="admin_table" enableFilter="true" enableFooter="false" columns="{{ json_encode( $columns ) }}" />
     </div>
 </div>
@@ -108,6 +111,14 @@ array_push( $contents, [
 <x-toast/>
 
 <script>
+
+    window['columns'] = @json( $columns );
+    
+    @foreach ( $columns as $column )
+    @if ( $column['type'] != 'default' )
+    window['{{ $column['id'] }}'] = '';
+    @endif
+    @endforeach
     
     var roles = @json( $data['roles'] ),
         dt_table,
@@ -143,14 +154,14 @@ array_push( $contents, [
             ],
             columnDefs: [
                 {
-                    targets: 0,
+                    targets: parseInt( '{{ Helper::columnIndex( $columns, "dt_no" ) }}' ),
                     orderable: false,
                     render: function( data, type, row, meta ) {
                         return table_no += 1;
                     },
                 },
                 {
-                    targets: 4,
+                    targets: parseInt( '{{ Helper::columnIndex( $columns, "role" ) }}' ),
                     render: function( data, type, row, meta ) {                       
                         return roles[roles.map( function( e ) { return e.key; } ).indexOf( data )].title;
                     },
@@ -162,7 +173,7 @@ array_push( $contents, [
                     className: 'text-center',
                     render: function( data, type, row, meta ) {
                         @can( 'edit admins' )
-                        return '<i class="dt-edit table-action" data-feather="edit-3" data-id="' + data + '"></i>';
+                        return '<strong class="dt-edit table-action link-primary" data-id="' + data + '">{{ __( 'datatables.edit' ) }}</strong>';
                         @else
                         return '-';
                         @endcan
@@ -191,11 +202,6 @@ array_push( $contents, [
             $( '.offcanvas-body .form-control' ).removeClass( 'is-invalid' ).val( '' );
             $( '.invalid-feedback' ).text( '' );
             $( '.offcanvas-body .form-select' ).removeClass( 'is-invalid' ).val( '' );
-        } );
-
-        $( '#search_date' ).flatpickr( {
-            mode: 'range',
-            disableMobile: true,
         } );
 
         $( document ).on( 'click', '.dt-edit', function() {
@@ -231,7 +237,7 @@ array_push( $contents, [
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function( response ) {
-                    $( '#toast .toast-body' ).text( 'New Admin Added.' ); 
+                    $( '#toast .toast-body' ).text( '{{ __( 'administrator.admin_created' ) }}' ); 
                     toast.show();
                     admin_create_canvas.hide();
                     dt_table.draw();
@@ -258,17 +264,11 @@ array_push( $contents, [
                     'username': $( ae + '_username' ).val(),
                     'email': $( ae + '_email' ).val(),
                     'role': $( ae + '_role' ).val(),
-                    'passord': $( ae + '_password' ).val(),
+                    'password': $( ae + '_password' ).val(),
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function( response ) {
-
-                    if( response.status == 'ok' ) {
-                        $( '#toast .toast-body' ).text( '{{ __( 'administrator.admin_updated' ) }}' );     
-                    } else {
-                        $( '#toast .toast-body' ).text( '{{ __( 'administrator.no_changes' ) }}' ); 
-                    }
-
+                    $( '#toast .toast-body' ).text( '{{ __( 'administrator.admin_updated' ) }}' );
                     toast.show();
                     admin_edit_canvas.hide();
                     dt_table.draw();
@@ -282,17 +282,14 @@ array_push( $contents, [
                     }
                 }
             } )
-            
         } );
 
-        $( '.form-control' ).focus( function() {
-            if( $( this ).hasClass( 'is-invalid' ) ) {
-                $( this ).removeClass( 'is-invalid' ).next().text( '' );
-            }
-        } );
-        $( '.form-select' ).focus( function() {
-            if( $( this ).hasClass( 'is-invalid' ) ) {
-                $( this ).removeClass( 'is-invalid' ).next().text( '' );
+        window['registeredDate'] = $( '#registered_date' ).flatpickr( {
+            mode: 'range',
+            disableMobile: true,
+            onClose: function( selected, dateStr, instance ) {
+                window[$( instance.element ).data('id')] = $( instance.element ).val();
+                dt_table.draw();
             }
         } );
     } );

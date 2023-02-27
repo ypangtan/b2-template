@@ -3,37 +3,34 @@ $module_create = 'module_create';
 $module_edit = 'module_edit';
 ?>
 
-<div class="listing-header">
-    <h1 class="h2 mb-3">{{ __( 'module.module' ) }}</h1>
-    @can( 'add admins' )
-    <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $module_create }}_canvas" aria-controls="{{ $module_create }}_canvas">{{ __( 'template.create' ) }}</button>
-    @endcan
-</div>
-
 <?php
 $columns = [
     [
         'type' => 'default',
+        'id' => 'dt_no',
         'title' => 'No.',
     ],
     [
         'type' => 'date',
         'placeholder' => __( 'datatables.search_x', [ 'title' => __( 'datatables.created_date' ) ] ),
-        'id' => 'search_date',
+        'id' => 'created_date',
         'title' => __( 'datatables.created_date' ),
     ],
     [
         'type' => 'input',
         'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'module.module_name' ) ] ),
+        'id' => 'module_name',
         'title' => __( 'module.module_name' ),
     ],
     [
         'type' => 'input',
         'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'module.guard_name' ) ] ),
+        'id' => 'guard_name',
         'title' => __( 'module.guard_name' ),
     ],
     [
         'type' => 'default',
+        'id' => 'dt_action',
         'title' => __( 'datatables.action' ),
     ],
 ]
@@ -41,6 +38,11 @@ $columns = [
 
 <div class="card">
     <div class="card-body">
+        <div class="mb-3 text-end">
+            @can( 'add admins' )
+            <button class="btn btn-sm btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $module_create }}_canvas" aria-controls="{{ $module_create }}_canvas">{{ __( 'template.create' ) }}</button>
+            @endcan
+        </div>
         <x-data-tables id="module_table" enableFilter="true" enableFooter="false" columns="{{ json_encode( $columns ) }}" />
     </div>
 </div>
@@ -69,6 +71,14 @@ $contents = [
 <x-toast/>
 
 <script>
+
+    window['columns'] = @json( $columns );
+    
+    @foreach ( $columns as $column )
+    @if ( $column['type'] != 'default' )
+    window['{{ $column['id'] }}'] = '';
+    @endif
+    @endforeach
     
     var roles = { super_admin: '{{ __( "module.super_admin" ) }}', admin: '{{ __( "module.admin" ) }}' },
         dt_table,
@@ -103,7 +113,7 @@ $contents = [
             ],
             columnDefs: [
                 {
-                    targets: 0,
+                    targets: parseInt( '{{ Helper::columnIndex( $columns, "dt_no" ) }}' ),
                     orderable: false,
                     render: function( data, type, row, meta ) {
                         return table_no += 1;
@@ -115,7 +125,6 @@ $contents = [
                     width: '10%',
                     className: 'text-center',
                     render: function( data, type, row, meta ) {
-                        // return '<i class="dt-edit table-action" data-feather="edit-3" data-id="' + data + '"></i>';
                         return '-';
                     },
                 },
@@ -197,8 +206,15 @@ $contents = [
 
         $( me + '_submit' ).click( function() {
 
+        } );
 
-            
+        window['createdDate'] = $( '#created_date' ).flatpickr( {
+            mode: 'range',
+            disableMobile: true,
+            onClose: function( selected, dateStr, instance ) {
+                window[$( instance.element ).data('id')] = $( instance.element ).val();
+                dt_table.draw();
+            }
         } );
     } );
 

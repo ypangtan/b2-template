@@ -17,7 +17,7 @@ return [
     'logout' => '登出',
     'operations' => '运营管理',
     'dashboard' => '仪表板',
-    'administrator' => '管理员',
+    'administrators' => '管理员',
     'audit_logs' => '审计日志',
     'list' => '列表',
     'roles' => '角色',
@@ -27,7 +27,10 @@ return [
     'customers' => '客户',
     'reports' => '报告',
     'settings' => '设定',
-
+    'first_setup' => '初次设置',
+    'verify_account' => '验证账号',
+    'profile' => '资料',
+    
     'loading' => '载入中...',
     'export' => '导出',
     'create' => '创建',

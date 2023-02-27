@@ -1,4 +1,4 @@
-<?php echo view( 'admin/header', [ 'basic' => @$basic ] ); ?>
+<?php echo view( 'admin/header_v2', [ 'basic' => @$basic ] ); ?>
     <main class="d-flex w-100">
         <div class="container d-flex flex-column">
             <div class="row vh-100">
@@ -12,9 +12,6 @@
             </div>
         </div>
     </main>
-
-    <script src="{{ asset( 'admin/js/app.js' ) . Helper::assetVersion() }}"></script>
-    
 </body>
 
 </html>

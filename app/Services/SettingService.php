@@ -19,8 +19,8 @@ class SettingService {
                
                 $google2fa = new Google2FA();
 
-                $valid = $google2fa->verifyKey( auth()->user()->mfa_secret, $value );
-                if( !$valid ) {
+                $valid = $google2fa->verifyKey( Crypt::decryptString( auth()->user()->mfa_secret ), $value );
+                if ( !$valid ) {
                     $fail( __( 'setting.invalid_one_time_password' ) );
                 }
             } ],
@@ -36,22 +36,24 @@ class SettingService {
     public function setupMFA( $request ) {
 
         $request->validate( [
-            'one_time_password' => [ 'bail', 'required', 'numeric', 'digits:6', function( $attributes, $value, $fail ) {
+            'authentication_code' => [ 'bail', 'required', 'numeric', 'digits:6', function( $attribute, $value, $fail ) {
                
                 $google2fa = new Google2FA();
 
                 $valid = $google2fa->verifyKey( request( 'mfa_secret' ), $value );
-                if( !$valid ) {
-                    $fail( __( 'setting.invalid_one_time_password' ) );
+                if ( !$valid ) {
+                    $fail( __( 'setting.invalid_code' ) );
                 }
             } ],
             'mfa_secret' => 'required',
         ] );
 
         $admin = Admin::find( auth()->user()->id );
-        $admin->mfa_secret = $request->mfa_secret;
+        $admin->mfa_secret = \Crypt::encryptString( $request->mfa_secret );
         $admin->save();
 
-        return true;
+        return response()->json( [
+            'stauts' => true,
+        ] );
     }
 }

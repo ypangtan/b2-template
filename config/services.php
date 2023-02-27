@@ -14,6 +14,10 @@ return [
     |
     */
 
+    'mfa' => [
+        'enabled' => env( 'MFA_ENABLED' ),
+    ],
+
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),

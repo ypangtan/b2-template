@@ -1,39 +1,39 @@
 <?php
 $role_create = 'role_create';
 $role_edit = 'role_edit';
-?>
 
-<div class="listing-header">
-    <h1 class="h2 mb-3">{{ __( 'role.roles' ) }}</h1>
-    @can( 'add admins' )
-    <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#{{ $role_create }}_canvas" aria-controls="{{ $role_create }}_canvas">{{ __( 'template.create' ) }}</button>
-    @endcan
-</div>
+$multiSelect = 0;
+?>
 
 <?php
 $columns = [
     [
         'type' => 'default',
+        'id' => 'dt_no',
         'title' => 'No.',
+
     ],
     [
         'type' => 'date',
         'placeholder' => __( 'datatables.search_x', [ 'title' => __( 'datatables.created_date' ) ] ),
-        'id' => 'search_date',
+        'id' => 'created_date',
         'title' => __( 'datatables.created_date' ),
     ],
     [
         'type' => 'input',
         'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'role.role_name' ) ] ),
+        'id' => 'role_name',
         'title' => __( 'role.role_name' ),
     ],
     [
         'type' => 'input',
         'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'role.guard_name' ) ] ),
+        'id' => 'guard_name',
         'title' => __( 'role.guard_name' ),
     ],
     [
         'type' => 'default',
+        'id' => 'dt_action',
         'title' => __( 'datatables.action' ),
     ],
 ]
@@ -71,6 +71,14 @@ $contents = [
 <x-toast/>
 
 <script>
+
+    window['columns'] = @json( $columns );
+    
+    @foreach ( $columns as $column )
+    @if ( $column['type'] != 'default' )
+    window['{{ $column['id'] }}'] = '';
+    @endif
+    @endforeach
     
     var roles = { super_admin: '{{ __( "role.super_admin" ) }}', admin: '{{ __( "role.admin" ) }}' },
         dt_table,
@@ -105,14 +113,14 @@ $contents = [
             ],
             columnDefs: [
                 {
-                    targets: 0,
+                    targets: parseInt( '{{ Helper::columnIndex( $columns, "dt_no" ) }}' ),
                     orderable: false,
                     render: function( data, type, row, meta ) {
                         return table_no += 1;
                     },
                 },
                 {
-                    targets: 2,
+                    targets: parseInt( '{{ Helper::columnIndex( $columns, "role_name" ) }}' ),
                     render: function( data, type, row, meta ) {
                         return data;
                     },
@@ -124,7 +132,7 @@ $contents = [
                     className: 'text-center',
                     render: function( data, type, row, meta ) {
                         @can( 'edit roles' )
-                        return '<i class="dt-edit table-action" data-feather="edit-3" data-id="' + data + '"></i>';
+                        return '<strong class="dt-edit table-action link-primary" data-id="' + data + '">Edit</strong>';
                         @else
                         return '-';
                         @endcan
@@ -159,11 +167,6 @@ $contents = [
             $( re + '_canvas' + ' .form-check-input' ).each( function() {
                 $( this ).prop( 'checked', false );
             } );
-        } );
-
-        $( '#search_date' ).flatpickr( {
-            mode: 'range',
-            disableMobile: true,
         } );
 
         $( document ).on( 'click', '.dt-edit', function() {
@@ -279,7 +282,15 @@ $contents = [
                     }
                 }
             } );
-            
+        } );
+
+        window['createdDate'] = $( '#created_date' ).flatpickr( {
+            mode: 'range',
+            disableMobile: true,
+            onClose: function( selected, dateStr, instance ) {
+                window[$( instance.element ).data('id')] = $( instance.element ).val();
+                dt_table.draw();
+            }
         } );
     } );
 

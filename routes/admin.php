@@ -4,7 +4,9 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 use App\Http\Controllers\Admin\{
     AdministratorController,
+    AuditController,
     DashboardController,
+    ProfileController,
     SettingController,
 };
 
@@ -12,45 +14,71 @@ Route::prefix( 'base2_admin' )->group( function() {
 
     Route::middleware( 'auth:admin' )->group( function() {
 
-        Route::prefix( 'dashboard' )->group( function() {
-            Route::get( 'test99', [ DashboardController::class, 'test99' ] );
-            Route::get( 'test88', [ DashboardController::class, 'test88' ] );
-            Route::get( '/', [ DashboardController::class, 'index' ] );
-            Route::post( 'total_datas', [ DashboardController::class, 'totalDatas' ] );
-            Route::post( 'monthly_sales', [ DashboardController::class, 'monthlySales' ] );
-        } );
+        Route::get( 'setup', [ SettingController::class, 'firstSetup' ] )->name( 'admin.first_setup' );
+        Route::post( 'settings/setup_mfa', [ SettingController::class, 'setupMFA' ] );
+        Route::post( 'settings/reset_mfa', [ SettingController::class, 'resetMFA' ] );
+
+        Route::get( 'verify', [ AdministratorController::class, 'verify' ] )->name( 'admin.verify' );
+        Route::post( 'verify-code', [ AdministratorController::class, 'verifyCode' ] )->name( 'admin.verifyCode' );
+
+        Route::post( 'administrators/logout', [ AdministratorController::class, 'logoutLog' ] );
+        Route::post( 'administrators/updateNotificationBox', [ AdministratorController::class, 'updateNotificationBox' ] );
+        Route::post( 'administrators/updateNotificationSeen', [ AdministratorController::class, 'updateNotificationSeen' ] );
         
-        Route::prefix( 'administrators' )->group( function() {
-
-            Route::group( [ 'middleware' => [ 'permission:add admins|view admins|edit admins|delete admins' ] ], function() {
-                Route::get( '/', [ AdministratorController::class, 'index' ] );
-                Route::get( 'roles', [ AdministratorController::class, 'role' ] );
-                Route::get( 'modules', [ AdministratorController::class, 'module' ] );
+        Route::group( [ 'middleware' => [ 'checkAdminIsMFA', 'checkMFA' ] ], function() {
+            
+            Route::prefix( 'dashboard' )->group( function() {
+                Route::get( '/', [ DashboardController::class, 'index' ] );
+                Route::post( 'total_datas', [ DashboardController::class, 'totalDatas' ] );
+                Route::post( 'monthly_sales', [ DashboardController::class, 'monthlySales' ] );
             } );
 
-            Route::post( 'create_admin', [ AdministratorController::class, 'createAdmin' ] );
-            Route::post( 'all_admins', [ AdministratorController::class, 'getAdmins' ] );
-            Route::post( 'one_admin', [ AdministratorController::class, 'getAdmin' ] );
-            Route::post( 'update_admin', [ AdministratorController::class, 'updateAdmin' ] );
-    
-            Route::post( 'create_module', [ AdministratorController::class, 'createModule' ] );
-            Route::post( 'all_modules', [ AdministratorController::class, 'getModules' ] );
-            Route::post( 'one_module', [ AdministratorController::class, 'getModule' ] );
+            Route::prefix( 'administrators' )->group( function() {
 
-            Route::post( 'create_role', [ AdministratorController::class, 'createRole' ] );
-            Route::post( 'all_roles', [ AdministratorController::class, 'getRoles' ] );
-            Route::post( 'one_role', [ AdministratorController::class, 'getRole' ] );
-            Route::post( 'update_role', [ AdministratorController::class, 'updateRole' ] );
-        } );
+                Route::group( [ 'middleware' => [ 'permission:add admins|view admins|edit admins|delete admins' ] ], function() {
+                    Route::get( '/', [ AdministratorController::class, 'index' ] );
+                    Route::get( 'roles', [ AdministratorController::class, 'role' ] );
+                    Route::get( 'modules', [ AdministratorController::class, 'module' ] );
+                } );
 
-        Route::prefix( 'settings' )->group( function() {
+                Route::post( 'create_admin', [ AdministratorController::class, 'createAdmin' ] );
+                Route::post( 'all_admins', [ AdministratorController::class, 'getAdmins' ] );
+                Route::post( 'one_admin', [ AdministratorController::class, 'getAdmin' ] );
+                Route::post( 'update_admin', [ AdministratorController::class, 'updateAdmin' ] );
+        
+                Route::post( 'create_module', [ AdministratorController::class, 'createModule' ] );
+                Route::post( 'all_modules', [ AdministratorController::class, 'getModules' ] );
+                Route::post( 'one_module', [ AdministratorController::class, 'getModule' ] );
 
-            Route::group( [ 'middleware' => [ 'permission:add admins|view settings|edit settings|delete settings' ] ], function() {
-                Route::get( '/', [ SettingController::class, 'index' ] );
+                Route::post( 'create_role', [ AdministratorController::class, 'createRole' ] );
+                Route::post( 'all_roles', [ AdministratorController::class, 'getRoles' ] );
+                Route::post( 'one_role', [ AdministratorController::class, 'getRole' ] );
+                Route::post( 'update_role', [ AdministratorController::class, 'updateRole' ] );
             } );
 
-            Route::post( 'setup_mfa', [ SettingController::class, 'setupMFA' ] );
-            Route::post( 'reset_mfa', [ SettingController::class, 'resetMFA' ] );
+            Route::prefix( 'audit-logs' )->group( function() {
+                Route::group( [ 'middleware' => [ 'permission:add audits|view audits|edit audits|delete audits' ] ], function() {
+                    Route::get( '/', [ AuditController::class, 'index' ] );
+                } );
+
+                Route::post( 'all_audits', [ AuditController::class, 'allAudits' ] );
+                Route::post( 'one_audit', [ AuditController::class, 'oneAudit' ] );
+            } );
+
+            Route::prefix( 'settings' )->group( function() {
+
+                Route::group( [ 'middleware' => [ 'permission:add admins|view settings|edit settings|delete settings' ] ], function() {
+                    Route::get( '/', [ SettingController::class, 'index' ] );
+                } );
+            } );
+
+            Route::prefix( 'profile' )->group( function() {
+
+                Route::get( '/', [ ProfileController::class, 'index' ] );
+
+                Route::post( 'update', [ ProfileController::class, 'update' ] );
+            } );
+
         } );
 
     } );

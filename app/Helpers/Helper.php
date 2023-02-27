@@ -2,6 +2,15 @@
 
 namespace App\Helpers;
 
+use App\Models\{
+    AdminMeta,
+    AdminNotification,
+    AdminNotificationSeen,
+};
+
+use Hashids\Hashids;
+use Carbon\Carbon;
+
 class Helper {
 
     public static function websiteName() {
@@ -662,5 +671,73 @@ class Helper {
             "ZM",
             "ZW"
         ];
+    }
+
+    public static function columnIndex( $object, $search ) {
+        foreach ( $object as $key => $o ) {
+            if ( $o['id'] == $search ) {
+                return $key;
+            }
+        }
+    }
+
+    public static function encode( $id ) {
+
+        $hashids = new Hashids( config( 'app.key' ) );
+
+        return $hashids->encode( $id );
+    }
+
+    public static function decode( $id ) {
+
+        $hashids = new Hashids( config( 'app.key' ) );
+
+        return $hashids->decode( $id )[0];
+    }
+
+    public function adminNotifications() {
+
+        $notifications = AdminNotification::select( 
+            'admin_notifications.*',
+            \DB::raw( '( SELECT COUNT(*) FROM admin_notification_seens AS a WHERE a.admin_notification_id = admin_notifications.id AND a.admin_id = ' .auth()->user()->id. ' ) as is_read' )
+        )->where( function( $query ) {
+            $query->where( 'admin_id', auth()->user()->id );
+            $query->orWhere( 'role_id', auth()->user()->role );
+        } )->orWhere( function( $query ) {
+            $query->whereNull( 'admin_id' );
+            $query->whereNull( 'role_id' );
+        } )->orderBy( 'admin_notifications.created_at', 'DESC' )->get();
+
+        $totalUnread = AdminNotificationSeen::where( 'admin_id', auth()->user()->id )->count();
+
+        $data['total_unread'] = count( $notifications ) - $totalUnread;
+        $data['notifications'] = $notifications;
+
+        $data['is_notification_box_opened'] = 0;
+        $nbo = AdminMeta::where( 'meta_key', 'is_notification_box_opened' )->first();
+        if ( $nbo ) {
+            $data['is_notification_box_opened'] = $nbo->meta_value;
+        }
+
+        return $data;
+    }
+
+    public function getDisplayTimeUnit( $createdAt ) {
+
+        $created = new Carbon( $createdAt );
+        $now = Carbon::now();
+
+        if ( $created->format( 'd' ) != $now->format( 'd' ) ) {
+
+            $difference = $created->startOfDay()->diff( $now->startOfDay() )->days;
+            if ( $difference == 1 ) {
+                return __( 'template.yesterday' );
+            } else {
+                return __( 'template.' . strtolower( $created->format( 'l' ) ) );
+            }
+
+        } else {
+            return $created->setTimezone( 'Asia/Kuala_Lumpur' )->format( 'H:i' );
+        }
     }
 }

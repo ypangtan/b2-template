@@ -17,7 +17,7 @@ return [
     'logout' => 'Logout',
     'operations' => 'Operations',
     'dashboard' => 'Dashboard',
-    'administrator' => 'Administrators',
+    'administrators' => 'Administrators',
     'audit_logs' => 'Audit Logs',
     'list' => 'List',
     'roles' => 'Roles',
@@ -27,6 +27,9 @@ return [
     'customers' => 'Customers',
     'reports' => 'Reports',
     'settings' => 'Settings',
+    'first_setup' => 'First Setup',
+    'verify_account' => 'Verify Account',
+    'profile' => 'Profile',
 
     'loading' => 'Loading...',
     'export' => 'Export',

@@ -51,16 +51,11 @@
     display: none;
 }
 
-.listing-header {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: flex-start;
-}
-
-.detailpage-header {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: flex-start;
+.listing-filter {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .click-action {
@@ -77,12 +72,15 @@
 }
 .dt-bootstrap5 .table-action {
     cursor: pointer;
+    color: #3461ff;
+    width: 16px;
+    height: 16px;
 }
 .dt-bootstrap5 > .row:nth-last-child(1) {
     margin-top: 1rem;
 }
 
-.page-link {
+/* .page-link {
     color: #6c757d;
 }
 .page-link:hover {
@@ -92,23 +90,11 @@
 .page-item.active .page-link {
     background-color: #3b7ddd;
     border-color: #3b7ddd;
-}
+} */
 
 .offcanvas-button-group {
     display: flex;
     justify-content: flex-end;
-}
-
-.rating {
-    cursor: pointer;
-    width: 24px;
-    height: 24px;
-    stroke-width: 1.25px;
-}
-
-.noline-td {
-    border-color: rgba(0, 0, 0, 0) !important;
-    vertical-align: top !important;
 }
 
 .password-wrapper {
@@ -144,6 +130,49 @@
     border: unset;
 }
 
+.mobile-listing-header {
+    display: none;
+}
+
+.first-mfa {
+    max-width: 25%;
+    margin: 0 auto;
+    text-align: center;
+    transform: translateY(25%);
+}
+
+.verify-mfa {
+    max-width: 25%;
+    margin: 0 auto;
+    text-align: center;
+    transform: translateY(25%);
+}
+
+.dashboard-icon-wrapper {
+    background-color: #d3e2f7;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.notification-read {
+    opacity: .65;
+}
+
+.header-notifications-list .msg-time {
+    font-weight: 500;
+}
+
+.attachment-list .attachment {
+    padding: 0px 10px 5px;
+}
+.attachment-list .attachment:not(:first-child) {
+    padding: 5px 10px 5px;
+}
+
 @media only screen and (max-width: 600px) {
     .offcanvas-right {
         width: 100%;
@@ -153,6 +182,33 @@
     .offcanvas-image-preview {
         display: flex;
         justify-content: center;
+    }
+    
+    .listing-filter {
+        grid-template-columns: 1fr;
+    }
+
+    .mobile-listing-header {
+        display: block;
+    }
+
+    .first-mfa {
+        max-width: 100%;
+        transform: unset;
+        height: 100vh;
+    }
+    .first-mfa .card-body {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+    .verify-mfa {
+        max-width: 100%;
+        transform: unset;
+        height: 100vh;
+    }
+    .verify-mfa .card-body {
+        padding-left: 30px;
+        padding-right: 30px;
     }
 }
 
