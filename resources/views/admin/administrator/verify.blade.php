@@ -21,7 +21,7 @@
         $( '#submit' ).click( function() {
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/verify-code',
+                url: '{{ route( 'admin.verifyCode' ) }}',
                 type: 'POST',
                 data: {
                     authentication_code: $( '#authentication_code' ).val(),
@@ -31,7 +31,7 @@
                     console.log( response );
 
                     if( response.status ) {
-                        window.location.href = '{{ Helper::baseAdminUrl() . '/dashboard' }}';
+                        window.location.href = '{{ route( 'admin.dashboard.index' ) }}';
                     }
                 },
                 error: function( error ) {
@@ -52,7 +52,7 @@
 
         $( '#logout' ).click( function() {
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/logout',
+                url: '{{ route( 'admin.logoutLog' ) }}',
                 type: 'POST',
                 data: { '_token': '{{ csrf_token() }}' },
                 success: function() {

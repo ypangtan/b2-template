@@ -88,6 +88,6 @@
                             }
 
                             function switchLanguage() {
-                                window.location.href = '{{ Helper::baseAdminUrl() }}/lang/' + document.getElementById( 'select_language' ).value
+                                window.location.href = '{{ Helper::baseAdminUrl() }}' + document.getElementById( 'select_language' ).value
                             }
                         </script>

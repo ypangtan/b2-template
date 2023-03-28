@@ -25,7 +25,7 @@
             
             $( '#_logout' ).click( function() {
                 $.ajax( {
-                    url: '{{ Helper::baseAdminUrl() }}/administrators/logout',
+                    url: '{{ route( 'admin.logoutLog' ) }}',
                     type: 'POST',
                     data: { '_token': '{{ csrf_token() }}' },
                     success: function() {
@@ -46,32 +46,16 @@
                 }
             } );
 
+            $( document ).on( 'hidden.bs.offcanvas', '.offcanvas-right', function() {
+                $( '.offcanvas-body .form-control' ).removeClass( 'is-invalid' ).val( '' );
+                $( '.invalid-feedback' ).text( '' );
+                $( '.offcanvas-body .form-select' ).removeClass( 'is-invalid' ).val( '' );
+            } );
+
             $( '.form-control-plaintext' ).focus( function() {
                 $( this ).blur();
             } );
         } );
-
-        // $( '.notification-dropdown' ).click( function() {
-        //     updateNotificationBox();
-        // } );
-
-        // function updateNotificationBox() {
-
-        //     if ( $( '.notify-badge' ).data( 'opened' ) == 0 ) {
-
-        //         $.ajax( {
-        //             url: '{{ Helper::baseAdminUrl() }}/administrators/updateNotificationBox',
-        //             type: 'POST',
-        //             data: {
-        //                 '_token': '{{ csrf_token() }}'
-        //             },
-        //             success: function( request ) {
-        //                 $( '.notify-badge' ).addClass( 'hidden' );
-        //                 $( '.notify-badge' ).data( 'opened', 1 );
-        //             },
-        //         } );
-        //     }
-        // }
 
         $( '.notification-row' ).click( function() {
 
@@ -82,7 +66,7 @@
             }
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/updateNotificationSeen',
+                url: '{{ route( 'admin.updateNotificationSeen' ) }}',
                 type: 'POST',
                 data: {
                     id: that.data( 'id' ),

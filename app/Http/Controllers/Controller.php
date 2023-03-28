@@ -17,7 +17,7 @@ class Controller extends BaseController
 
         if( !app()->runningInConsole() ) {
             $routeArray = app( 'request' )->route()->getAction();
-            list( $controller, $action ) = explode( '@', class_basename( $routeArray['controller'] ) );
+            list( $controller, $action ) = explode( '@', $routeArray['controller'] );
     
             $this->data['controller'] = $controller;
             $this->data['action'] = $action;

@@ -23,6 +23,8 @@ return [
     'password' => '密码',
     'leave_blank' => '密码 (留空保持不变)',
 
+    'super_admin' => '超级管理员',
+    
     'admin_created' => '已创建新管理员。',
     'admin_updated' => '已更新管理员。',
 ];

@@ -14,11 +14,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get( '/', function () {
-    return redirect( '/base2_admin/dashboard' );
+    return redirect( '/backoffice/dashboard' );
 } );
 
 Route::get( 'home', function () {
-    return redirect( '/base2_admin/dashboard' );
+    return redirect( '/backoffice/dashboard' );
 } );
 
 require __DIR__ . '/admin.php';

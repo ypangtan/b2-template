@@ -23,6 +23,8 @@ return [
     'password' => 'Password',
     'leave_blank' => 'Password (leave blank to leave unchanged)',
 
+    'super_admin' => 'Super Admin',
+
     'admin_created' => 'New Admin Created.',
     'admin_updated' => 'Admin Updated.',
 ];

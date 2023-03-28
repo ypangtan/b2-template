@@ -21,7 +21,7 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if( request()->is( 'base2_admin/*' ) ) {
+        if( request()->is( 'backoffice/*' ) ) {
             config()->set( 'fortify.guard', 'admin' );
             config()->set( 'fortify.home', '/admin/home' );
         }

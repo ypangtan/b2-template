@@ -26,7 +26,7 @@ class Helper {
     }
 
     public static function adminPath() {
-        return 'base2_admin';
+        return 'backoffice';
     }
 
     public static function baseBranchUrl() {

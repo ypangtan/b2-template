@@ -105,7 +105,7 @@
                     $( this ).addClass( 'disabled' );
 
                     $.ajax( {
-                        url: '{{ Helper::baseAdminUrl() }}/settings/reset_mfa',
+                        url: '{{ route( 'admin.resetMFA' ) }}',
                         type: 'POST',
                         data: {
                             one_time_password: $( '#mfa_reset_one_time_password' ).val(),
@@ -163,7 +163,7 @@
             $( '.invalid-feedback' ).text( '' );
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/settings/setup_mfa',
+                url: '{{ route( 'admin.setupMFA' ) }}',
                 type: 'POST',
                 data: data,
                 success: function( response ) {

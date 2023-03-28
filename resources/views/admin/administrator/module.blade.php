@@ -96,7 +96,7 @@ $contents = [
                 }
             },
             ajax: {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/all_modules',
+                url: '{{ route( 'admin.administrator.allModules' ) }}',
                 data: {
                     '_token': '{{ csrf_token() }}',
                 },
@@ -161,7 +161,7 @@ $contents = [
             var id = $( this ).data( 'id' );
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/one_role',
+                url: '{{ route( 'admin.administrator.oneRole' ) }}',
                 type: 'POST',
                 data: { id, '_token': '{{ csrf_token() }}', },
                 success: function( response ) {
@@ -179,7 +179,7 @@ $contents = [
         $( mc + '_submit' ).click( function() {
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/create_module',
+                url: '{{ route( 'admin.administrator.createModule' ) }}',
                 type: 'POST',
                 data: {
                     'module_name': $( mc + '_module_name' ).val().trim().replace(/ /g,"_").toLowerCase(),

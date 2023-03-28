@@ -61,7 +61,7 @@ $profile = 'profile';
             resetInputValidation();
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/profile/update',
+                url: '{{ route( 'admin.profile.update' ) }}',
                 type: 'POST',
                 data: {
                     username: $( p + '_username' ).val(),

@@ -33,6 +33,9 @@ return [
     'inactive' => 'Inactive',
     'action' => 'Action',
 
+    'view' => 'View',
+    'edit' => 'Edit',
+
     'sub_total' => 'Sub Total',
     'grand_total' => 'Grand Total',
 ];

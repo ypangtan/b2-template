@@ -18,8 +18,8 @@ class LogoutResponse implements LogoutResponseContract
      */
     public function toResponse($request)
     {
-        if( request()->is( 'base2_admin/*' ) ) {
-            return $request->wantsJson() ? new JsonResponse( '', 204 ) : redirect( 'base2_admin/login' );
+        if( request()->is( 'backoffice/*' ) ) {
+            return $request->wantsJson() ? new JsonResponse( '', 204 ) : redirect( 'backoffice/login' );
         } else if( request()->is( 'base2_branch/*' ) ) {
             return $request->wantsJson() ? new JsonResponse( '', 204 ) : redirect( 'base2_branch/login' );
         } else {

@@ -48,7 +48,7 @@
             }, that = $( this );
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/settings/setup_mfa',
+                url: '{{ route( 'admin.setupMFA' ) }}',
                 type: 'POST',
                 data: data,
                 success: function( response ) {
@@ -62,7 +62,7 @@
                     that.addClass( 'disabled' );
 
                     setTimeout(function(){
-                        window.location.href = '{{ Helper::baseAdminUrl() . '/dashboard' }}';
+                        window.location.href = '{{ route( 'admin.dashboard.index' ) }}';
                     }, 2000 );
 
                 },
@@ -86,7 +86,7 @@
 
         $( '#mfa_logout' ).click( function() {
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/logout',
+                url: '{{ route( 'admin.logoutLog' ) }}',
                 type: 'POST',
                 data: { '_token': '{{ csrf_token() }}' },
                 success: function() {

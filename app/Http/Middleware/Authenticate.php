@@ -16,7 +16,7 @@ class Authenticate extends Middleware
     {
         if (! $request->expectsJson()) {
 
-            if( request()->is( 'base2_admin/*' ) ) {
+            if( request()->is( 'backoffice/*' ) ) {
                 \Session::put( 'redirect', \URL::full() );
                 return route( 'admin.login' );
             }

@@ -36,12 +36,12 @@ class AdministratorController extends Controller {
         return view( 'admin.main_v2' )->with( $this->data );
     }
 
-    public function getAdmins( Request $request, AdminService $adminService ) {
+    public function allAdmins( Request $request, AdminService $adminService ) {
 
         return response()->json( $adminService->all( $request ) );
     }
 
-    public function getAdmin( Request $request, AdminService $adminService ) {
+    public function oneAdmin( Request $request, AdminService $adminService ) {
 
         return response()->json( $adminService->one( $request ) );
     }
@@ -59,11 +59,6 @@ class AdministratorController extends Controller {
     public function logoutLog( Request $request ) {
         
         return AdminService::logoutLog( $request );
-    }
-
-    public function updateNotificationBox( Request $request ) {
-
-        return AdminService::updateNotificationBox( $request );
     }
 
     public function updateNotificationSeen( Request $request ) {
@@ -85,7 +80,7 @@ class AdministratorController extends Controller {
         return view( 'admin.main_v2' )->with( $this->data );
     }
 
-    public function getModules( Request $request, ModuleService $moduleService ) {
+    public function allModules( Request $request, ModuleService $moduleService ) {
 
         return response()->json( $moduleService->all( $request ) );
     }
@@ -109,12 +104,12 @@ class AdministratorController extends Controller {
         return view( 'admin.main_v2' )->with( $this->data );
     }
 
-    public function getRoles( Request $request, RoleService $roleService ) {
+    public function allRoles( Request $request, RoleService $roleService ) {
 
         return response()->json( $roleService->all( $request ) );
     }
 
-    public function getRole( Request $request, RoleService $roleService ) {
+    public function oneRole( Request $request, RoleService $roleService ) {
 
         return response()->json( $roleService->one( $request ) );
     }

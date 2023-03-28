@@ -33,6 +33,9 @@ return [
     'inactive' => '待用',
     'action' => '操作',
 
+    'view' => '查看',
+    'edit' => '编辑',
+    
     'sub_total' => '小计',
     'grand_total' => '累计',
 ];

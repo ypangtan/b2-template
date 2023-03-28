@@ -13,8 +13,8 @@ class LoginResponse implements LoginResponseContract
     public function toResponse($request)
     {
         $home = '/home';
-        if( request()->is( 'base2_admin/*' ) ) {
-            $home = '/base2_admin/dashboard';
+        if( request()->is( 'backoffice/*' ) ) {
+            $home = '/backoffice/dashboard';
         }
         if( request()->is( 'base2_branch/*' ) ) {
             $home = '/base2_branch/dashboard';

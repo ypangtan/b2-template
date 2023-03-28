@@ -98,7 +98,7 @@
                     <div class="dropdown dropdown-user-setting">
                         <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                             <div class="user-setting d-flex align-items-center gap-3">
-                                <img src="{{ asset( 'admin/img/avatar.png' ) . Helper::assetVersion() }}" alt="" class="user-img" style="opacity: .65" />
+                                <img src="https://ui-avatars.com/api/?background=3461ff&color=fff&name={{ auth()->user()->name }}" alt="" class="user-img" style="" />
                                 <div class="d-none d-sm-block">
                                     <p class="user-name mb-0">{{ auth()->user()->name }}</p>
                                     <small class="mb-0 dropdown-user-designation">{{ $role[auth()->user()->role] }}</small>
@@ -107,7 +107,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="{{ Helper::baseAdminUrl() }}/profile">
+                                <a class="dropdown-item" href="{{ route( 'admin.profile.index' ) }}">
                                     <div class="d-flex align-items-center">
                                         <div class=""><i class="bi bi-person-lines-fill"></i></div>
                                         <div class="ms-3"><span>{{ __( 'template.profile' ) }}</span></div>

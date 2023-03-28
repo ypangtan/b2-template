@@ -128,7 +128,7 @@ $columns = [
                 }
             },
             ajax: {
-                url: '{{ Helper::baseAdminUrl() }}/audit-logs/all_audits',
+                url: '{{ route( 'admin.audit.allAudits' ) }}',
                 data: {
                     '_token': '{{ csrf_token() }}',
                 },
@@ -208,7 +208,7 @@ $columns = [
             var id = $( this ).data( 'id' );
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/audit-logs/one_audit',
+                url: '{{ route( 'admin.audit.oneAudit' ) }}',
                 type: 'POST',
                 data: { id, '_token': '{{ csrf_token() }}', },
                 success: function( response ) {

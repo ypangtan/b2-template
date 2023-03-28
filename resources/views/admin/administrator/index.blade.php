@@ -136,7 +136,7 @@ array_push( $contents, [
                 }
             },
             ajax: {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/all_admins',
+                url: '{{ route( 'admin.administrator.allAdmins' ) }}',
                 data: {
                     '_token': '{{ csrf_token() }}',
                 },
@@ -209,7 +209,7 @@ array_push( $contents, [
             var id = $( this ).data( 'id' );
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/one_admin',
+                url: '{{ route( 'admin.administrator.oneAdmin' ) }}',
                 type: 'POST',
                 data: { id, '_token': '{{ csrf_token() }}', },
                 success: function( response ) {
@@ -227,7 +227,7 @@ array_push( $contents, [
         $( ac + '_submit' ).click( function() {
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/create_admin',
+                url: '{{ route( 'admin.administrator.createAdmin' ) }}',
                 type: 'POST',
                 data: {
                     'username': $( ac + '_username' ).val(),
@@ -257,7 +257,7 @@ array_push( $contents, [
         $( ae + '_submit' ).click( function() {
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/update_admin',
+                url: '{{ route( 'admin.administrator.updateAdmin' ) }}',
                 type: 'POST',
                 data: {
                     'id': $( ae + '_id' ).val(),

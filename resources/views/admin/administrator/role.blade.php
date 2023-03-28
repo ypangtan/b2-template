@@ -96,7 +96,7 @@ $contents = [
                 }
             },
             ajax: {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/all_roles',
+                url: '{{ route( 'admin.administrator.allRoles' ) }}',
                 data: {
                     '_token': '{{ csrf_token() }}',
                 },
@@ -174,7 +174,7 @@ $contents = [
             var id = $( this ).data( 'id' );
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/one_role',
+                url: '{{ route( 'admin.administrator.oneRole' ) }}',
                 type: 'POST',
                 data: { id, '_token': '{{ csrf_token() }}', },
                 success: function( response ) {
@@ -213,7 +213,7 @@ $contents = [
             } );
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/create_role',
+                url: '{{ route( 'admin.administrator.createRole' ) }}',
                 type: 'POST',
                 data: {
                     'role_name': $( rc + '_role_name' ).val().trim().replace(/ /g,"_").toLowerCase(),
@@ -260,7 +260,7 @@ $contents = [
             } );
 
             $.ajax( {
-                url: '{{ Helper::baseAdminUrl() }}/administrators/update_role',
+                url: '{{ route( 'admin.administrator.updateRole' ) }}',
                 type: 'POST',
                 data: {
                     'id': $( re + '_id' ).val(),
