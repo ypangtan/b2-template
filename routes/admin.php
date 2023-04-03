@@ -49,6 +49,9 @@ Route::prefix( 'backoffice' )->group( function() {
         
                 Route::post( 'create-module', [ AdministratorController::class, 'createModule' ] )->name( 'admin.administrator.createModule' );
                 Route::post( 'all-modules', [ AdministratorController::class, 'allModules' ] )->name( 'admin.administrator.allModules' );
+                Route::post( 'one-module', [ AdministratorController::class, 'oneModule' ] )->name( 'admin.administrator.oneModule' );
+                Route::post( 'update-module', [ AdministratorController::class, 'updateModule' ] )->name( 'admin.administrator.updateModule' );
+                Route::post( 'delete-module', [ AdministratorController::class, 'deleteModule' ] )->name( 'admin.administrator.deleteModule' );
 
                 Route::post( 'create-role', [ AdministratorController::class, 'createRole' ] )->name( 'admin.administrator.createRole' );
                 Route::post( 'all-roles', [ AdministratorController::class, 'allRoles' ] )->name( 'admin.administrator.allRoles' );

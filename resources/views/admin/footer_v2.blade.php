@@ -51,10 +51,6 @@
                 $( '.invalid-feedback' ).text( '' );
                 $( '.offcanvas-body .form-select' ).removeClass( 'is-invalid' ).val( '' );
             } );
-
-            $( '.form-control-plaintext' ).focus( function() {
-                $( this ).blur();
-            } );
         } );
 
         $( '.notification-row' ).click( function() {

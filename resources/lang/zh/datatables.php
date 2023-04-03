@@ -26,6 +26,7 @@ return [
     'search_x' => '查找:title',
     'select_x' => '选择:title',
     'all' => '全部',
+    'all_x' => '全部:title',
     'created_date' => '创建日期',
     'registered_date' => '注册日期',
     'status' => '状态',

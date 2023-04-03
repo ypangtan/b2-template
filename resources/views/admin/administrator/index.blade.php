@@ -142,7 +142,7 @@ array_push( $contents, [
                 },
                 dataSrc: 'admins',
             },
-            lengthMenu: [[10, 2],[10, 2]],
+            lengthMenu: [[10, 1],[10, 1]],
             order: [[ 1, 'desc' ]],
             columns: [
                 { data: null },
@@ -240,10 +240,10 @@ array_push( $contents, [
                     $( '#toast .toast-body' ).text( '{{ __( 'administrator.admin_created' ) }}' ); 
                     toast.show();
                     admin_create_canvas.hide();
-                    dt_table.draw();
+                    dt_table.draw( false );
                 },
                 error: function( error ) {
-                    if( error.status === 422 ) {
+                    if ( error.status === 422 ) {
                         var errors = error.responseJSON.errors;
                         $.each( errors, function( key, value ) {
                             $( ac + '_' + key ).addClass( 'is-invalid' ).next().text( value );
@@ -271,17 +271,17 @@ array_push( $contents, [
                     $( '#toast .toast-body' ).text( '{{ __( 'administrator.admin_updated' ) }}' );
                     toast.show();
                     admin_edit_canvas.hide();
-                    dt_table.draw();
+                    dt_table.draw( false );
                 },
                 error: function( error ) {
-                    if( error.status === 422 ) {
+                    if ( error.status === 422 ) {
                         var errors = error.responseJSON.errors;
                         $.each( errors, function( key, value ) {
                             $( ae + '_' + key ).addClass( 'is-invalid' ).next().text( value );
                         } );
                     }
                 }
-            } )
+            } );
         } );
 
         window['registeredDate'] = $( '#registered_date' ).flatpickr( {
@@ -289,7 +289,7 @@ array_push( $contents, [
             disableMobile: true,
             onClose: function( selected, dateStr, instance ) {
                 window[$( instance.element ).data('id')] = $( instance.element ).val();
-                dt_table.draw();
+                dt_table.draw( false );
             }
         } );
     } );

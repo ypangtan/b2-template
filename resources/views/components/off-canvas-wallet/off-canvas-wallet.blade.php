@@ -1,6 +1,6 @@
 <div class="offcanvas offcanvas-end offcanvas-right" tabindex="-1" id="{{ $crud }}_canvas" aria-labelledby="service_add_canvas_label">
     <div class="offcanvas-header">
-        <h2 id="{{ $crud }}_canvas_label">{{ __( 'wallet.update_wallet' ) }}</h2>
+        <h2 id="{{ $crud }}_canvas_label" class="mb-0">{{ __( 'wallet.update_wallet' ) }}</h2>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">

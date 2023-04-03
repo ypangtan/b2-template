@@ -4,82 +4,175 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Storage;
 
-use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\{
+    Permission,
+    Role
+};
 
 use App\Models\{
-    Module
+    Module,
+    Role as RoleModel
 };
 
 use Helper;
 
+use Carbon\Carbon;
+
 class ModuleService {
 
-    public static function all( $request ) {
-
-        $filter = false;
-
-        $limit = $request->input( 'length' );
-        $offset = $request->input( 'start' );
+    public function allModules( $request ) {
 
         $module = Module::select( 'modules.*' );
 
-        if( !empty( $search_date = $request->input( 'columns.1.search.value' ) ) ) {
-            if( str_contains( $search_date, 'to' ) ) {
-                $dates = explode( ' to ', $search_date );
-                $module->whereBetween( 'modules.created_at', [ $dates[0] . ' 00:00:00' , $dates[1] . ' 23:59:59' ] );
-            } else {
-                $module->whereBetween( 'modules.created_at', [ $search_date . ' 00:00:00' , $search_date . ' 23:59:59' ] );
-            }
-            $filter = true;
-        }
-        
-        if( !empty( $name = $request->input( 'columns.2.search.value' ) ) ) {
-            $module->where( 'name', 'LIKE', "%{$name}%" );
-            $filter = true;
-        }
+        $filterObject = self::filter( $request, $module );
+        $module = $filterObject['model'];
+        $filter = $filterObject['filter'];
 
-        if( $request->input( 'order.0.column' ) != 0 ) {
-
-            switch( $request->input( 'order.0.column' ) ) {
+        if ( $request->input( 'order.0.column' ) != 0 ) {
+            $dir = $request->input( 'order.0.dir' );
+            switch ( $request->input( 'order.0.column' ) ) {
                 case 1:
-                    $module->orderBy( 'created_at', $request->input( 'order.0.dir' ) );
+                    $module->orderBy( 'created_at', $dir );
                     break;
                 case 2:
-                    $module->orderBy( 'name', $request->input( 'order.0.dir' ) );
+                    $module->orderBy( 'name', $dir );
                     break;
             }
         }
 
-        $count_module = $module->count();
+        $moduleCount = $module->count();
+
+        $limit = $request->length;
+        $offset = $request->start;
         
         $modules = $module->skip( $offset )->take( $limit )->get();
 
-        $total = Module::count();
+        $totalRecord = Module::count();
 
-        $data = array(
+        $data = [
             'modules' => $modules,
-            'draw' => $request->input( 'draw' ),
-            'recordsFiltered' => $filter ? $count_module : $total,
-            'recordsTotal' => $total,
-        );
+            'draw' => $request->draw,
+            'recordsFiltered' => $filter ? $moduleCount : $totalRecord,
+            'recordsTotal' => $totalRecord,
+        ];
 
-        return $data;
+        return response()->json( $data );
     }
 
-    public static function create( $request ) {
+    private function filter( $request, $model ) {
+
+        $filter = false;
+
+        if (  !empty( $request->created_date ) ) {
+            if ( str_contains( $request->created_date, 'to' ) ) {
+                $dates = explode( ' to ', $request->created_date );
+
+                $startDate = explode( '-', $dates[0] );
+                $start = Carbon::create( $startDate[0], $startDate[1], $startDate[2], 0, 0, 0, 'Asia/Kuala_Lumpur' );
+                
+                $endDate = explode( '-', $dates[1] );
+                $end = Carbon::create( $endDate[0], $endDate[1], $endDate[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
+
+                $model->whereBetween( 'modules.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );                
+            } else {
+
+                $dates = explode( '-', $request->created_date );
+    
+                $start = Carbon::create( $dates[0], $dates[1], $dates[2], 0, 0, 0, 'Asia/Kuala_Lumpur' );
+                $end = Carbon::create( $dates[0], $dates[1], $dates[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
+
+                $model->whereBetween( 'modules.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
+            }
+
+            $filter = true;
+        }
+        
+        if ( !empty( $name = $request->module_name ) ) {
+            $model->where( 'name', 'LIKE', "%{$name}%" );
+            $filter = true;
+        }
+
+        if ( !empty( $guardName = $request->guard_name ) ) {
+            $model->where( 'guard_name', $guardName );
+            $filter = true;
+        }
+
+        return [
+            'filter' => $filter,
+            'model' => $model,
+        ];
+    }
+
+    public function oneModule( $request ) {
+
+        $module = Module::find( $request->id );
+
+        return response()->json( $module );
+    }
+
+    public function createModule( $request ) {
 
         $request->validate( [
-            'module_name' => 'required|max:50',
+            'module_name' => [ 'required', 'max:50', function( $attribute, $value, $fail ) {
+
+                $existingModule = Module::where( 'name', $value )->where( 'guard_name', request( 'guard_name' ) )->first();
+                if ( $existingModule ) {
+                    $fail( __( 'validation.exists' ) );
+                }
+            } ],
             'guard_name' => 'required',
         ] );
 
-        Module::create( [
+        $createModule = Module::create( [
             'name' => $request->module_name,
             'guard_name' => $request->guard_name,
         ] );
 
-        foreach( Helper::moduleActions() as $action ) {
-            Permission::create( [ 'name' => $action . ' ' . $request->module_name, 'guard_name' => $request->guard_name ] );
+        foreach ( Helper::moduleActions() as $action ) {
+            $createPermission = Permission::create( [ 
+                'name' => $action . ' ' . $request->module_name, 
+                'guard_name' => $request->guard_name,  
+            ] );
+
+            $updatePermission = Permission::find( $createPermission->id );
+            $updatePermission->module = $createModule->id;
+            $updatePermission->save();
         }
+    }
+
+    public function updateModule( $request ) {
+
+        $updateModule = Module::find( $request->id );
+        $oldModuleName = $updateModule->name;
+        $updateModule->name = $request->module_name;
+        $updateModule->guard_name = $request->guard_name;
+        $updateModule->save();
+
+        $permissions = Permission::where( 'module', $request->id )->get();
+        foreach ( $permissions as $permission ) {
+
+            $permission->name = str_replace( $oldModuleName, $request->module_name, $permission->name );
+            $permission->save();
+        }
+
+        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();        
+    }
+
+    public function deleteModule( $request ) {
+
+        $module = Module::find( $request->id );
+
+        foreach ( Role::all() as $role ) {
+
+            foreach ( Helper::moduleActions() as $action ) {
+                $role->revokePermissionTo( $action . ' ' . $module->name, $module->guard );
+            }
+        }
+
+        Permission::where( 'module', $module->id )->delete();
+
+        $module->delete();
+
+        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

@@ -19,81 +19,58 @@ use Carbon\Carbon;
 
 class AdminService {
     
-    public function all( $request ) {
-
-        $filter = false;
+    public function allAdmins( $request ) {
 
         $admin = Admin::select( 'admins.*', 'roles.name as role_name' );
         $admin->leftJoin( 'roles', 'admins.role', '=', 'roles.id' );
 
-        if( !empty( $request->registered_date ) ) {
-            if( str_contains( $request->registered_date, 'to' ) ) {
-                $dates = explode( ' to ', $request->registered_date );
+        $filterObject = self::filter( $request, $admin );
+        $admin = $filterObject['model'];
+        $filter = $filterObject['filter'];
 
-                $startDate = explode( '-', $dates[0] );
-                $start = Carbon::create( $startDate[0], $startDate[1], $startDate[2], 0, 0, 0, 'Asia/Kuala_Lumpur' );
-                
-                $endDate = explode( '-', $dates[1] );
-                $end = Carbon::create( $endDate[0], $endDate[1], $endDate[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
-
-                $admin->whereBetween( 'admins.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
-            } else {
-
-                $dates = explode( '-', $request->registered_date );
-
-                $start = Carbon::create( $dates[0], $dates[1], $dates[2], 0, 0, 0, 'Asia/Kuala_Lumpur' );
-                $end = Carbon::create( $dates[0], $dates[1], $dates[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
-
-                $admin->whereBetween( 'admins.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
-            }
-            $filter = true;
-        }
-        
-        if( !empty( $request->username ) ) {
-            $admin->where( 'username', $request->username );
-            $filter = true;
-        }
-
-        if( !empty( $request->email ) ) {
-            $admin->where( 'email', $request->email );
-            $filter = true;
-        }
-
-        if( !empty( $request->role ) ) {
-            $admin->where( 'roles.id', $request->role );
-            $filter = true;
-        }
-
-        if( $request->input( 'order.0.column' ) != 0 ) {
-
-            switch( $request->input( 'order.0.column' ) ) {
+        if ( $request->input( 'order.0.column' ) != 0 ) {
+            $dir = $request->input( 'order.0.dir' );
+            switch ( $request->input( 'order.0.column' ) ) {
                 case 1:
-                    $admin->orderBy( 'created_at', $request->input( 'order.0.dir' ) );
+                    $admin->orderBy( 'created_at', $dir );
                     break;
                 case 2:
-                    $admin->orderBy( 'username', $request->input( 'order.0.dir' ) );
+                    $admin->orderBy( 'username', $dir );
                     break;
                 case 3:
-                    $admin->orderBy( 'email', $request->input( 'order.0.dir' ) );
+                    $admin->orderBy( 'email', $dir );
                     break;
                 case 4:
-                    $admin->orderBy( 'role', $request->input( 'order.0.dir' ) );
+                    $admin->orderBy( 'role', $dir );
                     break;
             }
         }
 
         $adminCount = $admin->count();
 
-        $limit = $request->input( 'length' );
-        $offset = $request->input( 'start' );
-        
-        $adminObject = $admin->skip( $offset )->take( $limit );
-        $admins = $adminObject->get();
+        $limit = $request->length;
+        $offset = $request->start;
 
-        $admin = Admin::select( \DB::raw( 'COUNT(id) as total' ) );
+        $admins = $admin->skip( $offset )->take( $limit )->get();
 
-        if( !empty( $request->registered_date ) ) {
-            if( str_contains( $request->registered_date, 'to' ) ) {
+        $totalRecord = Admin::count();
+
+        $data = [
+            'admins' => $admins,
+            'draw' => $request->draw,
+            'recordsFiltered' => $filter ? $adminCount : $totalRecord,
+            'recordsTotal' => $totalRecord,
+        ];
+
+        return response()->json( $data );
+    }
+
+    private function filter( $request, $model ) {
+
+        $filter = false;
+
+        if ( !empty( $request->registered_date ) ) {
+            if ( str_contains( $request->registered_date, 'to' ) ) {
                 $dates = explode( ' to ', $request->registered_date );
 
                 $startDate = explode( '-', $dates[0] );
@@ -102,7 +79,7 @@ class AdminService {
                 $endDate = explode( '-', $dates[1] );
                 $end = Carbon::create( $endDate[0], $endDate[1], $endDate[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
 
-                $admin->whereBetween( 'admins.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
+                $model->whereBetween( 'admins.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
             } else {
 
                 $dates = explode( '-', $request->registered_date );
@@ -110,29 +87,40 @@ class AdminService {
                 $start = Carbon::create( $dates[0], $dates[1], $dates[2], 0, 0, 0, 'Asia/Kuala_Lumpur' );
                 $end = Carbon::create( $dates[0], $dates[1], $dates[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
 
-                $admin->whereBetween( 'admins.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
+                $model->whereBetween( 'admins.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
             }
             $filter = true;
         }
 
-        $admin = $admin->first();
+        if ( !empty( $request->username ) ) {
+            $model->where( 'username', $request->username );
+            $filter = true;
+        }
 
-        $data = array(
-            'admins' => $admins,
-            'draw' => $request->input( 'draw' ),
-            'recordsFiltered' => $filter ? $adminCount : $admin->total,
-            'recordsTotal' => Admin::select( \DB::raw( 'COUNT(id) as total' ) )->first()->total,
-        );
+        if ( !empty( $request->email ) ) {
+            $model->where( 'email', $request->email );
+            $filter = true;
+        }
 
-        return $data;
+        if ( !empty( $request->role ) ) {
+            $model->where( 'roles.id', $request->role );
+            $filter = true;
+        }
+
+        return [
+            'filter' => $filter,
+            'model' => $model,
+        ];
     }
 
-    public function one( $request ) {
+    public function oneAdmin( $request ) {
 
-        return Admin::find( $request->id );
+        $admin = Admin::find( $request->id );
+
+        return response()->json( $admin );
     }
 
-    public function create( $request ) {
+    public function createAdmin( $request ) {
 
         $request->validate( [
             'username' => 'required|max:25|unique:admins,username',
@@ -142,8 +130,8 @@ class AdminService {
         ] );
 
         $createAdmin = Admin::create( [
-            'username' => $request->username,
-            'email' => $request->email,
+            'username' => strtolower( $request->username ),
+            'email' => strtolower( $request->email ),
             'role' => $request->role,
             'password' => \Hash::make( $request->password ),
         ] );
@@ -155,7 +143,7 @@ class AdminService {
         return $createAdmin;
     }
 
-    public function update( $request ) {
+    public function updateAdmin( $request ) {
 
         $request->validate( [
             'username' => 'required|max:25|unique:admins,username,' . $request->id,
@@ -166,11 +154,11 @@ class AdminService {
 
         $updateAdmin = Admin::find( $request->id );
         $updateAdmin->id = $request->id;
-        $updateAdmin->username = $request->username;
-        $updateAdmin->email = $request->email;
+        $updateAdmin->username = strtolower( $request->username );
+        $updateAdmin->email = strtolower( $request->email );
         $updateAdmin->role = $request->role;
 
-        if( !empty( $request->password ) ) {
+        if ( !empty( $request->password ) ) {
             $updateAdmin->password = \Hash::make( $request->password );
         }
 
@@ -224,16 +212,6 @@ class AdminService {
                 ]
             ] )
             ->log( 'admin logout' );
-    }
-
-    public function updateNotificationBox( $request ) {
-        
-        AdminMeta::updateOrCreate( [
-            'admin_id' => auth()->user()->id,
-            'meta_key' => 'is_notification_box_opened'
-        ], [
-            'meta_value' => '1'
-        ] );
     }
 
     public function updateNotificationSeen( $request ) {

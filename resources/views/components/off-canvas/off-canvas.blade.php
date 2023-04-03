@@ -1,6 +1,6 @@
 <div class="offcanvas offcanvas-end offcanvas-right" tabindex="-1" id="{{ $crud }}_canvas" aria-labelledby="{{ $crud }}_canvas_label">
     <div class="offcanvas-header">
-        <h2 id="{{ $crud }}_canvas_label">{{ $title }}</h2>
+        <h2 id="{{ $crud }}_canvas_label" class="mb-0">{{ $title }}</h2>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
@@ -53,7 +53,7 @@
     @endforeach
 
         <div class="offcanvas-button-group">
-            <button type="submit" class="btn btn-success" id="{{ $crud }}_submit">{{ __( 'template.save_changes' ) }}</button>&nbsp;&nbsp;<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas" aria-label="Close" id="offcanvas_close">{{ __( 'template.cancel' ) }}</button>
+            <button type="submit" class="btn btn-sm btn-success" id="{{ $crud }}_submit">{{ __( 'template.save_changes' ) }}</button>&nbsp;&nbsp;<button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="offcanvas" aria-label="Close" id="offcanvas_close">{{ __( 'template.cancel' ) }}</button>
         </div>
     </div>
 </div>

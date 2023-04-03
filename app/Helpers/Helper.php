@@ -92,7 +92,7 @@ class Helper {
         
         curl_close( $curl );
 
-        if( $error ) {
+        if ( $error ) {
             return false;
         } else {
             return $response;
@@ -124,7 +124,7 @@ class Helper {
         
         curl_close( $curl );
         
-        if( $error ) {
+        if ( $error ) {
             return false;
         } else {
             return $response;
@@ -156,7 +156,7 @@ class Helper {
 
         $info = getimagesize( $raw_image );
 
-		switch( $info['mime'] ) {
+		switch ( $info['mime'] ) {
 			case 'image/jpeg':
 				$image = imagecreatefromjpeg( $raw_image );
 				break;
@@ -164,13 +164,13 @@ class Helper {
 				$image = imagecreatefrompng( $raw_image );
 				break;
 			case 'image/gif':
-				$image = imagecreatefromgif( $raw_image );
+				$image = imagecreatefromgif ( $raw_image );
 				break;
 		}
 
         $exif = @exif_read_data( $raw_image );
 
-        if( !empty( $exif ) && isset( $exif['Orientation'] ) ) {
+        if ( !empty( $exif ) && isset( $exif['Orientation'] ) ) {
             $image = self::image_orientation( $image, $exif['Orientation'] );
         }
 
@@ -218,7 +218,7 @@ class Helper {
         foreach( $order->items as $i => $s ) {
 
             $last = '';
-            if( $product_count == count( $order->items ) ) {
+            if ( $product_count == count( $order->items ) ) {
                 $last = ' last';
             }
 
@@ -695,7 +695,7 @@ class Helper {
         return $hashids->decode( $id )[0];
     }
 
-    public function adminNotifications() {
+    public static function adminNotifications() {
 
         $notifications = AdminNotification::select( 
             'admin_notifications.*',
@@ -722,7 +722,7 @@ class Helper {
         return $data;
     }
 
-    public function getDisplayTimeUnit( $createdAt ) {
+    public static function getDisplayTimeUnit( $createdAt ) {
 
         $created = new Carbon( $createdAt );
         $now = Carbon::now();

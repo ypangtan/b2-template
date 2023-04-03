@@ -29,8 +29,8 @@ document.addEventListener( 'DOMContentLoaded', function() {
             
             lucide.createIcons();
 
-            if( response.json.subTotal != undefined ) {
-                if( Array.isArray( response.json.subTotal ) ) {
+            if ( response.json.subTotal != undefined ) {
+                if ( Array.isArray( response.json.subTotal ) ) {
                     $.each( response.json.subTotal, function( i, v ) {
                         $( '.dataTables_scrollFoot .subtotal' ).eq(i).html( v );
                         $( '.dataTables_scrollFoot .grandtotal' ).eq(i).html( response.json.grandTotal[i] );
@@ -59,7 +59,6 @@ document.addEventListener( 'DOMContentLoaded', function() {
         clearTimeout( timeout );
         timeout = setTimeout( function(){
             window[that.data( 'id' )] = that.val();
-            console.log(window[that.data( 'id' )]);
             dt_table.draw();
         }, 500 );
     } );

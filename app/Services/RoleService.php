@@ -12,16 +12,51 @@ use App\Models\{
 
 class RoleService {
 
-    public static function all( $request ) {
-        $filter = false;
-
-        $limit = $request->input( 'length' );
-        $offset = $request->input( 'start' );
+    public function allRoles( $request ) {
 
         $role = RoleModel::select( 'roles.*' );
 
-        if( !empty( $search_date = $request->input( 'columns.1.search.value' ) ) ) {
-            if( str_contains( $search_date, 'to' ) ) {
+        $filterObject = self::filter( $request, $role );
+        $role = $filterObject['model'];
+        $filter = $filterObject['filter'];
+
+        if ( $request->input( 'order.0.column' ) != 0 ) {
+            $dir = $request->input( 'order.0.dir' );
+            switch ( $request->input( 'order.0.column' ) ) {
+                case 1:
+                    $role->orderBy( 'created_at', $dir );
+                    break;
+                case 2:
+                    $role->orderBy( 'name', $dir );
+                    break;
+            }
+        }
+
+        $roleCount = $role->count();
+
+        $limit = $request->length;
+        $offset = $request->start;
+        
+        $roles = $role->skip( $offset )->take( $limit )->get();
+
+        $totalRecord = RoleModel::count();
+
+        $data = [
+            'roles' => $roles,
+            'draw' => $request->draw,
+            'recordsFiltered' => $filter ? $roleCount : $totalRecord,
+            'recordsTotal' => $totalRecord,
+        ];
+
+        return response()->json( $data );
+    }
+
+    private function filter( $request, $model ) {
+
+        $filter = false;
+
+        if ( !empty( $search_date = $request->input( 'columns.1.search.value' ) ) ) {
+            if ( str_contains( $search_date, 'to' ) ) {
                 $dates = explode( ' to ', $search_date );
                 $role->whereBetween( 'roles.created_at', [ $dates[0] . ' 00:00:00' , $dates[1] . ' 23:59:59' ] );
             } else {
@@ -30,47 +65,25 @@ class RoleService {
             $filter = true;
         }
         
-        if( !empty( $name = $request->input( 'columns.2.search.value' ) ) ) {
+        if ( !empty( $name = $request->input( 'columns.2.search.value' ) ) ) {
             $role->where( 'name', $name );
             $filter = true;
         }
 
-        if( $request->input( 'order.0.column' ) != 0 ) {
-
-            switch( $request->input( 'order.0.column' ) ) {
-                case 1:
-                    $role->orderBy( 'created_at', $request->input( 'order.0.dir' ) );
-                    break;
-                case 2:
-                    $role->orderBy( 'name', $request->input( 'order.0.dir' ) );
-                    break;
-            }
-        }
-
-        $count_role = $role->count();
-        
-        $roles = $role->skip( $offset )->take( $limit )->get();
-
-        $total = RoleModel::count();
-
-        $data = array(
-            'roles' => $roles,
-            'draw' => $request->input( 'draw' ),
-            'recordsFiltered' => $filter ? $count_role : $total,
-            'recordsTotal' => $total,
-        );
-
-        return $data;
+        return [
+            'filter' => $filter,
+            'model' => $model,
+        ];        
     }
 
-    public static function one( $request ) {
+    public function oneRole( $request ) {
 
         $permission = \DB::table( 'role_has_permissions' )->where( 'role_id', $request->id )->leftJoin( 'permissions', 'role_has_permissions.permission_id', '=', 'permissions.id' )->get();
 
-        return [ 'role' => RoleModel::find( $request->input( 'id' ) ), 'permissions' => $permission ];
+        return response()->json( [ 'role' => RoleModel::find( $request->input( 'id' ) ), 'permissions' => $permission ] );
     }
 
-    public static function create( $request ) {
+    public function createRole( $request ) {
 
         $request->validate( [
             'role_name' => 'required|unique:roles,name',
@@ -79,11 +92,11 @@ class RoleService {
 
         $role = Role::create( [ 'name' => $request->role_name, 'guard_name' => $request->guard_name ] );
 
-        if( !empty( $request->modules ) ) {
+        if ( !empty( $request->modules ) ) {
             foreach( $request->modules as $key => $module ) {
 
                 $key = explode( '|', $key );
-                if( $key[1] != $role_model->guard_name ) {
+                if ( $key[1] != $roleModel->guard_name ) {
                     echo $key[1];
                     continue;
                 }
@@ -95,18 +108,17 @@ class RoleService {
         }
     }
 
-    public static function update( $request ) {
+    public function updateRole( $request ) {
 
-        $role_model = RoleModel::find( $request->input( 'id' ) );
-        $role = Role::findByName( $role_model->name, $role_model->guard_name );
+        $roleModel = RoleModel::find( $request->input( 'id' ) );
+        $role = Role::findByName( $roleModel->name, $roleModel->guard_name );
 
         $permissions = [];
         
-        if( $request->modules ) {
+        if ( $request->modules ) {
             foreach( $request->modules as $key => $module ) {
-                var_dump($key);
                 $key = explode( '|', $key );
-                if( $key[1] != $role_model->guard_name ) {
+                if ( $key[1] != $roleModel->guard_name ) {
                     echo $key[1];
                     continue;
                 }
@@ -117,5 +129,10 @@ class RoleService {
         }
 
         $role->syncPermissions( $permissions );
+    }
+
+    public function delete() {
+        
+
     }
 }

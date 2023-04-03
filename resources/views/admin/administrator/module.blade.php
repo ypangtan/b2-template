@@ -68,6 +68,17 @@ $contents = [
 
 <x-off-canvas.off-canvas title="{{ __( 'module.' . $module_create ) }}" crud="{{ $module_create }}" contents="{{ json_encode( $contents ) }}" />
 
+<?php
+array_push( $contents, [
+    'id' => '_id',
+    'title' => __( 'datatables.id' ),
+    'placeholder' => __( 'datatables.id' ),
+    'type' => 'hidden',
+] );
+?>
+
+<x-off-canvas.off-canvas title="{{ __( 'module.' . $module_edit ) }}" crud="{{ $module_edit }}" contents="{{ json_encode( $contents ) }}" />
+
 <x-toast/>
 
 <script>
@@ -125,7 +136,14 @@ $contents = [
                     width: '10%',
                     className: 'text-center',
                     render: function( data, type, row, meta ) {
+
+                        @canany( [ 'edit modules', 'delete modules' ] )
+                        let edit = '<strong class="dt-edit table-action link-primary" data-id="' + data + '">Edit</strong>',
+                            _delete = ' <strong class="dt-delete table-action link-danger" data-id="' + data + '">Delete</strong>';
+                        return edit + _delete;
+                        @else
                         return '-';
+                        @endcanany
                     },
                 },
             ],
@@ -137,41 +155,41 @@ $contents = [
 
         var mc = '#{{ $module_create }}',
             me = '#{{ $module_edit }}',
-            module_create_canvas = new bootstrap.Offcanvas( document.getElementById( 'module_create_canvas' ) ),
-            // module_edit_canvas = new bootstrap.Offcanvas( document.getElementById( 'module_edit_canvas' ) ),
+            moduleCreateCanvas = new bootstrap.Offcanvas( document.getElementById( 'module_create_canvas' ) ),
+            moduleEditCanvas = new bootstrap.Offcanvas( document.getElementById( 'module_edit_canvas' ) ),
             toast = new bootstrap.Toast( document.getElementById( 'toast' ) );
-
-        document.getElementById( 'module_create_canvas' ).addEventListener( 'hidden.bs.offcanvas', function() {
-            $( 'input.form-control' ).removeClass( 'is-invalid' ).val( '' );
-            $( '.invalid-feedback' ).text( '' );
-        } );
-
-        // document.getElementById( 'module_edit_canvas' ).addEventListener( 'hidden.bs.offcanvas', function() {
-        //     $( 'input.form-control' ).removeClass( 'is-invalid' ).val( '' );
-        //     $( '.invalid-feedback' ).text( '' );
-        // } );
-
-        $( '#search_date' ).flatpickr( {
-            mode: 'range',
-            disableMobile: true,
-        } );
 
         $( document ).on( 'click', '.dt-edit', function() {
 
-            var id = $( this ).data( 'id' );
+            let id = $( this ).data( 'id' );
 
             $.ajax( {
-                url: '{{ route( 'admin.administrator.oneRole' ) }}',
+                url: '{{ route( 'admin.administrator.oneModule' ) }}',
                 type: 'POST',
                 data: { id, '_token': '{{ csrf_token() }}', },
                 success: function( response ) {
                     
                     $( me + '_id' ).val( response.id );
-                    $( me + '_username' ).val( response.username );
-                    $( me + '_email' ).val( response.email );
-                    $( me + '_role' ).val( response.role );
+                    $( me + '_module_name' ).val( response.name );
+                    $( me + '_guard_name' ).val( response.guard_name );
 
-                    module_edit_canvas.show();
+                    moduleEditCanvas.show();
+                },
+            } );
+        } );
+
+        $( document ).on( 'click', '.dt-delete', function() {
+
+            let id = $( this ).data( 'id' );
+
+            $.ajax( {
+                url: '{{ route( 'admin.administrator.deleteModule' ) }}',
+                type: 'POST',
+                data: { id, '_token': '{{ csrf_token() }}', },
+                success: function( response ) {
+                    $( '#toast .toast-body' ).text( '{{ __( 'module.module_deleted' ) }}' ); 
+                    toast.show();
+                    dt_table.draw( false );
                 },
             } );
         } );
@@ -189,8 +207,8 @@ $contents = [
                 success: function( response ) {
                     $( '#toast .toast-body' ).text( '{{ __( 'module.module_created' ) }}' ); 
                     toast.show();
-                    module_create_canvas.hide();
-                    dt_table.draw();
+                    moduleCreateCanvas.hide();
+                    dt_table.draw( false );
                 },
                 error: function( error ) {
                     if( error.status === 422 ) {
@@ -206,6 +224,19 @@ $contents = [
 
         $( me + '_submit' ).click( function() {
 
+            $.ajax( {
+                url: '{{ route( 'admin.administrator.updateModule' ) }}',
+                type: 'POST',
+                data: {
+                    'id': $( mc + '_id' ).val(),
+                    'module_name': $( me + '_module_name' ).val().trim().replace(/ /g,"_").toLowerCase(),
+                    'guard_name': $( me + '_guard_name' ).val().trim().toLowerCase(),
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function( response ) {
+
+                },             
+            } );
         } );
 
         window['createdDate'] = $( '#created_date' ).flatpickr( {
@@ -213,7 +244,7 @@ $contents = [
             disableMobile: true,
             onClose: function( selected, dateStr, instance ) {
                 window[$( instance.element ).data('id')] = $( instance.element ).val();
-                dt_table.draw();
+                dt_table.draw( false );
             }
         } );
     } );

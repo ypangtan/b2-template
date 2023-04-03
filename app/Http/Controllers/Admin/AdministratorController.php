@@ -36,24 +36,24 @@ class AdministratorController extends Controller {
         return view( 'admin.main_v2' )->with( $this->data );
     }
 
-    public function allAdmins( Request $request, AdminService $adminService ) {
+    public function allAdmins( Request $request ) {
 
-        return response()->json( $adminService->all( $request ) );
+        return AdminService::allAdmins( $request );
     }
 
-    public function oneAdmin( Request $request, AdminService $adminService ) {
+    public function oneAdmin( Request $request ) {
 
-        return response()->json( $adminService->one( $request ) );
+        return AdminService::oneAdmin( $request );
     }
 
-    public function createAdmin( Request $request, AdminService $adminService ) {
+    public function createAdmin( Request $request ) {
 
-        return response()->json( $adminService->create( $request ) );
+        return AdminService::createAdmin( $request );
     }
 
-    public function updateAdmin( Request $request, AdminService $adminService ) {
+    public function updateAdmin( Request $request ) {
         
-        return response()->json( $adminService->update( $request ) );
+        return AdminService::updateAdmin( $request );
     }
 
     public function logoutLog( Request $request ) {
@@ -80,14 +80,29 @@ class AdministratorController extends Controller {
         return view( 'admin.main_v2' )->with( $this->data );
     }
 
-    public function allModules( Request $request, ModuleService $moduleService ) {
+    public function allModules( Request $request ) {
 
-        return response()->json( $moduleService->all( $request ) );
+        return ModuleService::allModules( $request );
     }
 
-    public function createModule( Request $request, ModuleService $moduleService ) {
+    public function oneModule( Request $request ) {
 
-        $moduleService->create( $request );
+        return ModuleService::oneModule($request  );
+    }
+
+    public function createModule( Request $request ) {
+
+        return ModuleService::createModule( $request );
+    }
+
+    public function updateModule( Request $request ) {
+
+        return ModuleService::updateModule($request  );
+    }
+
+    public function deleteModule( Request $request ) {
+
+        return ModuleService::deleteModule( $request );
     }
 
     public function role() {
@@ -104,24 +119,24 @@ class AdministratorController extends Controller {
         return view( 'admin.main_v2' )->with( $this->data );
     }
 
-    public function allRoles( Request $request, RoleService $roleService ) {
+    public function allRoles( Request $request ) {
 
-        return response()->json( $roleService->all( $request ) );
+        return RoleService::allRoles( $request );
     }
 
-    public function oneRole( Request $request, RoleService $roleService ) {
+    public function oneRole( Request $request ) {
 
-        return response()->json( $roleService->one( $request ) );
+        return RoleService::oneRole( $request );
     }
 
-    public function createRole( Request $request, RoleService $roleService ) {
+    public function createRole( Request $request ) {
 
-        $roleService->create( $request );
+        return RoleService::createRole( $request );
     }
 
-    public function updateRole( Request $request, RoleService $roleService ) {
+    public function updateRole( Request $request ) {
         
-        $roleService->update( $request );
+        return RoleService::updateRole( $request );
     }
 
     public function verify( Request $request ) {

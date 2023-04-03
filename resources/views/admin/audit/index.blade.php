@@ -249,7 +249,7 @@ $columns = [
             disableMobile: true,
             onClose: function( selected, dateStr, instance ) {
                 window[$( instance.element ).data('id')] = $( instance.element ).val();
-                dt_table.draw();
+                dt_table.draw( false );
             }
         } );
     } );
