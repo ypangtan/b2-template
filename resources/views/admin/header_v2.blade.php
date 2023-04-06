@@ -20,16 +20,10 @@
         <!-- <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" /> -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
         <link href="{{ asset( 'admin/css/lightgallery.min.css' ) . Helper::assetVersion() }}" rel="stylesheet" />
-
         <!-- loader-->
         <link href="{{ asset( 'admin/css/pace.min.css' ) . Helper::assetVersion() }}" rel="stylesheet" />
-
         <link href="{{ asset( 'admin/css/flatpickr.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
-        <!--Theme Styles-->
-        <!-- <link href="assets/css/dark-theme.css" rel="stylesheet" /> -->
-        <!-- <link href="assets/css/light-theme.css" rel="stylesheet" /> -->
-        <!-- <link href="assets/css/semi-dark.css" rel="stylesheet" /> -->
-        <!-- <link href="assets/css/header-colors.css" rel="stylesheet" /> -->
+        <link href="{{ asset( 'admin/css/image-uploader.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
 
         @if ( @$header )
             <title>{{ @$header['title'] }} - {{ Helper::websiteName() }}</title>

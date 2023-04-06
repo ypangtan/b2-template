@@ -27,6 +27,10 @@ return [
     'customers' => 'Customers',
     'reports' => 'Reports',
     'settings' => 'Settings',
+    'categories' => 'Categories',
+    'products' => 'Products',
+    'orders' => 'Orders',
+    'marketings' => 'Marketings',
     'first_setup' => 'First Setup',
     'verify_account' => 'Verify Account',
     'profile' => 'Profile',
@@ -37,6 +41,7 @@ return [
     'update' => 'Update',
     'delete' => 'Delete',
     'add' => 'Add',
+    'edit' => 'Edit',
     'submit' => 'Submit',
     'save_changes' => 'Save Changes',
     'confirm' => 'Confirm',
@@ -44,4 +49,11 @@ return [
     'no_changes' => 'No Changes.',
     'confirmation' => 'Confirmation',
     'error' => 'Error',
+    
+    'general_info' => 'General Info',
+    'description' => 'Description',
+    'short_description' => 'Short Description',
+    
+    'gallery' => 'Gallery',
+    'drag_n_drop' => 'Drag & Drop files here or click to browse',
 ];

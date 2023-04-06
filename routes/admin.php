@@ -5,7 +5,10 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\{
     AdministratorController,
     AuditController,
+    CategoryController,
     DashboardController,
+    OrderController,
+    ProductController,
     ProfileController,
     SettingController,
 };
@@ -66,6 +69,40 @@ Route::prefix( 'backoffice' )->group( function() {
 
                 Route::post( 'all-audits', [ AuditController::class, 'allAudits' ] )->name( 'admin.audit.allAudits' );
                 Route::post( 'one-audit', [ AuditController::class, 'oneAudit' ] )->name( 'admin.audit.oneAudit' );
+            } );
+
+            Route::prefix( 'categories' )->group( function() {
+                Route::group( [ 'middleware' => [ 'permission:add categories|view categories|edit categories|delete categories' ] ], function() {
+                    Route::get( '/', [ CategoryController::class, 'index' ] )->name( 'admin.category.index' );
+                    Route::get( 'add', [ CategoryController::class, 'add' ] )->name( 'admin.category.add' );
+                    Route::get( 'edit', [ CategoryController::class, 'edit' ] )->name( 'admin.category.edit' );
+                } );
+
+                Route::post( 'all-categories', [ CategoryController::class, 'allCategories' ] )->name( 'admin.category.allCategories' );
+                Route::post( 'one-category', [ CategoryController::class, 'oneCategory' ] )->name( 'admin.category.oneCategory' );
+                Route::post( 'create-category', [ CategoryController::class, 'createCategory' ] )->name( 'admin.category.createCategory' );
+                Route::post( 'update-category', [ CategoryController::class, 'updateCategory' ] )->name( 'admin.category.updateCategory' );
+
+                Route::post( 'structure', [ CategoryController::class, 'getCategoryStructure' ] )->name( 'admin.category.getCategoryStructure' );
+            } );
+
+            Route::prefix( 'products' )->group( function() {
+                Route::group( [ 'middleware' => [ 'permission:add products|view products|edit products|delete products' ] ], function() {
+                    Route::get( '/', [ ProductController::class, 'index' ] )->name( 'admin.product.index' );
+                    Route::get( 'add', [ ProductController::class, 'add' ] )->name( 'admin.product.add' );
+                    Route::get( 'edit', [ ProductController::class, 'edit' ] )->name( 'admin.product.edit' );
+                } );
+
+                Route::post( 'all-categories', [ ProductController::class, 'allProducts' ] )->name( 'admin.product.allProducts' );
+                Route::post( 'one-category', [ ProductController::class, 'oneProduct' ] )->name( 'admin.product.oneProduct' );
+                Route::post( 'create-category', [ ProductController::class, 'createProduct' ] )->name( 'admin.product.createProduct' );
+                Route::post( 'update-category', [ ProductController::class, 'updateProduct' ] )->name( 'admin.product.updateProduct' );
+            } );
+
+            Route::prefix( 'orders' )->group( function() {
+                Route::group( [ 'middleware' => [ 'permission:add orders|view orders|edit orders|delete orders' ] ], function() {
+                    Route::get( '/', [ OrderController::class, 'index' ] )->name( 'admin.order.index' );
+                } );
             } );
 
             Route::prefix( 'settings' )->group( function() {

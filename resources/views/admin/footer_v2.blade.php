@@ -2,12 +2,14 @@
     <script src="{{ asset( 'admin/js/jquery-3.5.1.js' ) . Helper::assetVersion() }}"></script>
     <script src="{{ asset( 'admin/js/jquery.dataTables.min.js' ) . Helper::assetVersion() }}"></script>
     <script src="{{ asset( 'admin/js/dataTables.bootstrap5.min.js' ) . Helper::assetVersion() }}"></script>
+    <script src="{{ asset( 'admin/js/jquery.loading.min.js' ) . Helper::assetVersion() }}"></script>
     <script src="{{ asset( 'admin/plugins/simplebar/js/simplebar.min.js' ) . Helper::assetVersion() }}"></script>
     <script src="{{ asset( 'admin/plugins/metismenu/js/metisMenu.min.js' ) . Helper::assetVersion() }}"></script>
     <script src="{{ asset( 'admin/plugins/perfect-scrollbar/js/perfect-scrollbar.js' ) . Helper::assetVersion() }}"></script>
     <script src="{{ asset( 'admin/js/pace.min.js' ) . Helper::assetVersion() }}"></script>
+    <script src="{{ asset( 'admin/js/image-uploader.js' ) . Helper::assetVersion() }}"></script>
     <script src="{{ asset( 'admin/js/lucide.min.js' ) . Helper::assetVersion() }}"></script>
-    <script src="{{ asset( 'admin/js/flatpickr-4.6.9.js' ) . Helper::assetVersion() }}"></script>
+    <script src="{{ asset( 'admin/js/flatpickr-4.6.13.js' ) . Helper::assetVersion() }}"></script>
     <script src="{{ asset( 'admin/js/lightgallery.min.js' ) . Helper::assetVersion() }}"></script>
 
     <script>

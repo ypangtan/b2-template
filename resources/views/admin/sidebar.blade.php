@@ -39,8 +39,27 @@
                             <div class="menu-title">{{ __( 'template.audit_logs' ) }}</div>
                         </a>
                     </li>
-                    <li class="menu-label">{{ __( 'template.operations' ) }}</li>
                     @endif
+
+                    <li class="menu-label">{{ __( 'template.operations' ) }}</li>
+                    <li class="{{ $controller == 'App\Http\Controllers\Admin\CategoryController' ? 'mm-active' : '' }}">
+                        <a href="{{ route( 'admin.category.index' ) }}">
+                            <div class="parent-icon"><i class="align-middle feather" icon-name="boxes"></i></div>
+                            <div class="menu-title">{{ __( 'template.categories' ) }}</div>
+                        </a>
+                    </li>
+                    <li class="{{ $controller == 'App\Http\Controllers\Admin\ProductController' ? 'mm-active' : '' }}">
+                        <a href="{{ route( 'admin.product.index' ) }}">
+                            <div class="parent-icon"><i class="align-middle feather" icon-name="box"></i></div>
+                            <div class="menu-title">{{ __( 'template.products' ) }}</div>
+                        </a>
+                    </li>
+                    <li class="{{ $controller == 'App\Http\Controllers\Admin\OrderController' ? 'mm-active' : '' }}">
+                        <a href="{{ route( 'admin.order.index' ) }}">
+                            <div class="parent-icon"><i class="align-middle feather" icon-name="building-2"></i></div>
+                            <div class="menu-title">{{ __( 'template.orders' ) }}</div>
+                        </a>
+                    </li>
                 </ul>
                 <!--end navigation-->
             </aside>

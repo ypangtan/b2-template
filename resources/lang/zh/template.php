@@ -27,6 +27,10 @@ return [
     'customers' => '客户',
     'reports' => '报告',
     'settings' => '设定',
+    'categories' => '分类',
+    'products' => '产品',
+    'orders' => '订单',
+    'marketings' => '营销',
     'first_setup' => '初次设置',
     'verify_account' => '验证账号',
     'profile' => '资料',
@@ -37,6 +41,7 @@ return [
     'update' => '更新',
     'delete' => '删除',
     'add' => '添加',
+    'edit' => '编辑',
     'submit' => '提交',
     'save_changes' => '保存',
     'confirm' => '确定',
@@ -44,4 +49,11 @@ return [
     'no_changes' => '没有改变。',
     'confirmation' => '确认',
     'error' => '错误',
+
+    'general_info' => 'General Info',
+    'description' => 'Description',
+    'short_description' => 'Short Description',
+
+    'gallery' => '相册',
+    'drag_n_drop' => '拖拽文件或点击浏览',
 ];

@@ -1,3 +1,7 @@
+.table-striped tr td {
+    vertical-align: middle;
+}
+
 .side-status-history > h5 {
     color: grey;
     display: flex;

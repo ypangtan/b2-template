@@ -80,7 +80,7 @@ $profile = 'profile';
                             </div>
                         </div>
                     </div>` );
-                    $( window ).scrollTop(0);
+                    $( window ).scrollTop( 0 );
 
                     setTimeout(function(){
                         $( '.alert' ).fadeTo( 250, 0.01, function() { 
