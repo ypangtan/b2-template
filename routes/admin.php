@@ -93,10 +93,10 @@ Route::prefix( 'backoffice' )->group( function() {
                     Route::get( 'edit', [ ProductController::class, 'edit' ] )->name( 'admin.product.edit' );
                 } );
 
-                Route::post( 'all-categories', [ ProductController::class, 'allProducts' ] )->name( 'admin.product.allProducts' );
-                Route::post( 'one-category', [ ProductController::class, 'oneProduct' ] )->name( 'admin.product.oneProduct' );
-                Route::post( 'create-category', [ ProductController::class, 'createProduct' ] )->name( 'admin.product.createProduct' );
-                Route::post( 'update-category', [ ProductController::class, 'updateProduct' ] )->name( 'admin.product.updateProduct' );
+                Route::post( 'all-products', [ ProductController::class, 'allProducts' ] )->name( 'admin.product.allProducts' );
+                Route::post( 'one-product', [ ProductController::class, 'oneProduct' ] )->name( 'admin.product.oneProduct' );
+                Route::post( 'create-product', [ ProductController::class, 'createProduct' ] )->name( 'admin.product.createProduct' );
+                Route::post( 'update-product', [ ProductController::class, 'updateProduct' ] )->name( 'admin.product.updateProduct' );
             } );
 
             Route::prefix( 'orders' )->group( function() {

@@ -37,6 +37,8 @@ return [
     'inactive' => 'Inactive',
     'enabled' => 'Enabled',
     'disabled' => 'Disabled',
+    'yes' => 'Yes',
+    'no' => 'No',
     'action' => 'Action',
 
     'view' => 'View',

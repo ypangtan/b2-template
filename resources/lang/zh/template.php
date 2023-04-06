@@ -28,6 +28,7 @@ return [
     'reports' => '报告',
     'settings' => '设定',
     'categories' => '分类',
+    'category' => '分类',
     'products' => '产品',
     'orders' => '订单',
     'marketings' => '营销',
@@ -49,11 +50,16 @@ return [
     'no_changes' => '没有改变。',
     'confirmation' => '确认',
     'error' => '错误',
+    'optional' => '选填',
 
-    'general_info' => 'General Info',
-    'description' => 'Description',
-    'short_description' => 'Short Description',
-
+    'general_info' => '基本信息',
+    'description' => '描述',
+    'short_description' => '短描述',
+    'seo' => '搜索引擎优化 (SEO)',
+    'friendly_url' => '友好URL',
+    'meta_title' => '元标题',
+    'meta_description' => '元描述',
+    
     'gallery' => '相册',
     'drag_n_drop' => '拖拽文件或点击浏览',
 ];

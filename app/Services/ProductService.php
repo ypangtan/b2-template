@@ -3,9 +3,14 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 use App\Models\{
+    Metadata,
     Product,
+    ProductImage,
+    ProductInventory,
+    ProductPrice,
 };
 
 use Helper;
@@ -46,7 +51,6 @@ class ProductService {
 
         if ( $products ) {
             $products->append( [
-                'path',
                 'encrypted_id'
             ] );
         }
@@ -104,5 +108,92 @@ class ProductService {
             'filter' => $filter,
             'model' => $model,
         ];        
+    }
+
+    public function oneProduct( $request ) {
+
+        $product = Product::with( [ 
+            'metadata',
+            'productImages', 
+            'productInventory', 
+            'productPrices' 
+        ] )->find( Helper::decode( $request->id ) );
+
+        if ( $product ) {
+            $product->append( [
+                'encrypted_id',
+            ] );
+
+            if ( $product->productPrices ) {
+                $product->productPrices->append( [
+                    'promo_enabled',
+                ] );
+            }
+        }
+
+        return response()->json( $product );
+    }
+
+    public function createProduct( $request ) {
+
+        $request->validate( [
+            'sku' => [ 'required' ],
+            'title' => [ 'required' ],
+            'short_description' => [ 'required' ],
+            'regular_price' => [ 'bail', 'required', 'numeric', 'min:0.01', 'regex:/^\d*(\.\d{2})?$/' ],
+            'taxable' => [ 'required' ],
+            'enable_promotion' => [ 'required' ],
+            'promo_price' => [ 'exclude_if:enable_promotion,no', 'bail', 'numeric', 'min:0.01', 'lt:regular_price', 'regex:/^\d*(\.\d{2})?$/' ],
+            'promo_date_from' => [ 'exclude_if:enable_promotion,no', 'required', 'before:promo_date_to' ],
+            'promo_date_to' => [ 'exclude_if:enable_promotion,no', 'required', 'after:promo_date_from' ],
+            'quantity' => [ 'required', 'integer', 'min:0' ],
+            'friendly_url' => [ 'required', 'unique:products,url_slug' ],
+            'meta_title' => [ 'required' ],
+            'meta_description' => [ 'required' ],
+        ] );
+
+        $basicAttribute = [
+            'sku' => $request->sku,
+            'title' => $request->title,
+            'short_description' => $request->short_description,
+            'description' => $request->description,
+            'url_slug' =>  Str::slug( $request->friendly_url ? $request->friendly_url : $request->title ),
+            'type' => 'single',
+            'status' => 10,
+        ];
+
+        $createProduct = Product::create( $basicAttribute );
+
+        $priceAttribute = [
+            'product_id' => $createProduct->id,
+            'regular_price' => $request->regular_price,
+        ];
+
+        if ( $request->enable_promotion ) {
+            $priceAttribute['promo_price'] = $request->promo_price;
+            $priceAttribute['promo_date_from'] = $request->promo_date_from;
+            $priceAttribute['promo_date_to'] = $request->promo_date_to;
+        }
+
+        $createProductPrice = ProductPrice::create( $priceAttribute );
+
+        $createProductInventory = ProductInventory::create( [
+            'product_id' => $createProduct->id,
+            'quantity' => $request->quantity,
+        ] );
+
+        Metadata::create( [
+            'type' => 'product',
+            'type_id' => $createProduct->id,
+            'key' => 'meta_title',
+            'value' => $request->meta_title,
+        ] );
+
+        Metadata::create( [
+            'type' => 'product',
+            'type_id' => $createProduct->id,
+            'key' => 'meta_description',
+            'value' => $request->meta_description,
+        ] );
     }
 }

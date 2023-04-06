@@ -28,6 +28,7 @@ return [
     'reports' => 'Reports',
     'settings' => 'Settings',
     'categories' => 'Categories',
+    'category' => 'Category',
     'products' => 'Products',
     'orders' => 'Orders',
     'marketings' => 'Marketings',
@@ -49,10 +50,15 @@ return [
     'no_changes' => 'No Changes.',
     'confirmation' => 'Confirmation',
     'error' => 'Error',
+    'optional' => 'Optional',
     
     'general_info' => 'General Info',
     'description' => 'Description',
     'short_description' => 'Short Description',
+    'seo' => 'Search Engine Optimize (SEO)',
+    'friendly_url' => 'Friendly URL',
+    'meta_title' => 'Meta Title',
+    'meta_description' => 'Meta Description',
     
     'gallery' => 'Gallery',
     'drag_n_drop' => 'Drag & Drop files here or click to browse',

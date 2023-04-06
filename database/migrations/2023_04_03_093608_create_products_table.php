@@ -23,7 +23,7 @@ class CreateProductsTable extends Migration
             $table->string('url_slug')->nullable();
             $table->string('type',25)->default('single');
             $table->string('thumbnail')->nullable();
-            $table->tinyInteger('status');
+            $table->tinyInteger('status')->comment('1:disabled 10:enabled');
             $table->timestamps();
         });
     }

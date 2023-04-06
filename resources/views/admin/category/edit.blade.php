@@ -11,12 +11,12 @@ $category_edit = 'category_edit';
                 <div class="mb-3 row">
                     <label for="{{ $category_edit }}_title" class="col-sm-5 col-form-label">{{ __( 'datatables.title' ) }}</label>
                     <div class="col-sm-7">
-                        <input type="text" class="form-control form-control-sm" id="{{ $category_edit }}_title"></input>
+                        <input type="text" class="form-control form-control-sm" id="{{ $category_edit }}_title">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $category_edit }}_description" class="col-sm-5 col-form-label">{{ __( 'datatables.description' ) }}</label>
+                    <label for="{{ $category_edit }}_description" class="col-sm-5 col-form-label">{{ __( 'template.description' ) }}</label>
                     <div class="col-sm-7">
                         <textarea class="form-control form-control-sm" id="{{ $category_edit }}_description" rows="10"></textarea>
                         <div class="invalid-feedback"></div>
@@ -36,7 +36,7 @@ $category_edit = 'category_edit';
                     <label class="col-sm-5 col-form-label">{{ __( 'datatables.enabled' ) }}</label>
                     <div class="col-sm-7">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="{{ $category_edit }}_enabled"></input>
+                            <input class="form-check-input" type="checkbox" id="{{ $category_edit }}_enabled">
                             <label class="form-check-label" for="{{ $category_edit }}_enabled">
                                 <small>{{ __( 'category.enable_description' ) }}</small>
                             </label>
@@ -54,12 +54,12 @@ $category_edit = 'category_edit';
                                 <button class="btn btn-sm btn-outline-danger" id="delete">Delete</button>
                             </div>
                         </div>
-                        <input type="file" class="hidden" id="{{ $category_edit }}_thumbnail" accept="image/*"></input>
+                        <input type="file" class="hidden" id="{{ $category_edit }}_thumbnail" accept="image/*">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 @endif
-                <input type="file" class="hidden" id="{{ $category_edit }}_thumbnail" accept="image/*"></input>
+                <input type="file" class="hidden" id="{{ $category_edit }}_thumbnail" accept="image/*">
             </div>
         </div>
     </div>

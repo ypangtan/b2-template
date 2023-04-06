@@ -100,7 +100,7 @@ $columns = [
             order: [[ 2, 'desc' ]],
             columns: [
                 { data: null },
-                { data: 'path' },
+                { data: null },
                 { data: 'created_at' },
                 { data: 'title' },
                 { data: 'status' },

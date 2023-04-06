@@ -35,8 +35,10 @@ return [
     'status' => '状态',
     'active' => '启用中',
     'inactive' => '待用',
-    'enabled' => 'Enabled',
-    'disabled' => 'Disabled',
+    'enabled' => '启用中',
+    'disabled' => '已停用',
+    'yes' => '是',
+    'no' => '否',
     'action' => '操作',
 
     'view' => '查看',

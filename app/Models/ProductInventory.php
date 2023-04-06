@@ -10,26 +10,14 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class ProductPrice extends Model
+class ProductInventory extends Model
 {
     use HasFactory, LogsActivity;
 
     protected $fillable = [
         'product_id',
-        'regular_price',
-        'promo_price',
-        'promo_date_from',
-        'promo_date_to',
+        'quantity',
     ];
-
-    public function getPromoEnabledAttribute() {
-
-        if ( $this->attributes['promo_date_to'] > date( 'Y-m-d H:i:s' ) ) {
-            return 'yes';
-        }
-
-        return 'no';
-    }
 
     protected function serializeDate( DateTimeInterface $date ) {
         return $date->timezone( 'Asia/Kuala_Lumpur' )->format( 'Y-m-d H:i:s' );
@@ -37,13 +25,10 @@ class ProductPrice extends Model
 
     protected static $logAttributes = [
         'product_id',
-        'regular_price',
-        'promo_price',
-        'promo_date_from',
-        'promo_date_to',
+        'quantity',
     ];
 
-    protected static $logName = 'product_prices';
+    protected static $logName = 'product_inventories';
 
     protected static $logOnlyDirty = true;
 
@@ -52,6 +37,6 @@ class ProductPrice extends Model
     }
 
     public function getDescriptionForEvent( string $eventName ): string {
-        return "{$eventName} product price";
+        return "{$eventName} product inventory";
     }
 }
