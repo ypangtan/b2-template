@@ -203,6 +203,8 @@ $category_create = 'category_create';
             }
         } );
 
+        let option = '';
+
         $( cc + '_category_type' ).change( function() {
 
             $( cc + '_parent_category' ).empty();            
@@ -219,43 +221,35 @@ $category_create = 'category_create';
                         '_token': '{{ csrf_token() }}',
                     },
                     success: function( response ) {
-                        
-                        let html = '';
-                        for ( let i = 0; i < response.length; i++ ) {
-                            const category = response[i];
 
-                            let hasChildren = false,
-                                json1 = { parent_id: category.id, child_id: null };
+                        traverseDown( response );
 
-                            html +=
-                            `
-                            <option value="` + category.id + `">` + category.title + `</option>
-                            `;
-
-                            if ( category.childrens.length > 0 ) {
-                                hasChildren = true;
-
-                                for ( let j = 0; j < category.childrens.length; j++ ) {
-                                    const children = category.childrens[j];
-
-                                    let str = '--';
-                                        strLevel = str.repeat( children.level ),
-                                        json2 = { parent_id: children.parent_id, child_id: children.child_id };
-                                    
-                                    html +=
-                                    `
-                                    <option value="` + children.child_id + `">`+ strLevel + ` ` + children.category.title + `</option>
-                                    `;
-                                }
-                            }
-                        }
-
-                        $( cc + '_parent_category' ).append( html );
+                        $( cc + '_parent_category' ).append( option );
                     }
                 } );
 
                 $( cc + '_parent_category' ).parents( 'div.mb-3.row' ).removeClass( 'hidden' );
             }
         } );
+
+        // This block 70% was written by ChatGPT, I feel I am jobless soon 
+        function traverseDown( array ) {
+
+            array.forEach( function( item ) {
+
+                let str = '--';
+                    strLevel = str.repeat( item.level ),
+
+                option +=
+                `
+                <option value="` + item.id + `">` + strLevel + ` ` + item.title + `</option>
+                `;
+
+                if ( Array.isArray( item.childrens ) ) {
+                    traverseDown( item.childrens );
+                }
+            } );
+        }
+        // End
     } );
 </script>

@@ -217,16 +217,31 @@ class CategoryService {
             ->get()->toArray();
 
         foreach( $categories as $key => $category ) {
-            $categories[$key]['childrens'] = [];
+            $categories[$key]['level'] = 0;
+            $categories[$key]['childrens'] = self::traverseDown( $category['id'], 0 );
         }
 
         return $categories;
     }
 
-    public function traverseDown( $id ) {
+    // This block 80% was written by ChatGPT, I feel I am jobless soon 
+    public function traverseDown( $id, $level = 0 ) {
 
-        $category = Category::where( 'parent_id', $id )->get();
+        $categories = Category::where( 'parent_id', $id )->get();
 
-        return $category ? $category : false;
+        $newCategories = [];
+
+        foreach( $categories as $key => $category ) {
+
+            $childrens = self::traverseDown( $category->id, $level + 1 );
+
+            $category['level'] = $level + 1;
+            $category['childrens'] = $childrens;
+
+            $newCategories[] = $category;
+        }
+
+        return $newCategories;
     }
+    // End
 }
