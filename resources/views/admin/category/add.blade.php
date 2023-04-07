@@ -203,6 +203,14 @@ $category_create = 'category_create';
             }
         } );
 
+        $( cc + '_enabled' ).change( function() {
+            if ( $( this ).is( ':checked' ) ) {
+                $( this ).next().children( 'small' ).html( '{{ __( 'category.enable_description' ) }}' );
+            } else {
+                $( this ).next().children( 'small' ).html( '{{ __( 'category.disable_description' ) }}' );
+            }
+        } );
+
         let option = '';
 
         $( cc + '_category_type' ).change( function() {

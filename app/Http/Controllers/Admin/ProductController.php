@@ -77,4 +77,9 @@ class ProductController extends Controller
  
         return ProductService::updateProductStatus( $request );
     }
+
+    public function ckeUpload( Request $request ) {
+
+        return ProductService::ckeUpload( $request );
+    }
 }

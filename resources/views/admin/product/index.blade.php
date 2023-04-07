@@ -100,7 +100,7 @@ $columns = [
             order: [[ 2, 'desc' ]],
             columns: [
                 { data: null },
-                { data: null },
+                { data: 'product_images' },
                 { data: 'created_at' },
                 { data: 'title' },
                 { data: 'status' },
@@ -118,7 +118,7 @@ $columns = [
                     targets: parseInt( '{{ Helper::columnIndex( $columns, "thumbnail" ) }}' ),
                     orderable: false,
                     render: function( data, type, row, meta ) {
-                        return '<img src="' + ( data ? data : '{{ asset( 'admin/img/placeholder/fff.jpg' ) }}' ) + '" width="75px" />';
+                        return '<img src="' + ( data.length != 0 ? data[0].path : '{{ asset( 'admin/img/placeholder/fff.jpg' ) }}' ) + '" width="75px" />';
                     },
                 },
                 {

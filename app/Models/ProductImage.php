@@ -22,6 +22,10 @@ class ProductImage extends Model
         'file_type',
     ];
 
+    public function getPathAttribute() {
+        return $this->attributes['file'] ? asset( 'storage/'.$this->attributes['file'] ) : null;
+    }
+
     protected function serializeDate( DateTimeInterface $date ) {
         return $date->timezone( 'Asia/Kuala_Lumpur' )->format( 'Y-m-d H:i:s' );
     }

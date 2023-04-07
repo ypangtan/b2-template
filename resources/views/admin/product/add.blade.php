@@ -110,7 +110,7 @@ $product_create = 'product_create';
                 <div class="mb-3 row">
                     <label for="{{ $product_create }}_friendly_url" class="col-sm-5 col-form-label">{{ __( 'template.friendly_url' ) }}</label>
                     <div class="col-sm-7">
-                        <input type="text" class="form-control form-control-sm" id="{{ $product_create }}_friendly_url" placeholder="{{ __( 'template.optional' ) }}">
+                        <input type="text" class="form-control form-control-sm" id="{{ $product_create }}_friendly_url">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
@@ -145,7 +145,7 @@ $product_create = 'product_create';
             <div class="card-body">
                 <h5 class="card-title">{{ __( 'template.description' ) }}</h5>
                 <hr>
-                <textarea class="w-100" rows="10"></textarea>
+                <textarea class="form-control" id="{{ $product_create }}_description"></textarea>
             </div>
         </div>
     </div>
@@ -157,7 +157,8 @@ $product_create = 'product_create';
             <div class="card-body">
                 <h5 class="card-title">{{ __( 'template.gallery' ) }}</h5>
                 <hr>
-                <div class="input-images"></div>
+                <div class="images" id="{{ $product_create }}_images"></div>
+                <div class="invalid-feedback"></div>
             </div>
         </div>
     </div>
@@ -172,6 +173,18 @@ $product_create = 'product_create';
         </div>
     </div>
 </div>
+
+<link rel="stylesheet" href="{{ asset( 'admin/css/ckeditor/styles.css' ) }}">
+<script src="{{ asset( 'admin/js/ckeditor/ckeditor.js' ) }}"></script>
+<script src="{{ asset( 'admin/js/ckeditor/upload-adapter.js' ) }}"></script>
+
+<script>
+window.ckeupload_path = '{{ route( 'admin.product.ckeupload' ) }}';
+window.csrf_token = '{{ csrf_token() }}';
+window.cke_element = 'product_create_description';
+</script>
+
+<script src="{{ asset( 'admin/js/ckeditor/ckeditor-init.js' ) }}"></script>
 
 <script>
     document.addEventListener( 'DOMContentLoaded', function() {
@@ -188,10 +201,10 @@ $product_create = 'product_create';
             enableTime: true,
         } );
 
-        $( '.input-images' ).imageUploader( {
+        $( '.images' ).imageUploader( {
             label: '{!! __( 'template.drag_n_drop' ) !!}',
-            extensions: [ '.jpg', '.jpeg', '.png', '.gif', '.svg', '.mp4', '.MP4' ],
-            mimes: [ 'image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'video/mp4', 'video/mp4' ],
+            extensions: [ '.jpg', '.jpeg', '.png' ],
+            mimes: [ 'image/jpeg', 'image/png' ],
             maxSize: [ 64 * 1024 * 1024 ],
         } );
 
@@ -220,6 +233,7 @@ $product_create = 'product_create';
             formData.append( 'sku', $( pc + '_sku' ).val() );
             formData.append( 'title', $( pc + '_title' ).val() );
             formData.append( 'short_description', $( pc + '_short_description' ).val() );
+            formData.append( 'description', editor.getData() );
             formData.append( 'regular_price', $( pc + '_regular_price' ).val() );
             formData.append( 'taxable', $( pc + '_taxable' ).val() );
             formData.append( 'enable_promotion', $( pc + '_enable_promotion' ).val() );
@@ -227,6 +241,10 @@ $product_create = 'product_create';
             formData.append( 'promo_date_from', $( pc + '_promo_date_from' ).val() );
             formData.append( 'promo_date_to', $( pc + '_promo_date_to' ).val() );
             formData.append( 'quantity', $( pc + '_quantity' ).val() );
+
+            $.each( $( '.images input[name="images[]"]' )[0].files, function( i, file ) {
+                formData.append('images[]', file);
+            } );
 
             formData.append( 'friendly_url', $( pc + '_friendly_url' ).val() );
             formData.append( 'meta_title', $( pc + '_meta_title' ).val() );

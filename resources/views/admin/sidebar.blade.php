@@ -2,7 +2,8 @@
             <aside class="sidebar-wrapper" data-simplebar="true">
                 <div class="sidebar-header">
                     <div>
-                        <img src="{{ asset( 'admin/img/icons/default.png' ) }}" class="logo-icon" alt="logo icon" />
+                        <!-- admin/img/icons/default.png -->
+                        <img src="{{ asset( 'admin/img/placeholder/fff.jpg' ) }}" class="logo-icon" alt="logo icon" />
                     </div>
                     
                     <div class="toggle-icon ms-auto"><i class="bi bi-list"></i></div>

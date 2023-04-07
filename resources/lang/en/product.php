@@ -23,6 +23,7 @@ return [
     'promo_date_to' => 'Promo Date To',
     'stock' => 'Stock',
     'quantity' => 'Quantity',
+    'preloaded' => 'Preloaded Gallery',
 
     'product_created' => 'New Product Created.',
     'product_updated' => 'Product Updated.',

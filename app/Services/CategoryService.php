@@ -92,7 +92,7 @@ class CategoryService {
         }
 
         if ( !empty( $request->title ) ) {
-            $model->where( 'title', $request->title );
+            $model->where( 'title', 'LIKE', '%' . $request->title . '%' );
             $filter = true;
         }
 

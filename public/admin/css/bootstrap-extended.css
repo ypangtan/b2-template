@@ -846,3 +846,11 @@
 .col-sm-7 > .form-control-plaintext {
 	font-weight: 600;
 }
+
+.images.is-invalid > .image-uploader {
+	border-color: #dc3545;
+}
+
+.image-uploader {
+    border-radius: 0.25rem
+}

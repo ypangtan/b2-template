@@ -27,15 +27,15 @@ $columns = [
         'type' => 'select',
         'options' => [
             [
-                'title' => __( 'datatables.all' ),
+                'title' => __( 'datatables.all_x', [ 'title' => __( 'category.category_type' ) ] ),
                 'value' => ''
             ],
             [
-                'title' => __( 'datatables.parent' ),
+                'title' => __( 'category.parent' ),
                 'value' => '1'
             ],
             [
-                'title' => __( 'datatables.child' ),
+                'title' => __( 'category.child' ),
                 'value' => '2'
             ]
         ],
@@ -46,7 +46,7 @@ $columns = [
         'type' => 'select',
         'options' => [
             [
-                'title' => __( 'datatables.all' ),
+                'title' => __( 'datatables.all_x', [ 'title' => __( 'datatables.status' ) ] ),
                 'value' => ''
             ],
             [

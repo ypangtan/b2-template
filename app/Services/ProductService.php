@@ -2,7 +2,11 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\{
+    App,
+    Storage,
+    Validator,
+};
 use Illuminate\Support\Str;
 
 use App\Models\{
@@ -21,7 +25,7 @@ class ProductService {
 
     public function allProducts( $request ) {
 
-        $product = Product::select( 'products.*' );
+        $product = Product::with( [ 'productImages' ] )->select( 'products.*' );
 
         $filterObject = self::filter( $request, $product );
         $product = $filterObject['model'];
@@ -53,6 +57,14 @@ class ProductService {
             $products->append( [
                 'encrypted_id'
             ] );
+
+            foreach( $products as $p ) {
+                if ( $p->productImages ) {
+                    $p->productImages->append( [
+                        'path'
+                    ] );
+                }
+            }
         }
 
         $totalRecord = Product::count();
@@ -95,7 +107,7 @@ class ProductService {
         }
 
         if ( !empty( $request->title ) ) {
-            $model->where( 'title', $request->title );
+            $model->where( 'title', 'LIKE', '%' . $request->title . '%' );
             $filter = true;
         }
 
@@ -129,6 +141,12 @@ class ProductService {
                     'promo_enabled',
                 ] );
             }
+
+            if ( $product->productImages ) {
+                $product->productImages->append( [
+                    'path',
+                ] );
+            }
         }
 
         return response()->json( $product );
@@ -136,10 +154,11 @@ class ProductService {
 
     public function createProduct( $request ) {
 
-        $request->validate( [
-            'sku' => [ 'required' ],
+        $validator = Validator::make( $request->all(), [
+            'sku' => [ 'required', 'unique:products,sku' ],
             'title' => [ 'required' ],
             'short_description' => [ 'required' ],
+            // 'description' => [ 'required' ],
             'regular_price' => [ 'bail', 'required', 'numeric', 'min:0.01', 'regex:/^\d*(\.\d{2})?$/' ],
             'taxable' => [ 'required' ],
             'enable_promotion' => [ 'required' ],
@@ -147,17 +166,46 @@ class ProductService {
             'promo_date_from' => [ 'exclude_if:enable_promotion,no', 'required', 'before:promo_date_to' ],
             'promo_date_to' => [ 'exclude_if:enable_promotion,no', 'required', 'after:promo_date_from' ],
             'quantity' => [ 'required', 'integer', 'min:0' ],
+            'images' => [ 'required', 'array' ],
+            'images.*' => [ 'mimetypes:image/*' ],
             'friendly_url' => [ 'required', 'unique:products,url_slug' ],
             'meta_title' => [ 'required' ],
             'meta_description' => [ 'required' ],
         ] );
 
+        $attributeName = [
+            'sku' => __( 'product.sku' ),
+            'title' => __( 'datatables.title' ),
+            'short_description' => __( 'template.short_description' ),
+            'regular_price' => __( 'product.regular_price' ),
+            'promo_price' => __( 'product.promo_price' ),
+            'promo_date_from' => __( 'product.promo_date_from' ),
+            'promo_date_to' => __( 'product.promo_date_to' ),
+            'quantity' => __( 'product.quantity' ),
+            'preloaded' => __( 'product.preloaded' ),
+            'images' => __( 'template.gallery' ),
+            'friendly_url' => __( 'template.friendly_url' ),
+            'meta_title' => __( 'template.meta_title' ),
+            'meta_description' => __( 'template.meta_description' ),
+        ];
+
+        $validator->setAttributeNames( $attributeName )->validate();
+
         $basicAttribute = [
             'sku' => $request->sku,
-            'title' => $request->title,
-            'short_description' => $request->short_description,
-            'description' => $request->description,
-            'url_slug' =>  Str::slug( $request->friendly_url ? $request->friendly_url : $request->title ),
+            'title' => [
+                'en' => $request->title,
+                App::getLocale() => $request->title,
+            ],
+            'short_description' => [
+                'en' => $request->short_description,
+                App::getLocale() => $request->short_description,
+            ],
+            'description' => [
+                'en' => $request->description,
+                App::getLocale() => $request->description,
+            ],
+            'url_slug' => Str::slug( $request->friendly_url ? $request->friendly_url : $request->title ),
             'type' => 'single',
             'status' => 10,
         ];
@@ -169,7 +217,7 @@ class ProductService {
             'regular_price' => $request->regular_price,
         ];
 
-        if ( $request->enable_promotion ) {
+        if ( $request->enable_promotion == 'yes' ) {
             $priceAttribute['promo_price'] = $request->promo_price;
             $priceAttribute['promo_date_from'] = $request->promo_date_from;
             $priceAttribute['promo_date_to'] = $request->promo_date_to;
@@ -181,6 +229,18 @@ class ProductService {
             'product_id' => $createProduct->id,
             'quantity' => $request->quantity,
         ] );
+
+        if ( $request->hasFile( 'images' ) ) {
+            foreach( $request->file( 'images' ) as $image ) {
+                $createProductImage = ProductImage::create( [
+                    'product_id' => $createProduct->id,
+                    'title' => $image->getClientOriginalName(),
+                    'file' => $image->store( 'products/' . $createProduct->id, [ 'disk' => 'public' ] ),
+                    'type' => 1,
+                    'file_type' => 2, // 1: pdf 2: image
+                ] );
+            }
+        }
 
         Metadata::create( [
             'type' => 'product',
@@ -195,5 +255,125 @@ class ProductService {
             'key' => 'meta_description',
             'value' => $request->meta_description,
         ] );
+    }
+
+    public function updateProduct( $request ) {
+
+        $request->merge( [
+            'decrypted_id' => Helper::decode( $request->id ),
+        ] );
+
+        $validator = Validator::make( $request->all(), [
+            'sku' => [ 'required', 'unique:products,sku,' . $request->decrypted_id ],
+            'title' => [ 'required' ],
+            'short_description' => [ 'required' ],
+            // 'description' => [ 'required' ],
+            'regular_price' => [ 'bail', 'required', 'numeric', 'min:0.01', 'regex:/^\d*(\.\d{2})?$/' ],
+            'taxable' => [ 'required' ],
+            'enable_promotion' => [ 'required' ],
+            'promo_price' => [ 'exclude_if:enable_promotion,no', 'bail', 'numeric', 'min:0.01', 'lt:regular_price', 'regex:/^\d*(\.\d{2})?$/' ],
+            'promo_date_from' => [ 'exclude_if:enable_promotion,no', 'required', 'before:promo_date_to' ],
+            'promo_date_to' => [ 'exclude_if:enable_promotion,no', 'required', 'after:promo_date_from' ],
+            'quantity' => [ 'required', 'integer', 'min:0' ],
+            'images' => [ 'required_without:preloaded', 'array' ],
+            'images.*' => [ 'mimetypes:image/*' ],
+            'friendly_url' => [ 'required', 'unique:products,url_slug,' . $request->decrypted_id ],
+            'meta_title' => [ 'required' ],
+            'meta_description' => [ 'required' ],
+        ] );
+
+        $attributeName = [
+            'sku' => __( 'product.sku' ),
+            'title' => __( 'datatables.title' ),
+            'short_description' => __( 'template.short_description' ),
+            'regular_price' => __( 'product.regular_price' ),
+            'promo_price' => __( 'product.promo_price' ),
+            'promo_date_from' => __( 'product.promo_date_from' ),
+            'promo_date_to' => __( 'product.promo_date_to' ),
+            'quantity' => __( 'product.quantity' ),
+            'preloaded' => __( 'product.preloaded' ),
+            'images' => __( 'template.gallery' ),
+            'friendly_url' => __( 'template.friendly_url' ),
+            'meta_title' => __( 'template.meta_title' ),
+            'meta_description' => __( 'template.meta_description' ),
+        ];
+
+        $validator->setAttributeNames( $attributeName )->validate();
+
+        $updateProduct = Product::find( $request->decrypted_id );
+        $updateProduct->sku = $request->sku;
+        $updateProduct->title = [
+            App::getLocale() => $request->title,
+        ];
+        $updateProduct->description = [
+            App::getLocale() => $request->description,
+        ];
+        $updateProduct->short_description = [
+            App::getLocale() => $request->short_description,
+        ];
+        $updateProduct->url_slug = Str::slug( $request->friendly_url ? $request->friendly_url : $request->title );
+        $updateProduct->save();
+
+        $updateProductPrice = ProductPrice::where( 'product_id', $updateProduct->id )->first();
+        $updateProductPrice->regular_price = $request->regular_price;
+        if ( $request->enable_promotion == 'yes' ) {
+            $updateProductPrice->promo_price = $request->promo_price;
+            $updateProductPrice->promo_date_from = $request->promo_date_from;
+            $updateProductPrice->promo_date_to = $request->promo_date_to;
+        }
+        $updateProductPrice->save();
+
+        if ( isset( $request->preloaded ) ) {
+            $toBeDelete = ProductImage::where( 'product_id', $updateProduct->id )->whereNotIn( 'id', $request->preloaded );
+            foreach( $toBeDelete->get() as $tbd ) {
+                Storage::disk( 'public' )->delete( $tbd->file );
+            }
+            $toBeDelete->delete();
+        } else {
+            $toBeDelete = ProductImage::where( 'product_id', $updateProduct->id );
+            foreach( $toBeDelete->get() as $tbd ) {
+                Storage::disk( 'public' )->delete( $tbd->file );
+            }
+            $toBeDelete->delete();
+        }
+
+        if ( $request->hasFile( 'images' ) ) {
+            foreach( $request->file( 'images' ) as $image ) {
+                $createProductImage = ProductImage::create( [
+                    'product_id' => $updateProduct->id,
+                    'title' => $image->getClientOriginalName(),
+                    'file' => $image->store( 'products/' . $updateProduct->id, [ 'disk' => 'public' ] ),
+                    'type' => 1,
+                    'file_type' => 2, // 1: pdf 2: image
+                ] );
+            }
+        }
+
+        Metadata::updateOrCreate( [
+            'type' => 'product',
+            'type_id' => $updateProduct->id,
+            'key' => 'meta_title',
+        ], [
+            'value' => $request->meta_title,
+        ] );
+
+        Metadata::updateOrCreate( [
+            'type' => 'product',
+            'type_id' => $updateProduct->id,
+            'key' => 'meta_description',
+        ], [
+            'value' => $request->meta_description,
+        ] );
+    }
+
+    public function ckeUpload( $request ) {
+
+        $file = $request->file( 'file' )->store( 'products/ckeditor', [ 'disk' => 'public' ] );
+
+        $data = [
+            'url' => asset( 'storage/' . $file ),
+        ];
+
+        return response()->json( $data );
     }
 }

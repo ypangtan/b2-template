@@ -60,10 +60,8 @@
 
                     // Set preloaded images preview
                     for (let i = 0; i < plugin.settings.preloaded.length; i++) {
-                        console.log( plugin.settings.preloaded[i] );
-                        let isVideo = plugin.settings.preloaded[i].type == 'gallery' ? false : true;
-                        console.log( isVideo );
-                        $uploadedContainer.append(createImg(plugin.settings.preloaded[i].src, plugin.settings.preloaded[i].id, true, isVideo));
+                        // let isVideo = plugin.settings.preloaded[i].type == 'gallery' ? false : true;
+                        $uploadedContainer.append(createImg(plugin.settings.preloaded[i].src, plugin.settings.preloaded[i].id, true, false));
                     }
 
                 }

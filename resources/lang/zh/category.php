@@ -13,12 +13,12 @@ return [
     |
     */
 
-    'category_type' => 'Category Type',
-    'parent' => 'Parent',
-    'child' => 'Child',
-    'enable_description' => 'This category will show in category list',
-    'disable_description' => 'This category will not show in category list',
+    'category_type' => '分类类型',
+    'parent' => '父类',
+    'child' => '子类',
+    'enable_description' => '此分类会显示在分类列表',
+    'disable_description' => '此分类不会显示在分类列表',
 
-    'category_created' => 'New Category Created.',
-    'category_updated' => 'Category Updated.',
+    'category_created' => '已创建新分类。',
+    'category_updated' => '已更新分类。',
 ];

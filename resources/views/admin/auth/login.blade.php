@@ -1,5 +1,6 @@
                         <div class="text-center mt-4">
-                            <img style="width: 50%;"src="{{ asset( 'admin/img/icons/default.png' ) }}" />
+                            <!-- admin/img/icons/default.png -->
+                            <img style="width: 50%;"src="{{ asset( 'admin/img/placeholder/fff.jpg' ) }}" />
                             <br>
                             <br>
                             <h1 class="h2">{{ __( 'auth.welcome' ) }}</h1>
@@ -15,7 +16,7 @@
                                         @csrf
                                         <div class="mb-3">
                                             <label class="form-label">{{ __('auth.email') }}</label>
-                                            <input class="form-control form-control-sm @error('email') is-invalid @enderror" type="text" name="email" placeholder="{{ __( 'auth.enter_your_x', [ 'type' => strtolower( __( 'auth.email' ) ) ] ) }}" />
+                                            <input class="form-control form-control-sm @error('email') is-invalid @enderror" type="text" name="email" placeholder="{{ __( 'auth.enter_your_x', [ 'type' => strtolower( __( 'auth.email' ) ) ] ) }}" value="{{ old( 'email' ) ? old( 'email' ) : '' }}" />
                                             @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>

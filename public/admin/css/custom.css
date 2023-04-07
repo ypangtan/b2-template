@@ -1,3 +1,11 @@
+* {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.ck-editor__editable_inline {
+    min-height: 400px;
+}
+
 .table-striped tr td {
     vertical-align: middle;
 }

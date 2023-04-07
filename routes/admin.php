@@ -97,6 +97,8 @@ Route::prefix( 'backoffice' )->group( function() {
                 Route::post( 'one-product', [ ProductController::class, 'oneProduct' ] )->name( 'admin.product.oneProduct' );
                 Route::post( 'create-product', [ ProductController::class, 'createProduct' ] )->name( 'admin.product.createProduct' );
                 Route::post( 'update-product', [ ProductController::class, 'updateProduct' ] )->name( 'admin.product.updateProduct' );
+
+                Route::post( 'cke-upload', [ ProductController::class, 'ckeUpload' ] )->name( 'admin.product.ckeupload' );
             } );
 
             Route::prefix( 'orders' )->group( function() {

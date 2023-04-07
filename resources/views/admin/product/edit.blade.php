@@ -110,7 +110,7 @@ $product_edit = 'product_edit';
                 <div class="mb-3 row">
                     <label for="{{ $product_edit }}_friendly_url" class="col-sm-5 col-form-label">{{ __( 'template.friendly_url' ) }}</label>
                     <div class="col-sm-7">
-                        <input type="text" class="form-control form-control-sm" id="{{ $product_edit }}_friendly_url" placeholder="{{ __( 'template.optional' ) }}">
+                        <input type="text" class="form-control form-control-sm" id="{{ $product_edit }}_friendly_url">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
@@ -145,7 +145,7 @@ $product_edit = 'product_edit';
             <div class="card-body">
                 <h5 class="card-title">{{ __( 'template.description' ) }}</h5>
                 <hr>
-                <textarea class="w-100" rows="10"></textarea>
+                <textarea class="form-control" id="{{ $product_edit }}_description"></textarea>
             </div>
         </div>
     </div>
@@ -157,7 +157,8 @@ $product_edit = 'product_edit';
             <div class="card-body">
                 <h5 class="card-title">{{ __( 'template.gallery' ) }}</h5>
                 <hr>
-                <div class="input-images"></div>
+                <div class="images" id="{{ $product_edit }}_images"></div>
+                <div class="invalid-feedback"></div>
             </div>
         </div>
     </div>
@@ -172,6 +173,18 @@ $product_edit = 'product_edit';
         </div>
     </div>
 </div>
+
+<link rel="stylesheet" href="{{ asset( 'admin/css/ckeditor/styles.css' ) }}">
+<script src="{{ asset( 'admin/js/ckeditor/ckeditor.js' ) }}"></script>
+<script src="{{ asset( 'admin/js/ckeditor/upload-adapter.js' ) }}"></script>
+
+<script>
+window.ckeupload_path = '{{ route( 'admin.product.ckeupload' ) }}';
+window.csrf_token = '{{ csrf_token() }}';
+window.cke_element = 'product_edit_description';
+</script>
+
+<script src="{{ asset( 'admin/js/ckeditor/ckeditor-init.js' ) }}"></script>
 
 <script>
     document.addEventListener( 'DOMContentLoaded', function() {
@@ -219,17 +232,78 @@ $product_edit = 'product_edit';
             } );
 
             let formData = new FormData();
+            formData.append( 'id', '{{ request( 'id' ) }}' );
             formData.append( 'sku', $( pe + '_sku' ).val() );
             formData.append( 'title', $( pe + '_title' ).val() );
             formData.append( 'short_description', $( pe + '_short_description' ).val() );
+            formData.append( 'description', editor.getData() );
             formData.append( 'regular_price', $( pe + '_regular_price' ).val() );
             formData.append( 'taxable', $( pe + '_taxable' ).val() );
             formData.append( 'enable_promotion', $( pe + '_enable_promotion' ).val() );
             formData.append( 'promo_price', $( pe + '_promo_price' ).val() );
             formData.append( 'promo_date_from', $( pe + '_promo_date_from' ).val() );
             formData.append( 'promo_date_to', $( pe + '_promo_date_to' ).val() );
+            formData.append( 'quantity', $( pe + '_quantity' ).val() );
+
+            $.each( $( '.images input[name="preloaded[]"]' ), function( i, v ) {
+                formData.append( 'preloaded[]', v.value );
+            } );
+
+            $.each( $( '.images input[name="images[]"]' )[0].files, function( i, v ) {
+                formData.append( 'images[]', v );
+            } );
+
+            formData.append( 'friendly_url', $( pe + '_friendly_url' ).val() );
+            formData.append( 'meta_title', $( pe + '_meta_title' ).val() );
+            formData.append( 'meta_description', $( pe + '_meta_description' ).val() );
 
             formData.append( '_token', '{{ csrf_token() }}' );
+
+            $.ajax( {
+                url: '{{ route( 'admin.product.updateProduct' ) }}',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function( response ) {
+
+                    $( 'body' ).loading( 'stop' );
+
+                    $( 'main.page-content' ).prepend( `
+                    <div class="alert border-0 border-success border-start border-4 bg-light-success fade show py-2">
+                        <div class="d-flex align-items-center">
+                            <div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <div class="ms-3">
+                                <div class="text-success">{{ __( 'product.product_updated' ) }}</div>
+                            </div>
+                        </div>
+                    </div>` );
+                    $( window ).scrollTop( 0 );
+
+                    setTimeout(function(){
+                        $( '.alert' ).fadeTo( 250, 0.01, function() { 
+                            $( this ).slideUp( 50, function() {
+                                $( this ).remove();
+                                window.location.href = '{{ route( 'admin.product.index' ) }}';
+                            } ); 
+                        } );
+                    }, 2000 );
+                },
+                error: function( error ) {
+
+                    $( 'body' ).loading( 'stop' );
+
+                    if ( error.status === 422 ) {
+                        let errors = error.responseJSON.errors;
+                        $.each( errors, function( key, value ) {
+                            $( pe + '_' + key ).addClass( 'is-invalid' ).next().text( value );
+                        } );
+
+                        $( '.form-control.is-invalid:first' ).get( 0 ).scrollIntoView();
+                    }
+                }
+            } );
         } );
 
         function getProduct() {
@@ -250,6 +324,7 @@ $product_edit = 'product_edit';
                     $( pe + '_sku' ).val( response.sku );
                     $( pe + '_title' ).val( response.title );
                     $( pe + '_short_description' ).val( response.short_description );
+                    editor.setData( response.description );
                     $( pe + '_regular_price' ).val( response.product_prices[0].regular_price );
                     // $( pe + '_taxable' ).val( response.taxable );
                     $( pe + '_enable_promotion' ).val( response.product_prices[0].promo_enabled ).change();
@@ -261,6 +336,27 @@ $product_edit = 'product_edit';
                     $( pe + '_quantity' ).val( response.product_inventory.quantity );
                     $( pe + '_description' ).val( response.description );
                     $( pe + '_friendly_url' ).val( response.url_slug );
+
+                    response.metadata.map( function( v, i ) {
+                        $( pe + '_' + v.key ).val( v.value );
+                    } );
+
+                    let preloaded = [];
+                    response.product_images.map( function( v, i ) {
+                        preloaded.push( {
+                            id: v.id,
+                            src: v.path,
+                            type: v.type,
+                        } );
+                    } );
+
+                    $( '.images' ).imageUploader( {
+                        preloaded,
+                        label: '{!! __( 'template.drag_n_drop' ) !!}',
+                        extensions: [ '.jpg', '.jpeg', '.png' ],
+                        mimes: [ 'image/jpeg', 'image/png' ],
+                        maxSize: [ 64 * 1024 * 1024 ],
+                    } );
 
                     $( 'body' ).loading( 'stop' );
                 }
