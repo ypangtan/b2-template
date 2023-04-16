@@ -22,7 +22,7 @@ class AuditController extends Controller
             'mobile_title' => __( 'template.audit_logs' ),
         ];
 
-        return view( 'admin.main_v2' )->with( $this->data );
+        return view( 'admin.main' )->with( $this->data );
     }
 
     public function allAudits( Request $request ) {

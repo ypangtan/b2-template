@@ -134,6 +134,9 @@ $product_create = 'product_create';
             <div class="card-body">
                 <h5 class="card-title">{{ __( 'template.category' ) }}</h5>
                 <hr>
+                <div id="jstree_category">
+                    <ul></ul>
+                </div>
             </div>
         </div>
     </div>
@@ -189,7 +192,8 @@ window.cke_element = 'product_create_description';
 <script>
     document.addEventListener( 'DOMContentLoaded', function() {
 
-        let pc = '#{{ $product_create }}';
+        let pc = '#{{ $product_create }}',
+            jsTree = null;
 
         $( pc + '_promo_date_from' ).flatpickr( {
             disableMobile: true,
@@ -250,6 +254,8 @@ window.cke_element = 'product_create_description';
             formData.append( 'meta_title', $( pc + '_meta_title' ).val() );
             formData.append( 'meta_description', $( pc + '_meta_description' ).val() );
 
+            formData.append( 'categories', JSON.stringify( jsTree.jstree().get_bottom_selected() ) );
+
             formData.append( '_token', '{{ csrf_token() }}' );
 
             $.ajax( {
@@ -268,7 +274,7 @@ window.cke_element = 'product_create_description';
                             <div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i>
                             </div>
                             <div class="ms-3">
-                                <div class="text-success">{{ __( 'product.product_created' ) }}</div>
+                                <div class="text-success">` + response.message + `</div>
                             </div>
                         </div>
                     </div>` );
@@ -298,6 +304,52 @@ window.cke_element = 'product_create_description';
                 }
             } );
         } );
+        
+        getCategories();
+        function getCategories() {
+
+            $.ajax( {
+                url: '{{ route( 'admin.category.getCategoryStructure' ) }}',
+                type: 'POST',
+                data: {
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function( response ) {
+
+                    traverseDown( response );
+
+                    jsTree = $( '#jstree_category' );
+                    jsTree.jstree( {
+                        plugins: [ 'wholerow', 'checkbox' ],
+                    } ).on('changed.jstree', function (e, data) {
+                        console.log( data );
+                    } );;
+                }
+            } );
+        }
+
+        function traverseDown( array ) {
+
+            array.forEach( function( item ) {
+
+                console.log( item );
+
+                let structure1 =
+                `
+                <li id="child_` + item.id + `">` + item.title + ( item.childrens ? `<ul></ul>` : '' ) + `</li>
+                `;
+
+                if ( item.parent_id ) {
+                    $( '#jstree_category #child_' + item.parent_id + ' > ul' ).append( structure1 );
+                } else {
+                    $( '#jstree_category > ul' ).append( structure1 );
+                }
+
+                if ( Array.isArray( item.childrens ) ) {
+                    traverseDown( item.childrens );
+                }
+            } );
+        }
 
     } );
 </script>

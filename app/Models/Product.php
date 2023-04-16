@@ -46,6 +46,10 @@ class Product extends Model
         return $this->hasMany( ProductPrice::class, 'product_id' );
     }
 
+    public function productCategories() {
+        return $this->hasMany( ProductCategory::class, 'product_id' );
+    }
+
     public function getEncryptedIdAttribute() {
         return Helper::encode( $this->attributes['id'] );
     }

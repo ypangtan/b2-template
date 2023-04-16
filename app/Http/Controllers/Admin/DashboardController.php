@@ -29,7 +29,7 @@ class DashboardController extends Controller {
 
         $this->data['data'] = DashboardService::dashboardDatas( $request );
 
-        return view( 'admin.main_v2' )->with( $this->data );
+        return view( 'admin.main' )->with( $this->data );
     }
 
     public function totalDatas( Request $request ) {

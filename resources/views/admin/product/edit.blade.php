@@ -134,6 +134,9 @@ $product_edit = 'product_edit';
             <div class="card-body">
                 <h5 class="card-title">{{ __( 'template.category' ) }}</h5>
                 <hr>
+                <div id="jstree_category">
+                    <ul></ul>
+                </div>
             </div>
         </div>
     </div>
@@ -257,6 +260,8 @@ window.cke_element = 'product_edit_description';
             formData.append( 'meta_title', $( pe + '_meta_title' ).val() );
             formData.append( 'meta_description', $( pe + '_meta_description' ).val() );
 
+            formData.append( 'categories', JSON.stringify( jsTree.jstree().get_bottom_selected() ) );
+
             formData.append( '_token', '{{ csrf_token() }}' );
 
             $.ajax( {
@@ -275,7 +280,7 @@ window.cke_element = 'product_edit_description';
                             <div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i>
                             </div>
                             <div class="ms-3">
-                                <div class="text-success">{{ __( 'product.product_updated' ) }}</div>
+                                <div class="text-success">` + response.message + `</div>
                             </div>
                         </div>
                     </div>` );
@@ -321,28 +326,30 @@ window.cke_element = 'product_edit_description';
                 },
                 success: function( response ) {
 
-                    $( pe + '_sku' ).val( response.sku );
-                    $( pe + '_title' ).val( response.title );
-                    $( pe + '_short_description' ).val( response.short_description );
-                    editor.setData( response.description );
-                    $( pe + '_regular_price' ).val( response.product_prices[0].regular_price );
-                    // $( pe + '_taxable' ).val( response.taxable );
-                    $( pe + '_enable_promotion' ).val( response.product_prices[0].promo_enabled ).change();
-                    if ( response.product_prices[0].promo_enabled == 'yes' ) {
-                        $( pe + '_promo_price' ).val( response.product_prices[0].promo_price );
-                        promoDateFrom.setDate( response.product_prices[0].promo_date_from );
-                        promoDateTo.setDate( response.product_prices[0].promo_date_to );
-                    }
-                    $( pe + '_quantity' ).val( response.product_inventory.quantity );
-                    $( pe + '_description' ).val( response.description );
-                    $( pe + '_friendly_url' ).val( response.url_slug );
+                    let product = response.product;
 
-                    response.metadata.map( function( v, i ) {
+                    $( pe + '_sku' ).val( product.sku );
+                    $( pe + '_title' ).val( product.title );
+                    $( pe + '_short_description' ).val( product.short_description );
+                    editor.setData( product.description );
+                    $( pe + '_regular_price' ).val( product.product_prices[0].regular_price );
+                    // $( pe + '_taxable' ).val( product.taxable );
+                    $( pe + '_enable_promotion' ).val( product.product_prices[0].promo_enabled ).change();
+                    if ( product.product_prices[0].promo_enabled == 'yes' ) {
+                        $( pe + '_promo_price' ).val( product.product_prices[0].promo_price );
+                        promoDateFrom.setDate( product.product_prices[0].promo_date_from );
+                        promoDateTo.setDate( product.product_prices[0].promo_date_to );
+                    }
+                    $( pe + '_quantity' ).val( product.product_inventory.quantity );
+                    $( pe + '_description' ).val( product.description );
+                    $( pe + '_friendly_url' ).val( product.url_slug );
+
+                    product.metadata.map( function( v, i ) {
                         $( pe + '_' + v.key ).val( v.value );
                     } );
 
                     let preloaded = [];
-                    response.product_images.map( function( v, i ) {
+                    product.product_images.map( function( v, i ) {
                         preloaded.push( {
                             id: v.id,
                             src: v.path,
@@ -358,7 +365,49 @@ window.cke_element = 'product_edit_description';
                         maxSize: [ 64 * 1024 * 1024 ],
                     } );
 
+                    traverseDown( response.categories );
+
+                    jsTree = $( '#jstree_category' );
+                    jsTree.jstree( {
+                        plugins: [ 'wholerow', 'checkbox' ],
+                    } ).on('changed.jstree', function (e, data) {
+                        console.log( data );
+                    } );
+
+                    product.product_categories.map( function( v, i ) {
+
+                        jsTree.jstree( 'check_node', 'child_' + v.category_id );
+                        jsTree.jstree( 'open_node', 'child_' + v.category_id, function( e, d ) {
+                            if( e.parents.length ){
+                                jsTree.jstree( 'open_node', e.parent );
+                            };
+                        });
+                    } );
+
                     $( 'body' ).loading( 'stop' );
+                }
+            } );
+        }
+
+        function traverseDown( array ) {
+
+            array.forEach( function( item ) {
+
+                console.log( item );
+
+                let structure1 =
+                `
+                <li id="child_` + item.id + `">` + item.title + ( item.childrens ? `<ul></ul>` : '' ) + `</li>
+                `;
+
+                if ( item.parent_id ) {
+                    $( '#jstree_category #child_' + item.parent_id + ' > ul' ).append( structure1 );
+                } else {
+                    $( '#jstree_category > ul' ).append( structure1 );
+                }
+
+                if ( Array.isArray( item.childrens ) ) {
+                    traverseDown( item.childrens );
                 }
             } );
         }

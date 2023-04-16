@@ -10,7 +10,7 @@
         <link href="{{ asset( 'admin/plugins/simplebar/css/simplebar.css' ) .Helper::assetVersion() }}" rel="stylesheet" />
         <link href="{{ asset( 'admin/plugins/perfect-scrollbar/css/perfect-scrollbar.css' ) .Helper::assetVersion() }}" rel="stylesheet" />
         <link href="{{ asset( 'admin/plugins/metismenu/css/metisMenu.min.css' ) .Helper::assetVersion() }}" rel="stylesheet" />
-        <link href="https://fonts.cdnfonts.com/css/montserrat" rel="stylesheet">
+        <!-- <link href="https://fonts.cdnfonts.com/css/montserrat" rel="stylesheet"> -->
         <!-- Bootstrap CSS -->
         <link href="{{ asset( 'admin/css/bootstrap.min.css' ) . Helper::assetVersion() }}" rel="stylesheet" />
         <link href="{{ asset( 'admin/css/bootstrap-extended.css' ) . Helper::assetVersion() }}" rel="stylesheet" />
@@ -25,6 +25,23 @@
         <link href="{{ asset( 'admin/css/pace.min.css' ) . Helper::assetVersion() }}" rel="stylesheet" />
         <link href="{{ asset( 'admin/css/flatpickr.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
         <link href="{{ asset( 'admin/css/image-uploader.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+
+        <style>
+        /* montserrat-regular - latin */
+        @font-face {
+        font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+        font-family: 'Montserrat';
+        font-style: normal;
+        font-weight: 400;
+        src: url('{{ asset( 'admin/font/montserrat-v25-latin-regular.eot' ) }}'); /* IE9 Compat Modes */
+        src: url('{{ asset( 'admin/font/montserrat-v25-latin-regular.eot?#iefix' ) }}') format('embedded-opentype'), /* IE6-IE8 */
+            url('{{ asset( 'admin/font/montserrat-v25-latin-regular.woff2' ) }}') format('woff2'), /* Super Modern Browsers */
+            url('{{ asset( 'admin/font/montserrat-v25-latin-regular.woff' ) }}') format('woff'), /* Modern Browsers */
+            url('{{ asset( 'admin/font/montserrat-v25-latin-regular.ttf' ) }}') format('truetype'), /* Safari, Android, iOS */
+            url('{{ asset( 'admin/font/montserrat-v25-latin-regular.svg#Montserrat' ) }}') format('svg'); /* Legacy iOS */
+        }
+        </style>
 
         @if ( @$header )
             <title>{{ @$header['title'] }} - {{ Helper::websiteName() }}</title>

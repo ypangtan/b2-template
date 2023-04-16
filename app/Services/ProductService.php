@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\{
     App,
+    DB,
     Storage,
     Validator,
 };
@@ -12,6 +13,7 @@ use Illuminate\Support\Str;
 use App\Models\{
     Metadata,
     Product,
+    ProductCategory,
     ProductImage,
     ProductInventory,
     ProductPrice,
@@ -126,6 +128,7 @@ class ProductService {
 
         $product = Product::with( [ 
             'metadata',
+            'productCategories',
             'productImages', 
             'productInventory', 
             'productPrices' 
@@ -149,7 +152,10 @@ class ProductService {
             }
         }
 
-        return response()->json( $product );
+        $data['product'] = $product;
+        $data['categories'] = CategoryService::getCategoryStructure( $request );
+
+        return response()->json( $data );
     }
 
     public function createProduct( $request ) {
@@ -210,50 +216,79 @@ class ProductService {
             'status' => 10,
         ];
 
-        $createProduct = Product::create( $basicAttribute );
+        DB::beginTransaction();
 
-        $priceAttribute = [
-            'product_id' => $createProduct->id,
-            'regular_price' => $request->regular_price,
-        ];
+        try {
 
-        if ( $request->enable_promotion == 'yes' ) {
-            $priceAttribute['promo_price'] = $request->promo_price;
-            $priceAttribute['promo_date_from'] = $request->promo_date_from;
-            $priceAttribute['promo_date_to'] = $request->promo_date_to;
-        }
+            $createProduct = Product::create( $basicAttribute );
 
-        $createProductPrice = ProductPrice::create( $priceAttribute );
+            $priceAttribute = [
+                'product_id' => $createProduct->id,
+                'regular_price' => $request->regular_price,
+            ];
 
-        $createProductInventory = ProductInventory::create( [
-            'product_id' => $createProduct->id,
-            'quantity' => $request->quantity,
-        ] );
+            if ( $request->enable_promotion == 'yes' ) {
+                $priceAttribute['promo_price'] = $request->promo_price;
+                $priceAttribute['promo_date_from'] = $request->promo_date_from;
+                $priceAttribute['promo_date_to'] = $request->promo_date_to;
+            }
 
-        if ( $request->hasFile( 'images' ) ) {
-            foreach( $request->file( 'images' ) as $image ) {
-                $createProductImage = ProductImage::create( [
+            $createProductPrice = ProductPrice::create( $priceAttribute );
+
+            $createProductInventory = ProductInventory::create( [
+                'product_id' => $createProduct->id,
+                'quantity' => $request->quantity,
+            ] );
+
+            if ( $request->hasFile( 'images' ) ) {
+                foreach( $request->file( 'images' ) as $image ) {
+                    $createProductImage = ProductImage::create( [
+                        'product_id' => $createProduct->id,
+                        'title' => $image->getClientOriginalName(),
+                        'file' => $image->store( 'products/' . $createProduct->id, [ 'disk' => 'public' ] ),
+                        'type' => 1,
+                        'file_type' => 2, // 1: pdf 2: image
+                    ] );
+                }
+            }
+
+            Metadata::create( [
+                'type' => 'product',
+                'type_id' => $createProduct->id,
+                'key' => 'meta_title',
+                'value' => $request->meta_title,
+            ] );
+
+            Metadata::create( [
+                'type' => 'product',
+                'type_id' => $createProduct->id,
+                'key' => 'meta_description',
+                'value' => $request->meta_description,
+            ] );
+
+            $categories = json_decode( $request->categories );
+            foreach ( $categories as $cid ) {
+                $cid = str_replace( 'child_', '', $cid );
+                ProductCategory::create( [
                     'product_id' => $createProduct->id,
-                    'title' => $image->getClientOriginalName(),
-                    'file' => $image->store( 'products/' . $createProduct->id, [ 'disk' => 'public' ] ),
-                    'type' => 1,
-                    'file_type' => 2, // 1: pdf 2: image
+                    'category_id' => $cid,
+                    'status' => 10,
                 ] );
             }
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollBack();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+            ] );
         }
 
-        Metadata::create( [
-            'type' => 'product',
-            'type_id' => $createProduct->id,
-            'key' => 'meta_title',
-            'value' => $request->meta_title,
-        ] );
-
-        Metadata::create( [
-            'type' => 'product',
-            'type_id' => $createProduct->id,
-            'key' => 'meta_description',
-            'value' => $request->meta_description,
+        return response()->json( [
+            'message' => __( 'product.product_created' ),
         ] );
     }
 
@@ -363,6 +398,10 @@ class ProductService {
             'key' => 'meta_description',
         ], [
             'value' => $request->meta_description,
+        ] );
+
+        return response()->json( [
+            'message' => __( 'product.product_updated' ),
         ] );
     }
 

@@ -18,7 +18,7 @@ class OrderController extends Controller
             'mobile_title' => __( 'template.orders' ),
         ];
 
-        return view( 'admin.main_v2' )->with( $this->data );
+        return view( 'admin.main' )->with( $this->data );
     }
 
     public function allOrders() {

@@ -14,6 +14,7 @@ return [
     */
 
     'category_type' => '分类类型',
+    'parent_category' => '父类分类',
     'parent' => '父类',
     'child' => '子类',
     'enable_description' => '此分类会显示在分类列表',

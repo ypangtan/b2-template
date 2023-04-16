@@ -14,6 +14,7 @@ return [
     */
 
     'category_type' => 'Category Type',
+    'parent_category' => 'Parent Category',
     'parent' => 'Parent',
     'child' => 'Child',
     'enable_description' => 'This category will show in category list',

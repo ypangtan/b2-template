@@ -1,4 +1,4 @@
-<?php echo view( 'admin/header_v2', [ 'basic' => @$basic ] ); ?>
+<?php echo view( 'admin/header', [ 'basic' => @$basic ] ); ?>
     <main class="d-flex w-100">
         <div class="container d-flex flex-column">
             <div class="row vh-100">

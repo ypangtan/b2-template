@@ -11,7 +11,8 @@
     <script src="{{ asset( 'admin/js/lucide.min.js' ) . Helper::assetVersion() }}"></script>
     <script src="{{ asset( 'admin/js/flatpickr-4.6.13.js' ) . Helper::assetVersion() }}"></script>
     <script src="{{ asset( 'admin/js/lightgallery.min.js' ) . Helper::assetVersion() }}"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+    
     <script>
         lucide.createIcons();
 

@@ -22,7 +22,7 @@ class ProductController extends Controller
             'mobile_title' => __( 'template.products' ),
         ];
 
-        return view( 'admin.main_v2' )->with( $this->data );
+        return view( 'admin.main' )->with( $this->data );
     }
 
     public function add() {
@@ -36,7 +36,7 @@ class ProductController extends Controller
             'mobile_title' => __( 'template.products' ),
         ];
 
-        return view( 'admin.main_v2' )->with( $this->data );
+        return view( 'admin.main' )->with( $this->data );
     }
 
     public function edit() {
@@ -50,7 +50,7 @@ class ProductController extends Controller
             'mobile_title' => __( 'template.products' ),
         ];
 
-        return view( 'admin.main_v2' )->with( $this->data );
+        return view( 'admin.main' )->with( $this->data );
     }
 
     public function allProducts( Request $request ) {

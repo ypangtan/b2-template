@@ -22,7 +22,7 @@ class ProfileController extends Controller
             'mobile_title' => __( 'template.profile' ),
         ];
 
-        return view( 'admin.main_v2' )->with( $this->data );
+        return view( 'admin.main' )->with( $this->data );
     }
 
     public function update( Request $request ) {

@@ -33,7 +33,7 @@ class AdministratorController extends Controller {
 
         $this->data['data']['roles'] = $roles;
 
-        return view( 'admin.main_v2' )->with( $this->data );
+        return view( 'admin.main' )->with( $this->data );
     }
 
     public function allAdmins( Request $request ) {
@@ -77,7 +77,7 @@ class AdministratorController extends Controller {
             'mobile_title' => __( 'template.modules' ),
         ];
 
-        return view( 'admin.main_v2' )->with( $this->data );
+        return view( 'admin.main' )->with( $this->data );
     }
 
     public function allModules( Request $request ) {
@@ -116,7 +116,7 @@ class AdministratorController extends Controller {
             'mobile_title' => __( 'template.roles' ),
         ];
 
-        return view( 'admin.main_v2' )->with( $this->data );
+        return view( 'admin.main' )->with( $this->data );
     }
 
     public function allRoles( Request $request ) {

@@ -24,7 +24,7 @@ class ProductPrice extends Model
 
     public function getPromoEnabledAttribute() {
 
-        if ( $this->attributes['promo_date_to'] > date( 'Y-m-d H:i:s' ) ) {
+        if ( isset( $this->attributes['promo_date_to'] ) && $this->attributes['promo_date_to'] > date( 'Y-m-d H:i:s' ) ) {
             return 'yes';
         }
 

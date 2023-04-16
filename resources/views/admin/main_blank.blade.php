@@ -1,4 +1,4 @@
-<?php echo view( 'admin/header_v2', [ 'header' => @$header ] );?>
+<?php echo view( 'admin/header', [ 'header' => @$header ] );?>
 
     <body>
         <!--start wrapper-->
@@ -14,6 +14,6 @@
             
         </div>
 
-        <?php echo view( 'admin/footer_v2' ); ?>
+        <?php echo view( 'admin/footer' ); ?>
     </body>
 </html>
