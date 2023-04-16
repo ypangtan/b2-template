@@ -16,10 +16,11 @@ class CreateTmpUsersTable extends Migration
         Schema::create('tmp_users', function (Blueprint $table) {
             $table->id();
             $table->foreignId('country_id')->nullable()->constrained('countries')->onUpdate('restrict')->onDelete('cascade');
-            $table->string( 'phone_number', 20 );
-            $table->string( 'otp_code', 6 );
-            $table->string( 'status', 50 );
-            $table->timestamp( 'expire_on' );
+            $table->string('phone_number', 20)->nullable();
+            $table->string('email', 50)->nullable();
+            $table->string('otp_code', 6);
+            $table->tinyInteger('status');
+            $table->timestamp('expire_on');
             $table->timestamps();
         });
     }

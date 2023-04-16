@@ -13,6 +13,7 @@ return [
     |
     */
 
+    'header_message' => 'The given data was invalid.',
     'accepted' => 'The :attribute must be accepted.',
     'accepted_if' => 'The :attribute must be accepted when :other is :value.',
     'active_url' => 'The :attribute is not a valid URL.',
@@ -129,6 +130,7 @@ return [
     'uploaded' => 'The :attribute failed to upload.',
     'url' => 'The :attribute must be a valid URL.',
     'uuid' => 'The :attribute must be a valid UUID.',
+    'non_ascii_character_not_allowed' => 'The :attribute must not contain non-ASCII characters.',
 
     /*
     |--------------------------------------------------------------------------

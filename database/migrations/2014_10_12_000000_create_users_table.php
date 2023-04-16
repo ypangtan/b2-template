@@ -27,9 +27,9 @@ class CreateUsersTable extends Migration
             $table->string( 'invitation_code', '6' );
             $table->text( 'referral_structure' )->nullable();
             $table->date( 'birthday' )->nullable();
+            $table->tinyInteger('status')->default(10);
             $table->rememberToken();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

@@ -15,6 +15,7 @@ return [
 
     'header_message' => '提供的数据是无效的。',
     'accepted' => ':attribute must be accepted.',
+    'accepted_if' => 'The :attribute must be accepted when :other is :value.',
     'active_url' => ':attribute is not a valid URL.',
     'after' => ':attribute必须是:date之后的一个日期。',
     'after_or_equal' => ':attribute must be a date after or equal to :date.',
@@ -129,6 +130,7 @@ return [
     'uploaded' => ':attribute failed to upload.',
     'url' => ':attribute must be a valid URL.',
     'uuid' => ':attribute must be a valid UUID.',
+    'non_ascii_character_not_allowed' => ':attribute不能包含非ASCII字符',
 
     /*
     |--------------------------------------------------------------------------

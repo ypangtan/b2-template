@@ -17,6 +17,7 @@ class TmpUser extends Model
     protected $fillable = [
         'country_id',
         'phone_number',
+        'email',
         'otp_code',
         'status',
         'expire_on',
@@ -30,11 +31,12 @@ class TmpUser extends Model
         'country_id',
         'phone_number',
         'otp_code',
+        'email',
         'status',
         'expire_on',
     ];
 
-    protected static $logName = 'users';
+    protected static $logName = 'tmp_users';
 
     protected static $logOnlyDirty = true;
 
@@ -43,6 +45,6 @@ class TmpUser extends Model
     }
 
     public function getDescriptionForEvent( string $eventName ): string {
-        return "{$eventName} user";
+        return "{$eventName} tmp user";
     }
 }

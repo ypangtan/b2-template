@@ -9,14 +9,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, LogsActivity, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, LogsActivity;
 
     public function referral() {
         return $this->hasOne( User::class, 'id', 'referral_id' );
@@ -38,6 +37,7 @@ class User extends Authenticatable
         'invitation_code',
         'referral_structure',
         'birthday',
+        'status',
     ];
 
     /**
@@ -74,6 +74,7 @@ class User extends Authenticatable
         'invitation_code',
         'referral_structure',
         'birthday',
+        'status',
     ];
 
     protected static $logName = 'users';
