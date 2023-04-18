@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\{
     Category,
     CategoryStructure,
+    ProductCategory,
 };
 
 use Helper;
@@ -187,11 +188,22 @@ class CategoryService {
             'thumbnail' => [ 'nullable', 'image' ],
             'enabled' => [ 'required' ],
             'category_type' => [ 'required', function( $attribute, $value, $fail ) {
-
+                $exist = ProductCategory::where( 'category_id', $value )->first();
+                if ( $exist ) {
+                    $fail( 'Cannot change category type as there are product(s) assigned to it.' );
+                }
             } ],
         ] );
 
         $updateCategory = Category::find( Helper::decode( $request->id ) );
+        $parent = Category::find( $request->parent_category );
+        if ( $parent ) {
+            $updateCategory->parent_id = $parent->id;
+            $updateCategory->structure = $parent->structure . '|' . $request->id;
+        } else {
+            $updateCategory->parent_id = null;
+            $updateCategory->structure = '-';
+        }
         $updateCategory->title = $request->title;
         if ( $request->hasFile( 'thumbnail' ) ) {
             Storage::disk( 'public' )->delete( $updateCategory->thumbnail );
@@ -204,6 +216,7 @@ class CategoryService {
         }
         $updateCategory->url_slug = \Str::slug( $request->title );
         $updateCategory->status = $request->enabled;
+        $updateCategory->type = $request->category_type;
         $updateCategory->save();
     }
 

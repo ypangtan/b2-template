@@ -32,6 +32,14 @@ $category_edit = 'category_edit';
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
+                <div class="mb-3 row hidden">
+                    <label for="{{ $category_edit }}_parent_category" class="col-sm-5 col-form-label">{{ __( 'category.parent_category' ) }}</label>
+                    <div class="col-sm-7">
+                        <select class="form-control form-control-sm" id="{{ $category_edit }}_parent_category">
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
                 <div class="mb-3 row">
                     <label class="col-sm-5 col-form-label">{{ __( 'datatables.enabled' ) }}</label>
                     <div class="col-sm-7">
@@ -97,6 +105,9 @@ $category_edit = 'category_edit';
             formData.append( 'id', '{{ request( 'id' ) }}' );
             formData.append( 'title', $( ce + '_title' ).val() );
             formData.append( 'description', $( ce + '_description' ).val() );
+            formData.append( 'category_type', $( ce + '_category_type' ).val() );
+            formData.append( 'parent_category', $( ce + '_parent_category' ).val() );
+            formData.append( 'enabled', $( ce + '_enabled' ).is( ':checked' ) ? 10 : 1 );
             if ( $( ce + '_thumbnail' )[0].files.length != 0 ) {
                 formData.append( 'thumbnail', $( ce + '_thumbnail' )[0].files[0] );
             } else {
@@ -199,6 +210,43 @@ $category_edit = 'category_edit';
             }
         } );
 
+        $( ce + '_enabled' ).change( function() {
+            if ( $( this ).is( ':checked' ) ) {
+                $( this ).next().children( 'small' ).html( '{{ __( 'category.enable_description' ) }}' );
+            } else {
+                $( this ).next().children( 'small' ).html( '{{ __( 'category.disable_description' ) }}' );
+            }
+        } );
+
+        let option = '';
+
+        $( ce + '_category_type' ).change( function() {
+
+            $( ce + '_parent_category' ).empty();
+
+            if ( $( this ).val() == 1 ) {
+
+                $( ce + '_parent_category' ).parents( 'div.mb-3.row' ).addClass( 'hidden' );
+            } else {
+
+                $.ajax( {
+                    url: '{{ route( 'admin.category.getCategoryStructure' ) }}',
+                    type: 'POST',
+                    data: {
+                        '_token': '{{ csrf_token() }}',
+                    },
+                    success: function( response ) {
+
+                        traverseDown( response );
+
+                        $( ce + '_parent_category' ).append( option );
+                    }
+                } );
+
+                $( ce + '_parent_category' ).parents( 'div.mb-3.row' ).removeClass( 'hidden' );
+            }
+        } );
+
         function getCategory() {
 
             $( 'body' ).loading( {
@@ -217,6 +265,27 @@ $category_edit = 'category_edit';
                     $( ce + '_title' ).val( response.title );
                     $( ce + '_description' ).val( response.description );
                     $( ce + '_category_type' ).val( response.type );
+                    if ( response.type == 2 ) {
+                        let parentID = response.parent_id;
+                        $( ce + '_parent_category' ).parents( 'div.mb-3.row' ).removeClass( 'hidden' );
+                        $.ajax( {
+                            url: '{{ route( 'admin.category.getCategoryStructure' ) }}',
+                            type: 'POST',
+                            data: {
+                                '_token': '{{ csrf_token() }}',
+                            },
+                            success: function( response ) {
+
+                                traverseDown( response );
+
+                                $( ce + '_parent_category' ).append( option );
+
+                                $( ce + '_parent_category' ).val( parentID );
+                            }
+                        } );
+
+                        $( ce + '_parent_category' ).parents( 'div.mb-3.row' ).removeClass( 'hidden' );
+                    }
                     if ( response.status == 10 ) {
                         $( ce + '_enabled' ).prop( 'checked', true );
                     }
@@ -231,6 +300,24 @@ $category_edit = 'category_edit';
                     }
 
                     $( 'body' ).loading( 'stop' );
+                }
+            } );
+        }
+
+        function traverseDown( array ) {
+
+            array.forEach( function( item ) {
+
+                let str = '--';
+                    strLevel = str.repeat( item.level ),
+
+                option +=
+                `
+                <option value="` + item.id + `">` + strLevel + ` ` + item.title + `</option>
+                `;
+
+                if ( Array.isArray( item.childrens ) ) {
+                    traverseDown( item.childrens );
                 }
             } );
         }

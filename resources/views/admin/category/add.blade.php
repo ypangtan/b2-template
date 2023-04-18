@@ -215,7 +215,7 @@ $category_create = 'category_create';
 
         $( cc + '_category_type' ).change( function() {
 
-            $( cc + '_parent_category' ).empty();            
+            $( cc + '_parent_category' ).empty();
 
             if ( $( this ).val() == 1 ) {
 

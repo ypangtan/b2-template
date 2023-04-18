@@ -264,6 +264,7 @@ class ProductService {
                 'value' => $request->meta_description,
             ] );
 
+            ProductCategory::where( 'product_id', $createProduct->id )->delete();
             $categories = json_decode( $request->categories );
             foreach ( $categories as $cid ) {
                 $cid = str_replace( 'child_', '', $cid );
@@ -394,6 +395,7 @@ class ProductService {
             }
         }
 
+        ProductCategory::where( 'product_id', $updateProduct->id )->delete();
         $categories = json_decode( $request->categories );
         foreach ( $categories as $cid ) {
             $cid = str_replace( 'child_', '', $cid );
