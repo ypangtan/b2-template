@@ -34,6 +34,10 @@ class Category extends Model
         return $this->hasMany( CategoryStructure::class, 'parent_id' )->where( 'status', 10 )->orderBy( 'level', 'ASC' );
     }
 
+    public function products() {
+        return $this->hasMany( ProductCategory::class, 'category_id' );
+    }
+
     public function getPathAttribute() {
         return $this->attributes['thumbnail'] ? asset( 'storage/'.$this->attributes['thumbnail'] ) : null;
     }

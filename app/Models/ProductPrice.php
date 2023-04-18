@@ -16,20 +16,22 @@ class ProductPrice extends Model
 
     protected $fillable = [
         'product_id',
+        'display_price',
         'regular_price',
         'promo_price',
+        'promo_enabled',
         'promo_date_from',
         'promo_date_to',
     ];
 
-    public function getPromoEnabledAttribute() {
+    // public function getPromoEnabledAttribute() {
 
-        if ( isset( $this->attributes['promo_date_to'] ) && $this->attributes['promo_date_to'] > date( 'Y-m-d H:i:s' ) ) {
-            return 'yes';
-        }
+    //     if ( isset( $this->attributes['promo_date_to'] ) && $this->attributes['promo_date_to'] > date( 'Y-m-d H:i:s' ) ) {
+    //         return 'yes';
+    //     }
 
-        return 'no';
-    }
+    //     return 'no';
+    // }
 
     protected function serializeDate( DateTimeInterface $date ) {
         return $date->timezone( 'Asia/Kuala_Lumpur' )->format( 'Y-m-d H:i:s' );
@@ -37,8 +39,10 @@ class ProductPrice extends Model
 
     protected static $logAttributes = [
         'product_id',
+        'display_price',
         'regular_price',
         'promo_price',
+        'promo_enabled',
         'promo_date_from',
         'promo_date_to',
     ];

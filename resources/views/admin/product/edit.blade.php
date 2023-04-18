@@ -56,8 +56,8 @@ $product_edit = 'product_edit';
                     <label for="{{ $product_edit }}_enable_promotion" class="col-sm-5 col-form-label">{{ __( 'product.enable_promotion' ) }}</label>
                     <div class="col-sm-7">
                         <select class="form-control form-control-sm" id="{{ $product_edit }}_enable_promotion">
-                            <option value="no">{{ __( 'datatables.no' ) }}</option>
-                            <option value="yes">{{ __( 'datatables.yes' ) }}</option>
+                            <option value="0">{{ __( 'datatables.no' ) }}</option>
+                            <option value="1">{{ __( 'datatables.yes' ) }}</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
@@ -215,7 +215,7 @@ window.cke_element = 'product_edit_description';
 
         $( pe + '_enable_promotion' ).change( function() {
 
-            if ( $( this ).val() == 'yes' ) {
+            if ( $( this ).val() == 1 ) {
                 $( '#promo_section' ).removeClass( 'hidden' );
             } else {
                 $( '#promo_section' ).addClass( 'hidden' );
@@ -261,6 +261,11 @@ window.cke_element = 'product_edit_description';
             formData.append( 'meta_description', $( pe + '_meta_description' ).val() );
 
             formData.append( 'categories', JSON.stringify( jsTree.jstree().get_bottom_selected() ) );
+
+            // let a = jsTree.jstree();
+            // console.log( a.get_selected() );
+            // console.log( a.get_top_selected() );
+            // console.log( a.get_bottom_selected() );
 
             formData.append( '_token', '{{ csrf_token() }}' );
 
@@ -335,7 +340,7 @@ window.cke_element = 'product_edit_description';
                     $( pe + '_regular_price' ).val( product.product_prices[0].regular_price );
                     // $( pe + '_taxable' ).val( product.taxable );
                     $( pe + '_enable_promotion' ).val( product.product_prices[0].promo_enabled ).change();
-                    if ( product.product_prices[0].promo_enabled == 'yes' ) {
+                    if ( product.product_prices[0].promo_enabled ) {
                         $( pe + '_promo_price' ).val( product.product_prices[0].promo_price );
                         promoDateFrom.setDate( product.product_prices[0].promo_date_from );
                         promoDateTo.setDate( product.product_prices[0].promo_date_to );
@@ -376,7 +381,9 @@ window.cke_element = 'product_edit_description';
 
                     product.product_categories.map( function( v, i ) {
 
-                        jsTree.jstree( 'check_node', 'child_' + v.category_id );
+                        if ( v.is_child ) {
+                            jsTree.jstree( 'check_node', 'child_' + v.category_id );
+                        }
                         jsTree.jstree( 'open_node', 'child_' + v.category_id, function( e, d ) {
                             if( e.parents.length ){
                                 jsTree.jstree( 'open_node', e.parent );

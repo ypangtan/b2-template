@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\{
 use Illuminate\Support\Str;
 
 use App\Models\{
+    Category,
     Metadata,
     Product,
     ProductCategory,
@@ -25,7 +26,7 @@ use Carbon\Carbon;
 
 class ProductService {
 
-    public function allProducts( $request ) {
+    public static function allProducts( $request ) {
 
         $product = Product::with( [ 'productImages' ] )->select( 'products.*' );
 
@@ -124,7 +125,7 @@ class ProductService {
         ];        
     }
 
-    public function oneProduct( $request ) {
+    public static function oneProduct( $request ) {
 
         $product = Product::with( [ 
             'metadata',
@@ -139,12 +140,6 @@ class ProductService {
                 'encrypted_id',
             ] );
 
-            if ( $product->productPrices ) {
-                $product->productPrices->append( [
-                    'promo_enabled',
-                ] );
-            }
-
             if ( $product->productImages ) {
                 $product->productImages->append( [
                     'path',
@@ -158,7 +153,7 @@ class ProductService {
         return response()->json( $data );
     }
 
-    public function createProduct( $request ) {
+    public static function createProduct( $request ) {
 
         $validator = Validator::make( $request->all(), [
             'sku' => [ 'required', 'unique:products,sku' ],
@@ -168,9 +163,9 @@ class ProductService {
             'regular_price' => [ 'bail', 'required', 'numeric', 'min:0.01', 'regex:/^\d*(\.\d{2})?$/' ],
             'taxable' => [ 'required' ],
             'enable_promotion' => [ 'required' ],
-            'promo_price' => [ 'exclude_if:enable_promotion,no', 'bail', 'numeric', 'min:0.01', 'lt:regular_price', 'regex:/^\d*(\.\d{2})?$/' ],
-            'promo_date_from' => [ 'exclude_if:enable_promotion,no', 'required', 'before:promo_date_to' ],
-            'promo_date_to' => [ 'exclude_if:enable_promotion,no', 'required', 'after:promo_date_from' ],
+            'promo_price' => [ 'exclude_if:enable_promotion,0', 'bail', 'numeric', 'min:0.01', 'lt:regular_price', 'regex:/^\d*(\.\d{2})?$/' ],
+            'promo_date_from' => [ 'exclude_if:enable_promotion,0', 'required', 'before:promo_date_to' ],
+            'promo_date_to' => [ 'exclude_if:enable_promotion,0', 'required', 'after:promo_date_from' ],
             'quantity' => [ 'required', 'integer', 'min:0' ],
             'images' => [ 'required', 'array' ],
             'images.*' => [ 'mimetypes:image/*' ],
@@ -224,10 +219,13 @@ class ProductService {
 
             $priceAttribute = [
                 'product_id' => $createProduct->id,
+                'display_price' => $request->regular_price,
                 'regular_price' => $request->regular_price,
+                'promo_enabled' => $request->enable_promotion,
             ];
 
-            if ( $request->enable_promotion == 'yes' ) {
+            if ( $request->enable_promotion == 1 ) {
+                $priceAttribute['display_price'] = $request->promo_price;
                 $priceAttribute['promo_price'] = $request->promo_price;
                 $priceAttribute['promo_date_from'] = $request->promo_date_from;
                 $priceAttribute['promo_date_to'] = $request->promo_date_to;
@@ -269,11 +267,20 @@ class ProductService {
             $categories = json_decode( $request->categories );
             foreach ( $categories as $cid ) {
                 $cid = str_replace( 'child_', '', $cid );
-                ProductCategory::create( [
-                    'product_id' => $createProduct->id,
-                    'category_id' => $cid,
-                    'status' => 10,
-                ] );
+
+                $category = Category::find( $cid );
+                $structure = $category->structure . '|' . $cid;
+                $parents = array_reverse( explode( '|', $structure ) );
+                foreach ( $parents as $parent ) {
+                    if ( $parent != '-' ) {
+                        ProductCategory::updateOrCreate( [
+                            'product_id' => $createProduct->id,
+                            'category_id' => $parent,
+                            'is_child' => $parent == $cid ? 1 : 0,
+                            'status' => 10,
+                        ] );
+                    }
+                }
             }
 
             DB::commit();
@@ -292,7 +299,7 @@ class ProductService {
         ] );
     }
 
-    public function updateProduct( $request ) {
+    public static function updateProduct( $request ) {
 
         $request->merge( [
             'decrypted_id' => Helper::decode( $request->id ),
@@ -306,9 +313,9 @@ class ProductService {
             'regular_price' => [ 'bail', 'required', 'numeric', 'min:0.01', 'regex:/^\d*(\.\d{2})?$/' ],
             'taxable' => [ 'required' ],
             'enable_promotion' => [ 'required' ],
-            'promo_price' => [ 'exclude_if:enable_promotion,no', 'bail', 'numeric', 'min:0.01', 'lt:regular_price', 'regex:/^\d*(\.\d{2})?$/' ],
-            'promo_date_from' => [ 'exclude_if:enable_promotion,no', 'required', 'before:promo_date_to' ],
-            'promo_date_to' => [ 'exclude_if:enable_promotion,no', 'required', 'after:promo_date_from' ],
+            'promo_price' => [ 'exclude_if:enable_promotion,0', 'bail', 'numeric', 'min:0.01', 'lt:regular_price', 'regex:/^\d*(\.\d{2})?$/' ],
+            'promo_date_from' => [ 'exclude_if:enable_promotion,0', 'required', 'before:promo_date_to' ],
+            'promo_date_to' => [ 'exclude_if:enable_promotion,0', 'required', 'after:promo_date_from' ],
             'quantity' => [ 'required', 'integer', 'min:0' ],
             'images' => [ 'required_without:preloaded', 'array' ],
             'images.*' => [ 'mimetypes:image/*' ],
@@ -350,8 +357,11 @@ class ProductService {
         $updateProduct->save();
 
         $updateProductPrice = ProductPrice::where( 'product_id', $updateProduct->id )->first();
+        $updateProductPrice->display_price = $request->regular_price;
         $updateProductPrice->regular_price = $request->regular_price;
-        if ( $request->enable_promotion == 'yes' ) {
+        $updateProductPrice->promo_enabled = $request->enable_promotion;
+        if ( $request->enable_promotion == 1 ) {
+            $updateProductPrice->display_price = $request->promo_price;
             $updateProductPrice->promo_price = $request->promo_price;
             $updateProductPrice->promo_date_from = $request->promo_date_from;
             $updateProductPrice->promo_date_to = $request->promo_date_to;
@@ -384,6 +394,25 @@ class ProductService {
             }
         }
 
+        $categories = json_decode( $request->categories );
+        foreach ( $categories as $cid ) {
+            $cid = str_replace( 'child_', '', $cid );
+
+            $category = Category::find( $cid );
+            $structure = $category->structure . '|' . $cid;
+            $parents = array_reverse( explode( '|', $structure ) );
+            foreach ( $parents as $parent ) {
+                if ( $parent != '-' ) {
+                    ProductCategory::updateOrCreate( [
+                        'product_id' => $updateProduct->id,
+                        'category_id' => $parent,
+                        'is_child' => $parent == $cid ? 1 : 0,
+                        'status' => 10,
+                    ] );
+                }
+            }
+        }
+
         Metadata::updateOrCreate( [
             'type' => 'product',
             'type_id' => $updateProduct->id,
@@ -405,7 +434,7 @@ class ProductService {
         ] );
     }
 
-    public function ckeUpload( $request ) {
+    public static function ckeUpload( $request ) {
 
         $file = $request->file( 'file' )->store( 'products/ckeditor', [ 'disk' => 'public' ] );
 
@@ -414,5 +443,70 @@ class ProductService {
         ];
 
         return response()->json( $data );
+    }
+
+    public static function getProducts( $request ) {
+
+        $products = Product::with( [
+            'productCategories:product_id,category_id,status',
+            'productCategories.category',
+            'productImages'
+        ] )->select( 'products.*' );
+
+        $products->withAggregate( 'productPrices', 'display_price' );
+        $products->withAggregate( 'productPrices', 'regular_price' );
+        $products->withAggregate( 'productPrices', 'promo_price' );
+        $products->withAggregate( 'productPrices', 'promo_enabled' );
+        $products->withAggregate( 'productPrices', 'promo_date_from' );
+        $products->withAggregate( 'productPrices', 'promo_date_to' );
+
+        if ( $request->category ) {
+            $products->whereHas( 'productCategories.category', function( $query ) {
+                $query->where( 'url_slug', request( 'category' ) );
+                $query->orWhere( 'id', request( 'category' ) );
+            } );
+        }
+
+        if ( $request->sort ) {
+            $dir = $request->order ? $request->order : 'desc';
+            switch ( $request->sort ) {   
+                case 1:
+                    $products->orderBy( 'product_prices_display_price', $dir );
+                    break;
+            }
+        }
+
+        $products = $products->paginate( empty( $request->per_page ) ? 10 : $request->per_page );
+
+        foreach( $products->items() as $item ) {
+            if ( $item->productImages ) {
+                $item->productImages->append( [
+                    'path',
+                ] );
+            }
+        }
+
+        return response()->json( $products );
+    }
+
+    public static function getProduct( $request ) {
+
+        $product = Product::with( [ 'productPrices', 'productImages' ] );
+        $product->where( function( $query ) {
+            $query->where( 'url_slug', request( 'url_slug' ) );
+            $query->orWhere( 'id', request( 'id' ) );
+        } );
+
+        $product = $product->first();
+
+        if ( $product ) {
+            if ( $product->productImages ) {
+                $product->productImages->append( [
+                    'path',
+                ] );
+            }
+        }
+
+        return response()->json( $product );
     }
 }

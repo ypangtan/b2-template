@@ -15,7 +15,7 @@ use Carbon\Carbon;
 
 class CategoryService {
 
-    public function allCategories( $request ) {
+    public static function allCategories( $request ) {
 
         $category = Category::select( 'categories.*' );
 
@@ -107,7 +107,7 @@ class CategoryService {
         ];
     }
 
-    public function oneCategory( $request ) {
+    public static function oneCategory( $request ) {
 
         $category = Category::find( Helper::decode( $request->id ) );
 
@@ -121,7 +121,7 @@ class CategoryService {
         return response()->json( $category );
     }
 
-    public function createCategory( $request ) {
+    public static function createCategory( $request ) {
 
         $request->validate( [
             'title' => [ 'required', 'string' ],
@@ -179,7 +179,7 @@ class CategoryService {
         }
     }
 
-    public function updateCategory( $request ) {
+    public static function updateCategory( $request ) {
 
         $request->validate( [
             'title' => [ 'required' ],
@@ -207,11 +207,11 @@ class CategoryService {
         $updateCategory->save();
     }
 
-    public function updateCategoryStatus ( $request ) {
+    public static function updateCategoryStatus ( $request ) {
 
     }
 
-    public function getCategoryStructure( $request ) {
+    public static function getCategoryStructure( $request ) {
 
         $categories = Category::where( 'type', 1 )
             ->get()->toArray();
@@ -225,7 +225,7 @@ class CategoryService {
     }
 
     // This block 80% was written by ChatGPT, I feel I am jobless soon 
-    public function traverseDown( $id, $level = 0 ) {
+    public static function traverseDown( $id, $level = 0 ) {
 
         $categories = Category::where( 'parent_id', $id )->get();
 
@@ -244,4 +244,33 @@ class CategoryService {
         return $newCategories;
     }
     // End
+
+    public static function getCategories( $request ) {
+
+        $categories = Category::where( 'type', 1 )->select( 'categories.*' );
+
+        if ( $request->with_product ) {
+            $categories->with( [ 
+                'products:product_id,category_id',
+                'products.product:id,title,short_description,description,url_slug,type,status,created_at',
+                'products.product.productPrices',
+            ] );
+        }
+
+        $categories->where( function( $query ) {
+            $query->where( 'url_slug', request( 'url_slug' ) );
+            $query->orWhere( 'id', request( 'id' ) );
+        } );
+
+        $categories = $categories->get()->toArray();
+
+        foreach( $categories as $key => $category ) {
+            $categories[$key]['level'] = 0;
+            $categories[$key]['childrens'] = self::traverseDown( $category['id'], 0 );
+        }
+
+        return response()->json( [
+            'data' => $categories
+        ] );
+    }
 }

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\V1\{
+    CategoryController,
+    ProductController,
     UserController,
 };
 
@@ -27,6 +29,14 @@ Route::prefix( 'users' )->group( function() {
     Route::post( 'token', [ UserController::class, 'createToken' ] );
     // Social Login
     Route::post( 'social', [ UserController::class, 'createTokenSocial' ] );
+} );
+
+Route::prefix( 'products' )->group( function() {
+    Route::get( '/', [ ProductController::class, 'getProducts' ] );
+    Route::get( 'detail', [ ProductController::class, 'getProduct' ] );
+} );
+Route::prefix( 'categories' )->group( function() {
+    Route::get( '/', [ CategoryController::class, 'getCategories' ] );
 } );
 /* End Public route */
 

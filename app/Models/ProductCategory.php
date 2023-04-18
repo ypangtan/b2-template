@@ -17,8 +17,17 @@ class ProductCategory extends Model
     protected $fillable = [
         'product_id',
         'category_id',
+        'is_child',
         'status',
     ];
+
+    public function category() {
+        return $this->belongsTo( Category::class, 'category_id' );
+    }
+
+    public function product() {
+        return $this->belongsTo( Product::class, 'product_id' );
+    }
 
     protected function serializeDate( DateTimeInterface $date ) {
         return $date->timezone( 'Asia/Kuala_Lumpur' )->format( 'Y-m-d H:i:s' );
@@ -27,6 +36,7 @@ class ProductCategory extends Model
     protected static $logAttributes = [
         'product_id',
         'category_id',
+        'is_child',
         'status',
     ];
 

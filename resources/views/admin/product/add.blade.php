@@ -56,8 +56,8 @@ $product_create = 'product_create';
                     <label for="{{ $product_create }}_enable_promotion" class="col-sm-5 col-form-label">{{ __( 'product.enable_promotion' ) }}</label>
                     <div class="col-sm-7">
                         <select class="form-control form-control-sm" id="{{ $product_create }}_enable_promotion">
-                            <option value="no">{{ __( 'datatables.no' ) }}</option>
-                            <option value="yes">{{ __( 'datatables.yes' ) }}</option>
+                            <option value="0">{{ __( 'datatables.no' ) }}</option>
+                            <option value="1">{{ __( 'datatables.yes' ) }}</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
@@ -214,7 +214,7 @@ window.cke_element = 'product_create_description';
 
         $( pc + '_enable_promotion' ).change( function() {
 
-            if ( $( this ).val() == 'yes' ) {
+            if ( $( this ).val() == 1 ) {
                 $( '#promo_section' ).removeClass( 'hidden' );
             } else {
                 $( '#promo_section' ).addClass( 'hidden' );

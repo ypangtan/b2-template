@@ -16,8 +16,10 @@ class CreateProductPricesTable extends Migration
         Schema::create('product_prices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->onUpdate( 'restrict')->onDelete('cascade');
+            $table->decimal('display_price',16,2);
             $table->decimal('regular_price',16,2);
             $table->decimal('promo_price',16,2)->nullable();
+            $table->tinyInteger('promo_enabled')->default(0);
             $table->timestamp('promo_date_from')->nullable();
             $table->timestamp('promo_date_to')->nullable();
             $table->timestamps();

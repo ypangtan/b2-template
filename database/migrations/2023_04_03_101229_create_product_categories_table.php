@@ -17,6 +17,7 @@ class CreateProductCategoriesTable extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained('products')->onUpdate( 'restrict')->onDelete('cascade');
             $table->foreignId('category_id')->constrained('categories')->onUpdate('restrict')->onDelete('cascade');
+            $table->tinyInteger('is_child')->default(0);
             $table->tinyInteger('status');
             $table->timestamps();
         });
