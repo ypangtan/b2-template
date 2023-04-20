@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class AdminSeeder extends Seeder
+class AdministratorSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,7 +15,7 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
-        DB::table( 'admins' )->insert([
+        DB::table( 'administrators' )->insert([
             'username' => 'altasB2',
             'email' => 'altas@base2.my',
             'password' => Hash::make( 'altas1234' ),
@@ -34,7 +34,7 @@ class AdminSeeder extends Seeder
 
         DB::table( 'model_has_roles' )->insert( [
             'role_id' => 1,
-            'model_type' => 'App\Models\Admin',
+            'model_type' => 'App\Models\Administrator',
             'model_id' => 1,
         ] );
     }

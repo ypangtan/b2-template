@@ -13,17 +13,28 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
 
-class Admin extends Authenticatable
+use Helper;
+
+class Administrator extends Authenticatable
 {
     use HasFactory, LogsActivity, HasRoles, SoftDeletes;
 
     protected $fillable = [
         'username',
         'email',
+        'name',
         'role',
         'mfa_secret',
         'password'
     ];
+
+    public function role() {
+        return $this->BelongsTo( Role::class, 'id' );
+    }
+
+    public function getEncryptedIdAttribute() {
+        return Helper::encode( $this->attributes['id'] );
+    }
 
     protected function serializeDate( DateTimeInterface $date ) {
         return $date->timezone( 'Asia/Kuala_Lumpur' )->format( 'Y-m-d H:i:s' );
@@ -32,12 +43,13 @@ class Admin extends Authenticatable
     protected static $logAttributes = [
         'username',
         'email',
+        'name',
         'role',
         'mfa_secret',
         'password'
     ];
 
-    protected static $logName = 'admins';
+    protected static $logName = 'administrators';
 
     protected static $logOnlyDirty = true;
 
@@ -46,6 +58,6 @@ class Admin extends Authenticatable
     }
 
     public function getDescriptionForEvent( string $eventName ): string {
-        return "{$eventName} admin";
+        return "{$eventName} administrator";
     }
 }

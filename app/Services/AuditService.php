@@ -16,9 +16,9 @@ class AuditService {
 
     public function allAudits( $request, $export = false ) {
 
-        $log = ActivityLog::select( 'activity_log.*', 'admins.username AS admin_username' );
-        $log->leftJoin( 'admins', 'activity_log.causer_id', '=', 'admins.id' );
-        $log->where( 'causer_type', 'App\Models\Admin' );
+        $log = ActivityLog::select( 'activity_log.*', 'administrators.username AS admin_username' );
+        $log->leftJoin( 'administrators', 'activity_log.causer_id', '=', 'administrators.id' );
+        $log->where( 'causer_type', 'App\Models\Administrator' );
 
         $filterObject = self::filter( $request, $log );
         $log = $filterObject['model'];

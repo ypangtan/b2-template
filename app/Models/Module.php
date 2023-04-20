@@ -19,6 +19,10 @@ class Module extends Model
         'guard_name',
     ];
 
+    public function presetPermissions() {
+        return $this->hasMany( PresetPermission::class, 'module_id' );
+    }
+
     protected function serializeDate( DateTimeInterface $date ) {
         return $date->timezone( 'Asia/Kuala_Lumpur' )->format( 'Y-m-d H:i:s' );
     }

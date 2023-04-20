@@ -14,7 +14,7 @@ class AddModuleToPermissionsTable extends Migration
     public function up()
     {
         Schema::table('permissions', function (Blueprint $table) {
-            $table->foreignId( 'module' )->nullable()->after( 'guard_name' );
+            $table->foreignId('module_id')->nullable()->after('id')->constrained('modules')->onUpdate( 'restrict')->onDelete('cascade');
         });
     }
 
@@ -26,7 +26,7 @@ class AddModuleToPermissionsTable extends Migration
     public function down()
     {
         Schema::table('permissions', function (Blueprint $table) {
-            $table->dropColumn( 'module' );
+            $table->dropColumn( 'module_id' );
         });
     }
 }

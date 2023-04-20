@@ -35,7 +35,10 @@ return [
     'first_setup' => 'First Setup',
     'verify_account' => 'Verify Account',
     'profile' => 'Profile',
+    'add_x' => 'Add :title',
+    'edit_x' => 'Edit :title',
 
+    'leave_blank' => 'Password (leave blank to leave unchanged)',
     'loading' => 'Loading...',
     'export' => 'Export',
     'create' => 'Create',
@@ -49,6 +52,7 @@ return [
     'cancel' => 'Cancel',
     'no_changes' => 'No Changes.',
     'confirmation' => 'Confirmation',
+    'success' => 'Success',
     'error' => 'Error',
     'optional' => 'Optional',
     
@@ -62,4 +66,7 @@ return [
     
     'gallery' => 'Gallery',
     'drag_n_drop' => 'Drag & Drop files here or click to browse',
+
+    'yes' => 'Yes',
+    'no' => 'No',
 ];

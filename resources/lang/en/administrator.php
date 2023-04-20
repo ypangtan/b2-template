@@ -14,17 +14,12 @@ return [
     */
 
     'administrator' => 'Administrators',
-    'admin_create' => 'Create Admin',
-    'admin_edit' => 'Edit Admin',
     'username' => 'Username',
     'email' => 'Email',
+    'fullname' => 'Fullname',
     'role' => 'Role',
-    'admin' => 'Admin',
     'password' => 'Password',
-    'leave_blank' => 'Password (leave blank to leave unchanged)',
 
-    'super_admin' => 'Super Admin',
-
-    'admin_created' => 'New Admin Created.',
-    'admin_updated' => 'Admin Updated.',
+    'administrator_created' => 'New Administrator Created.',
+    'administrator_updated' => 'Administrator Updated.',
 ];

@@ -42,7 +42,7 @@ return [
         ],
         'admin' => [
             'driver' => 'session',
-            'provider' => 'admins',
+            'provider' => 'administrators',
         ],
         'branch' => [
             'driver' => 'session',
@@ -78,9 +78,9 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-        'admins' => [
+        'administrators' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Admin::class,
+            'model' => App\Models\Administrator::class,
         ],
         'branches' => [
             'driver' => 'eloquent',

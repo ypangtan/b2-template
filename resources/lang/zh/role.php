@@ -23,6 +23,7 @@ return [
     'super_admin' => '超级管理员',
     'admin' => '管理员',
     'staff' => '员工',
+    
     'role_created' => '已创建新角色。',
     'role_updated' => '已更新角色。',
     'no_changes' => '没有改变。',
@@ -37,5 +38,7 @@ return [
     'view' => '查看',
     'edit' => '编辑',
     'delete' => '删除',
+    'upload' => '上传',
+    'export' => '导出',
 
 ];

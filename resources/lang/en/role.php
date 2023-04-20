@@ -23,6 +23,7 @@ return [
     'super_admin' => 'Super Admin',
     'admin' => 'Admin',
     'staff' => 'Staff',
+    
     'role_created' => 'New Role Created.',
     'role_updated' => 'Role Updated.',
     'no_changes' => 'No Changes.',
@@ -37,5 +38,7 @@ return [
     'view' => 'View',
     'edit' => 'Edit',
     'delete' => 'Delete',
+    'upload' => 'Upload',
+    'export' => 'Export',
 
 ];

@@ -88,11 +88,8 @@
 
                     $role = [ 
                         '', 
-                        __( 'administrator.super_admin' ), 
-                        __( 'administrator.compliance' ), 
-                        __( 'administrator.legal' ), 
-                        __( 'administrator.finance' ), 
-                        __( 'administrator.marketing' )
+                        __( 'role.super_admin' ), 
+                        __( 'role.admin' ), 
                     ];
                     ?>
                     <div class="dropdown dropdown-user-setting">
@@ -101,7 +98,7 @@
                                 <img src="https://ui-avatars.com/api/?background=3461ff&color=fff&name={{ auth()->user()->name }}" alt="" class="user-img" style="" />
                                 <div class="d-none d-sm-block">
                                     <p class="user-name mb-0">{{ auth()->user()->name }}</p>
-                                    <small class="mb-0 dropdown-user-designation">{{ $role[auth()->user()->role] }}</small>
+                                    <small class="mb-0 dropdown-user-designation">{{ @$role[auth()->user()->role] }}</small>
                                 </div>
                             </div>
                         </a>
@@ -153,6 +150,10 @@
                 <hr class="mobile-listing-header">
 
                 <?php echo view( $content, [ 'data' => @$data ] ); ?>
+
+                <x-modal-confirmation />
+                <x-modal-success />
+                <x-modal-danger />
             </main>
 
             <form id="logout-form" action="{{ route('admin.logout') }}" method="POST">

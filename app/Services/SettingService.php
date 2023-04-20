@@ -5,7 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Storage;
 
 use App\Models\{
-    Admin,
+    Administrator,
 };
 
 use PragmaRX\Google2FAQRCode\Google2FA;
@@ -26,9 +26,9 @@ class SettingService {
             } ],
         ] );
 
-        $admin = Admin::find( auth()->user()->id );
-        $admin->mfa_secret = null;
-        $admin->save();
+        $updateAdministartor = Administrator::find( auth()->user()->id );
+        $updateAdministartor->mfa_secret = null;
+        $updateAdministartor->save();
         
         return true;
     }
@@ -48,9 +48,9 @@ class SettingService {
             'mfa_secret' => 'required',
         ] );
 
-        $admin = Admin::find( auth()->user()->id );
-        $admin->mfa_secret = \Crypt::encryptString( $request->mfa_secret );
-        $admin->save();
+        $updateAdministartor = Administrator::find( auth()->user()->id );
+        $updateAdministartor->mfa_secret = \Crypt::encryptString( $request->mfa_secret );
+        $updateAdministartor->save();
 
         return response()->json( [
             'stauts' => true,

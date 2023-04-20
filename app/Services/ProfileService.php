@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\{
-    Admin,
+    Administrator,
 };
 
 use Helper;
@@ -17,11 +17,11 @@ class ProfileService {
         $adminID = auth()->user()->id;
 
         $request->validate( [
-            'username' => 'required|max:25|unique:admins,username,' . $adminID,
-            'email' => 'required|max:25|unique:admins,email,' . $adminID. '|email|regex:/(.+)@(.+)\.(.+)/i',
+            'username' => 'required|max:25|unique:administrators,username,' . $adminID,
+            'email' => 'required|max:25|unique:administrators,email,' . $adminID. '|email|regex:/(.+)@(.+)\.(.+)/i',
         ] );
 
-        $updateAdmin = Admin::find( $adminID );
+        $updateAdmin = Administrator::find( $adminID );
         $updateAdmin->username = $request->username;
         $updateAdmin->email = $request->email;
         $updateAdmin->save();

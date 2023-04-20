@@ -35,7 +35,10 @@ return [
     'first_setup' => '初次设置',
     'verify_account' => '验证账号',
     'profile' => '资料',
+    'add_x' => '新增:title',
+    'edit_x' => '编辑:title',
     
+    'leave_blank' => '密码 (留空保持不变)',
     'loading' => '载入中...',
     'export' => '导出',
     'create' => '创建',
@@ -49,6 +52,7 @@ return [
     'cancel' => '取消',
     'no_changes' => '没有改变。',
     'confirmation' => '确认',
+    'success' => '成功',
     'error' => '错误',
     'optional' => '选填',
 
@@ -62,4 +66,7 @@ return [
     
     'gallery' => '相册',
     'drag_n_drop' => '拖拽文件或点击浏览',
+
+    'yes' => '是',
+    'no' => '否',
 ];

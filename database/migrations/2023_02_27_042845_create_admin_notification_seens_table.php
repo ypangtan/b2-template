@@ -16,7 +16,7 @@ class CreateAdminNotificationSeensTable extends Migration
         Schema::create('admin_notification_seens', function (Blueprint $table) {
             $table->id();
             $table->foreignId( 'admin_notification_id' )->constrained( 'admin_notifications' )->onUpdate( 'restrict' )->onDelete( 'cascade' );
-            $table->foreignId( 'admin_id' )->constrained( 'admins' )->onUpdate( 'restrict' )->onDelete( 'cascade' );
+            $table->foreignId( 'admin_id' )->constrained( 'administrators' )->onUpdate( 'restrict' )->onDelete( 'cascade' );
             $table->timestamps();
         });
     }

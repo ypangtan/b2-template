@@ -2,26 +2,18 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Storage;
-
-use Spatie\Permission\Models\{
-    Permission,
-    Role
-};
-
 use App\Models\{
     Module,
-    Role as RoleModel
 };
 
 use Helper;
 
 use Carbon\Carbon;
 
-class ModuleService {
-
-    public function allModules( $request ) {
-
+class ModuleService
+{
+    public static function allModules( $request ) {
+        
         $module = Module::select( 'modules.*' );
 
         $filterObject = self::filter( $request, $module );
@@ -59,7 +51,7 @@ class ModuleService {
         return response()->json( $data );
     }
 
-    private function filter( $request, $model ) {
+    private static function filter( $request, $model ) {
 
         $filter = false;
 
@@ -101,78 +93,5 @@ class ModuleService {
             'filter' => $filter,
             'model' => $model,
         ];
-    }
-
-    public function oneModule( $request ) {
-
-        $module = Module::find( $request->id );
-
-        return response()->json( $module );
-    }
-
-    public function createModule( $request ) {
-
-        $request->validate( [
-            'module_name' => [ 'required', 'max:50', function( $attribute, $value, $fail ) {
-
-                $existingModule = Module::where( 'name', $value )->where( 'guard_name', request( 'guard_name' ) )->first();
-                if ( $existingModule ) {
-                    $fail( __( 'validation.exists' ) );
-                }
-            } ],
-            'guard_name' => 'required',
-        ] );
-
-        $createModule = Module::create( [
-            'name' => $request->module_name,
-            'guard_name' => $request->guard_name,
-        ] );
-
-        foreach ( Helper::moduleActions() as $action ) {
-            $createPermission = Permission::create( [ 
-                'name' => $action . ' ' . $request->module_name, 
-                'guard_name' => $request->guard_name,  
-            ] );
-
-            $updatePermission = Permission::find( $createPermission->id );
-            $updatePermission->module = $createModule->id;
-            $updatePermission->save();
-        }
-    }
-
-    public function updateModule( $request ) {
-
-        $updateModule = Module::find( $request->id );
-        $oldModuleName = $updateModule->name;
-        $updateModule->name = $request->module_name;
-        $updateModule->guard_name = $request->guard_name;
-        $updateModule->save();
-
-        $permissions = Permission::where( 'module', $request->id )->get();
-        foreach ( $permissions as $permission ) {
-
-            $permission->name = str_replace( $oldModuleName, $request->module_name, $permission->name );
-            $permission->save();
-        }
-
-        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();        
-    }
-
-    public function deleteModule( $request ) {
-
-        $module = Module::find( $request->id );
-
-        foreach ( Role::all() as $role ) {
-
-            foreach ( Helper::moduleActions() as $action ) {
-                $role->revokePermissionTo( $action . ' ' . $module->name, $module->guard );
-            }
-        }
-
-        Permission::where( 'module', $module->id )->delete();
-
-        $module->delete();
-
-        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

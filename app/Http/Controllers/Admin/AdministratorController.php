@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Services\{
-    AdminService,
-    ModuleService,
-    RoleService
+    AdministratorService,
+};
+
+use App\Models\{
+    Role as RoleModel,
 };
 
 use Helper;
@@ -36,34 +38,74 @@ class AdministratorController extends Controller {
         return view( 'admin.main' )->with( $this->data );
     }
 
-    public function allAdmins( Request $request ) {
+    public function add() {
 
-        return AdminService::allAdmins( $request );
+        $this->data['header']['title'] = __( 'template.administrators' );
+        $this->data['content'] = 'admin.administrator.add';
+        $this->data['breadcrumbs'] = [
+            'enabled' => true,
+            'main_title' => __( 'template.administrators' ),
+            'title' => __( 'template.add_x', [ 'title' => __( 'template.administrators' ) ] ),
+            'mobile_title' => __( 'template.add_x', [ 'title' => __( 'template.administrators' ) ] ),
+        ];
+        $roles = [];
+        foreach( RoleModel::orderBy( 'id', 'ASC' )->get() as $role ) {
+            $roles[] = [ 'key' => $role->name, 'value' => $role->id, 'title' => __( 'role.' . $role->name ) ];
+        }
+
+        $this->data['data']['roles'] = $roles;
+
+        return view( 'admin.main' )->with( $this->data );
     }
 
-    public function oneAdmin( Request $request ) {
+    public function edit() {
 
-        return AdminService::oneAdmin( $request );
+        $this->data['header']['title'] = __( 'template.administrators' );
+        $this->data['content'] = 'admin.administrator.edit';
+        $this->data['breadcrumbs'] = [
+            'enabled' => true,
+            'main_title' => __( 'template.administrators' ),
+            'title' => __( 'template.edit_x', [ 'title' => __( 'template.administrators' ) ] ),
+            'mobile_title' => __( 'template.edit_x', [ 'title' => __( 'template.administrators' ) ] ),
+        ];
+        $roles = [];
+        foreach( RoleModel::orderBy( 'id', 'ASC' )->get() as $role ) {
+            $roles[] = [ 'key' => $role->name, 'value' => $role->id, 'title' => __( 'role.' . $role->name ) ];
+        }
+
+        $this->data['data']['roles'] = $roles;
+
+        return view( 'admin.main' )->with( $this->data );
     }
 
-    public function createAdmin( Request $request ) {
+    public function allAdministrators( Request $request ) {
 
-        return AdminService::createAdmin( $request );
+        return AdministratorService::allAdministrators( $request );
     }
 
-    public function updateAdmin( Request $request ) {
+    public function oneAdministrator( Request $request ) {
+
+        return AdministratorService::oneAdministrator( $request );
+    }
+
+    public function createAdministrator( Request $request ) {
+
+        return AdministratorService::createAdministrator( $request );
+    }
+
+    public function updateAdministrator( Request $request ) {
         
-        return AdminService::updateAdmin( $request );
+        return AdministratorService::updateAdministrator( $request );
     }
 
     public function logoutLog( Request $request ) {
         
-        return AdminService::logoutLog( $request );
+        return AdministratorService::logoutLog( $request );
     }
 
     public function updateNotificationSeen( Request $request ) {
 
-        return AdminService::updateNotificationSeen( $request );
+        return AdministratorService::updateNotificationSeen( $request );
     }
 
     public function module() {
@@ -156,6 +198,6 @@ class AdministratorController extends Controller {
 
     public function verifyCode( Request $request ) {
 
-        return AdminService::verifyCode( $request );
+        return AdministratorService::verifyCode( $request );
     }
 }

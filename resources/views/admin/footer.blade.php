@@ -22,7 +22,57 @@
 		return m ? parseFloat(m[1]).toFixed(digits) : this.valueOf().toFixed( 2 ).replace(/\d(?=(\d{3})+\.)/g, '$&,');
         }
 
+        let modalConfirmation = new bootstrap.Modal( document.getElementById( 'modal_confirmation' ) ),
+            modalSuccess = new bootstrap.Modal( document.getElementById( 'modal_success' ) ),
+            modalDanger = new bootstrap.Modal( document.getElementById( 'modal_danger' ) );
+
         document.addEventListener( 'DOMContentLoaded', function() {
+
+            let parents = [];
+            let menus = [];
+
+            // and when you show it, move it to the body
+            $( '.dataTables_scrollBody' ).on( 'show.bs.dropdown', function( e ) {
+
+                let target = $( e.target );
+
+                // save the parent
+                parents.push( target.parent() );
+
+                // grab the menu
+                let dropdownMenu = target.next();
+
+                // save the menu
+                menus.push( dropdownMenu );
+
+                // detach it and append it to the body
+                $( 'body' ).append( dropdownMenu.detach() );
+
+                // grab the new offset position
+                let eOffset = target.offset();
+
+                // make sure to place it where it would normally go (this could be improved)
+                dropdownMenu.css( {
+                    'display': 'block',
+                    'top': eOffset.top + target.outerHeight(),
+                    'left': eOffset.left
+                } );
+            } );
+
+            // and when you hide it, reattach the drop down, and hide it normally
+            $( '.dataTables_scrollBody' ).on( 'hide.bs.dropdown', function( e ) {
+
+                menus.forEach( function( element, index ) {
+                    let parent = parents[index];
+                    let dropdownMenu = element;
+
+                    parent.append( dropdownMenu.detach() );
+                    dropdownMenu.hide();
+
+                    menus.splice( index, 1 );
+                    parents.splice( index, 1 );
+                } )
+            } );
 
             new PerfectScrollbar(".header-notifications-list")
             
@@ -80,6 +130,12 @@
         function resetInputValidation() {
 
             $( '.form-control' ).each( function( i, v ) {
+                if ( $( this ).hasClass( 'is-invalid' ) ) {
+                    $( this ).removeClass( 'is-invalid' ).next().html( '' );
+                }
+            } );
+
+            $( '.form-select' ).each( function( i, v ) {
                 if ( $( this ).hasClass( 'is-invalid' ) ) {
                     $( this ).removeClass( 'is-invalid' ).next().html( '' );
                 }
