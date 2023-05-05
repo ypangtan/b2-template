@@ -19,7 +19,4 @@ return [
     'fullname' => 'Fullname',
     'role' => 'Role',
     'password' => 'Password',
-
-    'administrator_created' => 'New Administrator Created.',
-    'administrator_updated' => 'Administrator Updated.',
 ];

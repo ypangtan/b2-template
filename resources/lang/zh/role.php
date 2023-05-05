@@ -23,10 +23,6 @@ return [
     'super_admin' => '超级管理员',
     'admin' => '管理员',
     'staff' => '员工',
-    
-    'role_created' => '已创建新角色。',
-    'role_updated' => '已更新角色。',
-    'no_changes' => '没有改变。',
 
     'no_action_found' => '没有找到操作',
     'no_module_found' => '没有找到模块',

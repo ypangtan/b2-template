@@ -17,9 +17,6 @@ return [
     'parent_category' => '父类分类',
     'parent' => '父类',
     'child' => '子类',
-    'enable_description' => '此分类会显示在分类列表',
-    'disable_description' => '此分类不会显示在分类列表',
-
-    'category_created' => '已创建新分类。',
-    'category_updated' => '已更新分类。',
+    'enable_description' => '此分类会显示在店面分类列表',
+    'disable_description' => '此分类不会显示在店面分类列表',
 ];

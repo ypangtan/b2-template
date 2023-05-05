@@ -17,9 +17,6 @@ return [
     'parent_category' => 'Parent Category',
     'parent' => 'Parent',
     'child' => 'Child',
-    'enable_description' => 'This category will show in category list',
-    'disable_description' => 'This category will not show in category list',
-
-    'category_created' => 'New Category Created.',
-    'category_updated' => 'Category Updated.',
+    'enable_description' => 'This category will show in storefront category list',
+    'disable_description' => 'This category will not show in storefront category list',
 ];

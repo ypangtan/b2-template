@@ -17,7 +17,8 @@ use App\Models\{
     TmpUser,
     User,
     UserSocial,
-    UserDeviceOneSignal
+    UserDevice,
+    UserWallet,
 };
 
 use Illuminate\Validation\Rules\Password;
@@ -171,6 +172,13 @@ class UserService {
                 'referral_structure' => '-',
                 'status' => 10,
             ] );
+
+            for ( $i = 1; $i <= 2; $i++ ) { 
+                UserWallet::create( [
+                    'user_id' => $createUser->id,
+                    'type' => $i,
+                ] );
+            }
 
             DB::commit();
 
@@ -546,6 +554,13 @@ class UserService {
             // Register OneSignal
             if ( !empty( $request->register_token ) ) {
                 self::registerOneSignal( $createUser->id, $request->device_type, $request->register_token );
+            }
+
+            for ( $i = 1; $i <= 2; $i++ ) { 
+                UserWallet::create( [
+                    'user_id' => $createUser->id,
+                    'type' => $i,
+                ] );
             }
 
             \DB::commit();

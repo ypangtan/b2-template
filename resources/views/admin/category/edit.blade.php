@@ -92,7 +92,7 @@ $category_edit = 'category_edit';
         getCategory();
 
         $( ce + '_cancel' ).click( function() {
-            window.location.href = '{{ route( 'admin.category.index' ) }}';
+            window.location.href = '{{ route( 'admin.module_parent.category.index' ) }}';
         } );
 
         $( ce + '_submit' ).click( function() {
@@ -127,32 +127,15 @@ $category_edit = 'category_edit';
                 processData: false,
                 contentType: false,
                 success: function( response ) {
-
                     $( 'body' ).loading( 'stop' );
+                    $( '#modal_success .caption-text' ).html( response.message );
+                    modalSuccess.toggle();
 
-                    $( 'main.page-content' ).prepend( `
-                    <div class="alert border-0 border-success border-start border-4 bg-light-success fade show py-2">
-                        <div class="d-flex align-items-center">
-                            <div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i>
-                            </div>
-                            <div class="ms-3">
-                                <div class="text-success">{{ __( 'category.category_updated' ) }}</div>
-                            </div>
-                        </div>
-                    </div>` );
-                    $( window ).scrollTop( 0 );
-
-                    setTimeout(function(){
-                        $( '.alert' ).fadeTo( 250, 0.01, function() { 
-                            $( this ).slideUp( 50, function() {
-                                $( this ).remove();
-                                window.location.href = '{{ route( 'admin.category.index' ) }}';
-                            } ); 
-                        } );
-                    }, 2000 );
+                    document.getElementById( 'modal_success' ).addEventListener( 'hidden.bs.modal', function (event) {
+                        window.location.href = '{{ route( 'admin.module_parent.category.index' ) }}';
+                    } );
                 },
                 error: function( error ) {
-
                     $( 'body' ).loading( 'stop' );
 
                     if ( error.status === 422 ) {
@@ -162,6 +145,9 @@ $category_edit = 'category_edit';
                         } );
 
                         $( '.form-control.is-invalid:first' ).get( 0 ).scrollIntoView();
+                    } else {
+                        $( '#modal_danger .caption-text' ).html( error.responseJSON.message );
+                        modalDanger.toggle();       
                     }
                 }
             } );

@@ -13,7 +13,7 @@ use Carbon\Carbon;
 class Helper {
 
     public static function websiteName() {
-        return 'Starter';
+        return 'MeCar';
     }
 
     public static function baseUrl() {
@@ -46,8 +46,27 @@ class Helper {
         ];
     }
 
-    public static function numberFormat( $number, $decimal ) {
-        return number_format( $number, $decimal );
+    public static function wallets() {
+        return [
+            '1' => __( 'wallet.wallet_1' ),
+            '2' => __( 'wallet.wallet_2' ),
+        ];
+    }
+
+    public static function trxTypes() {
+        return [
+            '1' => __( 'wallet.topup' ),
+            '2' => __( 'wallet.refund' ),
+            '3' => __( 'wallet.manual_adjustment' ),
+        ];
+    }
+
+    public static function numberFormat( $number, $decimal, $isRound = false ) {
+        if ( $isRound ) {
+            return number_format( $number, $decimal );    
+        } else {
+            return number_format( bcdiv( $number, 1, $decimal ), $decimal );
+        }
     }
 
     public static function hideTimestamp( $model, $columns ) {

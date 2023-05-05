@@ -223,7 +223,7 @@ window.cke_element = 'product_edit_description';
         } );
 
         $( pe + '_cancel' ).click( function() {
-            window.location.href = '{{ route( 'admin.product.index' ) }}';
+            window.location.href = '{{ route( 'admin.module_parent.product.index' ) }}';
         } );
 
         $( pe + '_submit' ).click( function() {
@@ -260,12 +260,14 @@ window.cke_element = 'product_edit_description';
             formData.append( 'meta_title', $( pe + '_meta_title' ).val() );
             formData.append( 'meta_description', $( pe + '_meta_description' ).val() );
 
-            formData.append( 'categories', JSON.stringify( jsTree.jstree().get_bottom_selected() ) );
+            formData.append( 'categories', JSON.stringify( jsTree.jstree().get_selected() ) );
 
             // let a = jsTree.jstree();
             // console.log( a.get_selected() );
             // console.log( a.get_top_selected() );
             // console.log( a.get_bottom_selected() );
+
+            // return 0;
 
             formData.append( '_token', '{{ csrf_token() }}' );
 
@@ -276,32 +278,15 @@ window.cke_element = 'product_edit_description';
                 processData: false,
                 contentType: false,
                 success: function( response ) {
-
                     $( 'body' ).loading( 'stop' );
+                    $( '#modal_success .caption-text' ).html( response.message );
+                    modalSuccess.toggle();
 
-                    $( 'main.page-content' ).prepend( `
-                    <div class="alert border-0 border-success border-start border-4 bg-light-success fade show py-2">
-                        <div class="d-flex align-items-center">
-                            <div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i>
-                            </div>
-                            <div class="ms-3">
-                                <div class="text-success">` + response.message + `</div>
-                            </div>
-                        </div>
-                    </div>` );
-                    $( window ).scrollTop( 0 );
-
-                    setTimeout(function(){
-                        $( '.alert' ).fadeTo( 250, 0.01, function() { 
-                            $( this ).slideUp( 50, function() {
-                                $( this ).remove();
-                                window.location.href = '{{ route( 'admin.product.index' ) }}';
-                            } ); 
-                        } );
-                    }, 2000 );
+                    document.getElementById( 'modal_success' ).addEventListener( 'hidden.bs.modal', function (event) {
+                        window.location.href = '{{ route( 'admin.module_parent.product.index' ) }}';
+                    } );
                 },
                 error: function( error ) {
-
                     $( 'body' ).loading( 'stop' );
 
                     if ( error.status === 422 ) {
@@ -311,6 +296,9 @@ window.cke_element = 'product_edit_description';
                         } );
 
                         $( '.form-control.is-invalid:first' ).get( 0 ).scrollIntoView();
+                    } else {
+                        $( '#modal_danger .caption-text' ).html( error.responseJSON.message );
+                        modalDanger.toggle();       
                     }
                 }
             } );
@@ -375,20 +363,27 @@ window.cke_element = 'product_edit_description';
                     jsTree = $( '#jstree_category' );
                     jsTree.jstree( {
                         plugins: [ 'wholerow', 'checkbox' ],
+                        checkbox: {
+                            three_state: false,
+                        },
                     } ).on('changed.jstree', function (e, data) {
                         console.log( data );
                     } );
 
+                    jsTree.jstree( 'open_all' );
+
                     product.product_categories.map( function( v, i ) {
 
-                        if ( v.is_child ) {
-                            jsTree.jstree( 'check_node', 'child_' + v.category_id );
-                        }
-                        jsTree.jstree( 'open_node', 'child_' + v.category_id, function( e, d ) {
-                            if( e.parents.length ){
-                                jsTree.jstree( 'open_node', e.parent );
-                            };
-                        });
+                        jsTree.jstree( 'check_node', 'child_' + v.category_id );
+                        
+                        // if ( v.is_child ) {
+                        //     jsTree.jstree( 'check_node', 'child_' + v.category_id );
+                        // }
+                        // jsTree.jstree( 'open_node', 'child_' + v.category_id, function( e, d ) {
+                        //     if( e.parents.length ){
+                        //         jsTree.jstree( 'open_node', e.parent );
+                        //     };
+                        // });
                     } );
 
                     $( 'body' ).loading( 'stop' );

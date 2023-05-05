@@ -4,6 +4,7 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 use App\Http\Controllers\Admin\{
     AdministratorController,
+    AnnouncementController,
     AuditController,
     CategoryController,
     DashboardController,
@@ -14,6 +15,8 @@ use App\Http\Controllers\Admin\{
     RoleController,
     UserController,
     SettingController,
+    WalletController,
+    WalletTransactionController,
 };
 
 Route::prefix( 'backoffice' )->group( function() {
@@ -113,6 +116,42 @@ Route::prefix( 'backoffice' )->group( function() {
                 Route::post( 'one-user', [ UserController::class, 'oneUser' ] )->name( 'admin.user.oneUser' );
                 Route::post( 'create-user', [ UserController::class, 'createUser' ] )->name( 'admin.user.createUser' );
                 Route::post( 'update-user', [ UserController::class, 'updateUser' ] )->name( 'admin.user.updateUser' );
+            } );
+
+            Route::prefix( 'wallets' )->group( function() {
+                Route::group( [ 'middleware' => [ 'permission:view wallets' ] ], function() {
+                    Route::get( '/', [ WalletController::class, 'index' ] )->name( 'admin.module_parent.wallet.index' );
+                } );
+
+                Route::post( 'all-wallets', [ WalletController::class, 'allWallets' ] )->name( 'admin.wallet.allWallets' );
+                Route::post( 'one-wallet', [ WalletController::class, 'oneWallet' ] )->name( 'admin.wallet.oneWallet' );
+                Route::post( 'update-wallet', [ WalletController::class, 'updateWallet' ] )->name( 'admin.wallet.updateWallet' );
+            } );
+
+            
+            Route::prefix( 'wallet-transactions' )->group( function() {
+                Route::group( [ 'middleware' => [ 'permission:view wallet_transactions' ] ], function() {
+                    Route::get( '/', [ WalletTransactionController::class, 'index' ] )->name( 'admin.module_parent.wallet_transaction.index' );
+                } );
+
+                Route::post( 'all-wallet-transactions', [ WalletTransactionController::class, 'allWalletTransactions' ] )->name( 'admin.wallet_transaction.allWalletTransactions' );
+            } );
+
+            Route::prefix( 'announcements' )->group( function() {
+                Route::group( [ 'middleware' => [ 'permission:view announcements' ] ], function() {
+                    Route::get( '/', [ AnnouncementController::class, 'index' ] )->name( 'admin.module_parent.announcement.index' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:add announcements' ] ], function() {
+                    Route::get( 'add', [ AnnouncementController::class, 'add' ] )->name( 'admin.announcement.add' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:edit announcements' ] ], function() {
+                    Route::get( 'edit/{id?}', [ AnnouncementController::class, 'edit' ] )->name( 'admin.announcement.edit' );
+                } );
+
+                Route::post( 'all-announcements', [ AnnouncementController::class, 'allAnnouncements' ] )->name( 'admin.announcement.allAnnouncements' );
+                Route::post( 'create-announcement', [ AnnouncementController::class, 'createAnnouncement' ] )->name( 'admin.announcement.createAnnouncement' );
+                Route::post( 'update-announcement', [ AnnouncementController::class, 'updateAnnouncement' ] )->name( 'admin.announcement.updateAnnouncement' );
+                Route::post( 'update-announcement-status', [ AnnouncementController::class, 'updateAnnouncementStatus' ] )->name( 'admin.announcement.updateAnnouncementStatus' );
             } );
 
             if ( 1 == 2 ):

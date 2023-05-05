@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\{
     App,
     DB,
     Storage,
     Validator,
 };
-use Illuminate\Support\Str;
 
 use App\Models\{
     Category,
@@ -44,7 +44,7 @@ class ProductService {
                     $product->orderBy( 'title', $dir );
                     break;
                 case 4:
-                    $product->orderBy( 'email', $dir );
+                    $product->orderBy( 'status', $dir );
                     break;
             }
         }
@@ -61,7 +61,7 @@ class ProductService {
                 'encrypted_id'
             ] );
 
-            foreach( $products as $p ) {
+            foreach ( $products as $p ) {
                 if ( $p->productImages ) {
                     $p->productImages->append( [
                         'path'
@@ -82,7 +82,7 @@ class ProductService {
         return response()->json( $data );
     }
 
-    private function filter( $request, $model ) {
+    private static function filter( $request, $model ) {
 
         $filter = false;
 
@@ -190,6 +190,10 @@ class ProductService {
             'meta_description' => __( 'template.meta_description' ),
         ];
 
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
         $validator->setAttributeNames( $attributeName )->validate();
 
         $basicAttribute = [
@@ -239,7 +243,7 @@ class ProductService {
             ] );
 
             if ( $request->hasFile( 'images' ) ) {
-                foreach( $request->file( 'images' ) as $image ) {
+                foreach ( $request->file( 'images' ) as $image ) {
                     $createProductImage = ProductImage::create( [
                         'product_id' => $createProduct->id,
                         'title' => $image->getClientOriginalName(),
@@ -269,19 +273,26 @@ class ProductService {
             foreach ( $categories as $cid ) {
                 $cid = str_replace( 'child_', '', $cid );
 
-                $category = Category::find( $cid );
-                $structure = $category->structure . '|' . $cid;
-                $parents = array_reverse( explode( '|', $structure ) );
-                foreach ( $parents as $parent ) {
-                    if ( $parent != '-' ) {
-                        ProductCategory::updateOrCreate( [
-                            'product_id' => $createProduct->id,
-                            'category_id' => $parent,
-                            'is_child' => $parent == $cid ? 1 : 0,
-                            'status' => 10,
-                        ] );
-                    }
-                }
+                // $category = Category::find( $cid );
+                // $structure = $category->structure . '|' . $cid;
+                // $parents = array_reverse( explode( '|', $structure ) );
+                // foreach ( $parents as $parent ) {
+                //     if ( $parent != '-' ) {
+                //         ProductCategory::updateOrCreate( [
+                //             'product_id' => $createProduct->id,
+                //             'category_id' => $parent,
+                //             'is_child' => $parent == $cid ? 1 : 0,
+                //             'status' => 10,
+                //         ] );
+                //     }
+                // }
+
+                ProductCategory::updateOrCreate( [
+                    'product_id' => $createProduct->id,
+                    'category_id' => $cid,
+                    'is_child' => 0,
+                    'status' => 10,
+                ] );
             }
 
             DB::commit();
@@ -296,7 +307,7 @@ class ProductService {
         }
 
         return response()->json( [
-            'message' => __( 'product.product_created' ),
+            'message' => __( 'template.new_x_created', [ 'title' => Str::singular( __( 'template.products' ) ) ] ),
         ] );
     }
 
@@ -341,98 +352,124 @@ class ProductService {
             'meta_description' => __( 'template.meta_description' ),
         ];
 
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
         $validator->setAttributeNames( $attributeName )->validate();
 
-        $updateProduct = Product::find( $request->decrypted_id );
-        $updateProduct->sku = $request->sku;
-        $updateProduct->title = [
-            App::getLocale() => $request->title,
-        ];
-        $updateProduct->description = [
-            App::getLocale() => $request->description,
-        ];
-        $updateProduct->short_description = [
-            App::getLocale() => $request->short_description,
-        ];
-        $updateProduct->url_slug = Str::slug( $request->friendly_url ? $request->friendly_url : $request->title );
-        $updateProduct->save();
+        DB::beginTransaction();
 
-        $updateProductPrice = ProductPrice::where( 'product_id', $updateProduct->id )->first();
-        $updateProductPrice->display_price = $request->regular_price;
-        $updateProductPrice->regular_price = $request->regular_price;
-        $updateProductPrice->promo_enabled = $request->enable_promotion;
-        if ( $request->enable_promotion == 1 ) {
-            $updateProductPrice->display_price = $request->promo_price;
-            $updateProductPrice->promo_price = $request->promo_price;
-            $updateProductPrice->promo_date_from = $request->promo_date_from;
-            $updateProductPrice->promo_date_to = $request->promo_date_to;
-        }
-        $updateProductPrice->save();
+        try {
 
-        if ( isset( $request->preloaded ) ) {
-            $toBeDelete = ProductImage::where( 'product_id', $updateProduct->id )->whereNotIn( 'id', $request->preloaded );
-            foreach( $toBeDelete->get() as $tbd ) {
-                Storage::disk( 'public' )->delete( $tbd->file );
+            $updateProduct = Product::find( $request->decrypted_id );
+            $updateProduct->sku = $request->sku;
+            $updateProduct->title = [
+                App::getLocale() => $request->title,
+            ];
+            $updateProduct->description = [
+                App::getLocale() => $request->description,
+            ];
+            $updateProduct->short_description = [
+                App::getLocale() => $request->short_description,
+            ];
+            $updateProduct->url_slug = Str::slug( $request->friendly_url ? $request->friendly_url : $request->title );
+            $updateProduct->save();
+
+            $updateProductPrice = ProductPrice::where( 'product_id', $updateProduct->id )->first();
+            $updateProductPrice->display_price = $request->regular_price;
+            $updateProductPrice->regular_price = $request->regular_price;
+            $updateProductPrice->promo_enabled = $request->enable_promotion;
+            if ( $request->enable_promotion == 1 ) {
+                $updateProductPrice->display_price = $request->promo_price;
+                $updateProductPrice->promo_price = $request->promo_price;
+                $updateProductPrice->promo_date_from = $request->promo_date_from;
+                $updateProductPrice->promo_date_to = $request->promo_date_to;
             }
-            $toBeDelete->delete();
-        } else {
-            $toBeDelete = ProductImage::where( 'product_id', $updateProduct->id );
-            foreach( $toBeDelete->get() as $tbd ) {
-                Storage::disk( 'public' )->delete( $tbd->file );
+            $updateProductPrice->save();
+
+            if ( isset( $request->preloaded ) ) {
+                $toBeDelete = ProductImage::where( 'product_id', $updateProduct->id )->whereNotIn( 'id', $request->preloaded );
+                foreach ( $toBeDelete->get() as $tbd ) {
+                    Storage::disk( 'public' )->delete( $tbd->file );
+                }
+                $toBeDelete->delete();
+            } else {
+                $toBeDelete = ProductImage::where( 'product_id', $updateProduct->id );
+                foreach ( $toBeDelete->get() as $tbd ) {
+                    Storage::disk( 'public' )->delete( $tbd->file );
+                }
+                $toBeDelete->delete();
             }
-            $toBeDelete->delete();
-        }
 
-        if ( $request->hasFile( 'images' ) ) {
-            foreach( $request->file( 'images' ) as $image ) {
-                $createProductImage = ProductImage::create( [
-                    'product_id' => $updateProduct->id,
-                    'title' => $image->getClientOriginalName(),
-                    'file' => $image->store( 'products/' . $updateProduct->id, [ 'disk' => 'public' ] ),
-                    'type' => 1,
-                    'file_type' => 2, // 1: pdf 2: image
-                ] );
-            }
-        }
-
-        ProductCategory::where( 'product_id', $updateProduct->id )->delete();
-        $categories = json_decode( $request->categories );
-        foreach ( $categories as $cid ) {
-            $cid = str_replace( 'child_', '', $cid );
-
-            $category = Category::find( $cid );
-            $structure = $category->structure . '|' . $cid;
-            $parents = array_reverse( explode( '|', $structure ) );
-            foreach ( $parents as $parent ) {
-                if ( $parent != '-' ) {
-                    ProductCategory::updateOrCreate( [
+            if ( $request->hasFile( 'images' ) ) {
+                foreach ( $request->file( 'images' ) as $image ) {
+                    $createProductImage = ProductImage::create( [
                         'product_id' => $updateProduct->id,
-                        'category_id' => $parent,
-                        'is_child' => $parent == $cid ? 1 : 0,
-                        'status' => 10,
+                        'title' => $image->getClientOriginalName(),
+                        'file' => $image->store( 'products/' . $updateProduct->id, [ 'disk' => 'public' ] ),
+                        'type' => 1,
+                        'file_type' => 2, // 1: pdf 2: image
                     ] );
                 }
             }
+
+            ProductCategory::where( 'product_id', $updateProduct->id )->delete();
+            $categories = json_decode( $request->categories );
+            foreach ( $categories as $cid ) {
+                $cid = str_replace( 'child_', '', $cid );
+
+                // $category = Category::find( $cid );
+                // $structure = $category->structure . '|' . $cid;
+                // $parents = array_reverse( explode( '|', $structure ) );
+                // foreach ( $parents as $parent ) {
+                //     if ( $parent != '-' ) {
+                //         ProductCategory::updateOrCreate( [
+                //             'product_id' => $updateProduct->id,
+                //             'category_id' => $parent,
+                //             'is_child' => $parent == $cid ? 1 : 0,
+                //             'status' => 10,
+                //         ] );
+                //     }
+                // }
+
+                ProductCategory::updateOrCreate( [
+                    'product_id' => $updateProduct->id,
+                    'category_id' => $cid,
+                    'is_child' => 0,
+                    'status' => 10,
+                ] );
+            }
+
+            Metadata::updateOrCreate( [
+                'type' => 'product',
+                'type_id' => $updateProduct->id,
+                'key' => 'meta_title',
+            ], [
+                'value' => $request->meta_title,
+            ] );
+
+            Metadata::updateOrCreate( [
+                'type' => 'product',
+                'type_id' => $updateProduct->id,
+                'key' => 'meta_description',
+            ], [
+                'value' => $request->meta_description,
+            ] );
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollback();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine(),
+            ], 500 );
         }
 
-        Metadata::updateOrCreate( [
-            'type' => 'product',
-            'type_id' => $updateProduct->id,
-            'key' => 'meta_title',
-        ], [
-            'value' => $request->meta_title,
-        ] );
-
-        Metadata::updateOrCreate( [
-            'type' => 'product',
-            'type_id' => $updateProduct->id,
-            'key' => 'meta_description',
-        ], [
-            'value' => $request->meta_description,
-        ] );
-
         return response()->json( [
-            'message' => __( 'product.product_updated' ),
+            'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.products' ) ) ] ),
         ] );
     }
 
@@ -480,7 +517,7 @@ class ProductService {
 
         $products = $products->paginate( empty( $request->per_page ) ? 10 : $request->per_page );
 
-        foreach( $products->items() as $item ) {
+        foreach ( $products->items() as $item ) {
             if ( $item->productImages ) {
                 $item->productImages->append( [
                     'path',
@@ -510,5 +547,27 @@ class ProductService {
         }
 
         return response()->json( $product );
+    }
+
+    public static function detail( $productID ) {
+
+        $product = Product::with( [
+            'productPrices'
+        ] )->lockForUpdate()->find( $productID );
+
+        return $product;
+    }
+
+    public static function checkStock( $productID, $quantity ) {
+
+        $inventory = ProductInventory::where( 'product_id', $productID )->lockForUpdate()->first();
+
+        return $inventory->quantity < $quantity ? false : $inventory;
+    }
+
+    public static function updateStock( ProductInventory $productInventory, $quantity ) {
+
+        $productInventory->quantity -= $quantity;
+        $productInventory->save();
     }
 }

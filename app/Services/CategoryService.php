@@ -2,7 +2,12 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\{
+    DB,
+    Storage,
+    Validator,
+};
 
 use App\Models\{
     Category,
@@ -124,7 +129,7 @@ class CategoryService {
 
     public static function createCategory( $request ) {
 
-        $request->validate( [
+        $validator = Validator::make( $request->all(), [
             'title' => [ 'required', 'string' ],
             'description' => [ 'required', 'string' ],
             'thumbnail' => [ 'nullable', 'image' ],
@@ -139,85 +144,154 @@ class CategoryService {
             } ]
         ] );
 
-        $basicAttribute = [
-            'title' => $request->title,
-            'description' => $request->description,
-            'url_slug' => \Str::slug( $request->title ),
-            'sort' => 1,
-            'status' => $request->enabled,
-            'type' => $request->category_type,
+        $attributeName = [
+            'title' => __( 'datatables.title' ),
+            'description' => __( 'datatables.description' ),
+            'thumbnail' => __( 'datatables.thumbnail' ),
         ];
 
-        if ( $request->parent_category != 'null' ) {
-            $parentCategory = Category::find( $request->parent_category );
-            $basicAttribute['parent_id'] = $parentCategory->id;
-            $basicAttribute['structure'] = $parentCategory->structure . '|' . $parentCategory->id;
-        } else {
-            $basicAttribute['parent_id'] = null;
-            $basicAttribute['structure'] = '-';
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
         }
 
-        if ( $request->hasFile( 'thumbnail' ) ) {
-            $basicAttribute['thumbnail'] = $request->file( 'thumbnail' )->store( 'category', [ 'disk' => 'public' ] );
-        }
+        $validator->setAttributeNames( $attributeName )->validate();
 
-        $createCategory = Category::create( $basicAttribute );
+        DB::beginTransaction();
 
-        if ( $request->parent_category ) {
+        try {
 
-            $structureArray = explode( '|', $basicAttribute['structure'] );
-            $structureLevel = count( $structureArray );
-            for ( $i = $structureLevel - 1; $i >= 0; $i-- ) {
-                if ( $structureArray[$i] != '-' ) {
-                    CategoryStructure::create( [
-                        'parent_id' => $structureArray[$i],
-                        'child_id' => $createCategory->id,
-                        'level' => $structureLevel - $i,
-                        'status' => 10,
-                    ] );
-                }
+            $basicAttribute = [
+                'title' => $request->title,
+                'description' => $request->description,
+                'url_slug' => \Str::slug( $request->title ),
+                'sort' => 1,
+                'status' => $request->enabled,
+                'type' => $request->category_type,
+            ];
+
+            if ( $request->parent_category != 'null' ) {
+                $parentCategory = Category::find( $request->parent_category );
+                $basicAttribute['parent_id'] = $parentCategory->id;
+                // $basicAttribute['structure'] = $parentCategory->structure . '|' . $parentCategory->id;
+            } else {
+                $basicAttribute['parent_id'] = null;
+                // $basicAttribute['structure'] = '-';
             }
+
+            if ( $request->hasFile( 'thumbnail' ) ) {
+                $basicAttribute['thumbnail'] = $request->file( 'thumbnail' )->store( 'category', [ 'disk' => 'public' ] );
+            }
+
+            // $createCategory = Category::create( $basicAttribute );
+
+            // if ( $request->parent_category ) {
+
+            //     $structureArray = explode( '|', $basicAttribute['structure'] );
+            //     $structureLevel = count( $structureArray );
+            //     for ( $i = $structureLevel - 1; $i >= 0; $i-- ) {
+            //         if ( $structureArray[$i] != '-' ) {
+            //             CategoryStructure::create( [
+            //                 'parent_id' => $structureArray[$i],
+            //                 'child_id' => $createCategory->id,
+            //                 'level' => $structureLevel - $i,
+            //                 'status' => 10,
+            //             ] );
+            //         }
+            //     }
+            // }
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollback();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine(),
+            ], 500 );
         }
+
+        return response()->json( [
+            'message' => __( 'template.new_x_created', [ 'title' => Str::singular( __( 'template.categories' ) ) ] ),
+        ] );
     }
 
     public static function updateCategory( $request ) {
 
-        $request->validate( [
+        $request->merge( [
+            'id' => Helper::decode( $request->id ),
+        ] );
+
+        $validator = Validator::make( $request->all(), [
             'title' => [ 'required' ],
             'description' => [ 'required', 'string' ],
             'thumbnail' => [ 'nullable', 'image' ],
             'enabled' => [ 'required' ],
             'category_type' => [ 'required', function( $attribute, $value, $fail ) {
-                $exist = ProductCategory::where( 'category_id', $value )->first();
-                if ( $exist ) {
-                    $fail( 'Cannot change category type as there are product(s) assigned to it.' );
-                }
+                // $category = Category::find( request( 'id' ) );
+                // if ( $category->type != $value ) {
+                //     $exist = ProductCategory::where( 'category_id', request( 'id' ) )->first();
+                //     if ( $exist ) {
+                //         $fail( 'Cannot change category type as there are product(s) assigned to it.' );
+                //     }
+                // }
             } ],
         ] );
 
-        $updateCategory = Category::find( Helper::decode( $request->id ) );
-        $parent = Category::find( $request->parent_category );
-        if ( $parent ) {
-            $updateCategory->parent_id = $parent->id;
-            $updateCategory->structure = $parent->structure . '|' . $request->id;
-        } else {
-            $updateCategory->parent_id = null;
-            $updateCategory->structure = '-';
+        $attributeName = [
+            'title' => __( 'datatables.title' ),
+            'description' => __( 'datatables.description' ),
+            'thumbnail' => __( 'datatables.thumbnail' ),
+        ];
+
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
         }
-        $updateCategory->title = $request->title;
-        if ( $request->hasFile( 'thumbnail' ) ) {
-            Storage::disk( 'public' )->delete( $updateCategory->thumbnail );
-            $updateCategory->thumbnail = $request->file( 'thumbnail' )->store( 'category', [ 'disk' => 'public' ] );
-        } else {
-            if ( $request->thumbnail_removed ) {
-                Storage::disk( 'public' )->delete( $updateCategory->thumbnail );
-                $updateCategory->thumbnail = null;
+
+        $validator->setAttributeNames( $attributeName )->validate();
+
+        DB::beginTransaction();
+
+        try {
+
+            $updateCategory = Category::find( $request->id );
+            $parent = Category::find( $request->parent_category );
+            if ( $parent ) {
+                $updateCategory->parent_id = $parent->id;
+                // $updateCategory->structure = $parent->structure . '|' . $parent->id;
+            } else {
+                $updateCategory->parent_id = null;
+                // $updateCategory->structure = '-';
             }
+            $updateCategory->title = $request->title;
+            if ( $request->hasFile( 'thumbnail' ) ) {
+                Storage::disk( 'public' )->delete( $updateCategory->thumbnail );
+                $updateCategory->thumbnail = $request->file( 'thumbnail' )->store( 'category', [ 'disk' => 'public' ] );
+            } else {
+                if ( $request->thumbnail_removed ) {
+                    Storage::disk( 'public' )->delete( $updateCategory->thumbnail );
+                    $updateCategory->thumbnail = null;
+                }
+            }
+            $updateCategory->url_slug = \Str::slug( $request->title );
+            $updateCategory->status = $request->enabled;
+            $updateCategory->type = $request->category_type;
+            $updateCategory->save();
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollback();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine(),
+            ], 500 );
         }
-        $updateCategory->url_slug = \Str::slug( $request->title );
-        $updateCategory->status = $request->enabled;
-        $updateCategory->type = $request->category_type;
-        $updateCategory->save();
+
+        return response()->json( [
+            'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.categories' ) ) ] ),
+        ] );
     }
 
     public static function updateCategoryStatus ( $request ) {
@@ -240,7 +314,8 @@ class CategoryService {
     // This block 80% was written by ChatGPT, I feel I am jobless soon 
     public static function traverseDown( $id, $level = 0 ) {
 
-        $categories = Category::where( 'parent_id', $id )->get();
+        $categories = Category::where( 'parent_id', $id )
+            ->get();
 
         $newCategories = [];
 
@@ -270,10 +345,12 @@ class CategoryService {
             ] );
         }
 
-        $categories->where( function( $query ) {
-            $query->where( 'url_slug', request( 'url_slug' ) );
-            $query->orWhere( 'id', request( 'id' ) );
-        } );
+        if ( !empty( $request->url_slug ) || !empty( $request->id ) ) {
+            $categories->where( function( $query ) {
+                $query->where( 'url_slug', request( 'url_slug' ) );
+                $query->orWhere( 'id', request( 'id' ) );
+            } );
+        }
 
         $categories = $categories->get()->toArray();
 

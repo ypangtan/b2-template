@@ -24,7 +24,4 @@ return [
     'stock' => '库存',
     'quantity' => '数量',
     'preloaded' => '预载相册',
-
-    'product_created' => '已创建新产品。',
-    'product_updated' => '已更新产品。',
 ];

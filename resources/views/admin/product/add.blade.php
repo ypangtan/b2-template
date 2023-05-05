@@ -222,7 +222,7 @@ window.cke_element = 'product_create_description';
         } );
 
         $( pc + '_cancel' ).click( function() {
-            window.location.href = '{{ route( 'admin.product.index' ) }}';
+            window.location.href = '{{ route( 'admin.module_parent.product.index' ) }}';
         } );
 
         $( pc + '_submit' ).click( function() {
@@ -254,7 +254,7 @@ window.cke_element = 'product_create_description';
             formData.append( 'meta_title', $( pc + '_meta_title' ).val() );
             formData.append( 'meta_description', $( pc + '_meta_description' ).val() );
 
-            formData.append( 'categories', JSON.stringify( jsTree.jstree().get_bottom_selected() ) );
+            formData.append( 'categories', JSON.stringify( jsTree.jstree().get_selected() ) );
 
             formData.append( '_token', '{{ csrf_token() }}' );
 
@@ -265,32 +265,15 @@ window.cke_element = 'product_create_description';
                 processData: false,
                 contentType: false,
                 success: function( response ) {
-                    
                     $( 'body' ).loading( 'stop' );
+                    $( '#modal_success .caption-text' ).html( response.message );
+                    modalSuccess.toggle();
 
-                    $( 'main.page-content' ).prepend( `
-                    <div class="alert border-0 border-success border-start border-4 bg-light-success fade show py-2">
-                        <div class="d-flex align-items-center">
-                            <div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i>
-                            </div>
-                            <div class="ms-3">
-                                <div class="text-success">` + response.message + `</div>
-                            </div>
-                        </div>
-                    </div>` );
-                    $( window ).scrollTop( 0 );
-
-                    setTimeout(function(){
-                        $( '.alert' ).fadeTo( 250, 0.01, function() { 
-                            $( this ).slideUp( 50, function() {
-                                $( this ).remove();
-                                window.location.href = '{{ route( 'admin.product.index' ) }}';
-                            } ); 
-                        } );
-                    }, 2000 );
+                    document.getElementById( 'modal_success' ).addEventListener( 'hidden.bs.modal', function (event) {
+                        window.location.href = '{{ route( 'admin.module_parent.product.index' ) }}';
+                    } );
                 },
                 error: function( error ) {
-
                     $( 'body' ).loading( 'stop' );
 
                     if ( error.status === 422 ) {
@@ -300,6 +283,9 @@ window.cke_element = 'product_create_description';
                         } );
 
                         $( '.form-control.is-invalid:first' ).get( 0 ).scrollIntoView();
+                    } else {
+                        $( '#modal_danger .caption-text' ).html( error.responseJSON.message );
+                        modalDanger.toggle();       
                     }
                 }
             } );
@@ -321,9 +307,14 @@ window.cke_element = 'product_create_description';
                     jsTree = $( '#jstree_category' );
                     jsTree.jstree( {
                         plugins: [ 'wholerow', 'checkbox' ],
+                        checkbox: {
+                            three_state: false,
+                        },
                     } ).on('changed.jstree', function (e, data) {
                         console.log( data );
-                    } );;
+                    } );
+
+                    jsTree.jstree( 'open_all' );
                 }
             } );
         }

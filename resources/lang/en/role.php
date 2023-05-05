@@ -23,10 +23,6 @@ return [
     'super_admin' => 'Super Admin',
     'admin' => 'Admin',
     'staff' => 'Staff',
-    
-    'role_created' => 'New Role Created.',
-    'role_updated' => 'Role Updated.',
-    'no_changes' => 'No Changes.',
 
     'no_action_found' => 'No action found',
     'no_module_found' => 'No module found',
