@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAdminNotificationsTable extends Migration
+class CreateAdministratorNotificationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateAdminNotificationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('admin_notifications', function (Blueprint $table) {
+        Schema::create('administrator_notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId( 'admin_id' )->nullable()->constrained( 'administrators' )->onUpdate( 'restrict' )->onDelete( 'cascade' );
+            $table->foreignId( 'administrator_id' )->nullable()->constrained( 'administrators' )->onUpdate( 'restrict' )->onDelete( 'cascade' );
             $table->foreignId( 'role_id' )->nullable()->constrained( 'roles' )->onUpdate( 'restrict' )->onDelete( 'cascade' );
             $table->string('title')->nullable();
             $table->text('content')->nullable();
@@ -37,6 +37,6 @@ class CreateAdminNotificationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admin_notifications');
+        Schema::dropIfExists('administrator_notifications');
     }
 }

@@ -16,7 +16,7 @@ class AuditService {
 
     public function allAudits( $request, $export = false ) {
 
-        $log = ActivityLog::select( 'activity_log.*', 'administrators.username AS admin_username' );
+        $log = ActivityLog::select( 'activity_log.*', 'administrators.username AS administrator_username' );
         $log->leftJoin( 'administrators', 'activity_log.causer_id', '=', 'administrators.id' );
         $log->where( 'causer_type', 'App\Models\Administrator' );
 

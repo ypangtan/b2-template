@@ -20,6 +20,7 @@ return [
     'roles' => '角色',
     'modules' => '模块',
     'audits' => '审计日志',
+    'users' => '用户',
     'categories' => '分类',
     'products' => '产品',
     'orders' => '订单',

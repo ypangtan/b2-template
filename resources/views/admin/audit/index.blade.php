@@ -139,7 +139,7 @@ $columns = [
             columns: [
                 { data: null },
                 { data: 'created_at' },
-                { data: 'admin_username' },
+                { data: 'administrator_username' },
                 { data: 'log_name' },
                 { data: 'description' },
                 { data: 'id' },

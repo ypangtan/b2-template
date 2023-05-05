@@ -17,7 +17,7 @@
                     </form>
                     @endif
                     <?php
-                    $notification = Helper::adminNotifications();
+                    $notification = Helper::administratorNotifications();
                     $totalUnread = $notification['total_unread'];
                     $notifications = $notification['notifications'];
                     ?>
@@ -26,10 +26,6 @@
                             <li class="nav-item dropdown dropdown-large">
                                 <a class="nav-link dropdown-toggle dropdown-toggle-nocaret notification-dropdown" href="#" data-bs-toggle="dropdown">
                                     <div class="notifications">
-                                        @if ( 1 == 2 )
-                                        <span class="notify-badge" data-opened="{{ $notification['is_notification_box_opened'] }}" style="{{ $notification['is_notification_box_opened'] ? 'display: none;' : '' }}">{{ $totalUnread }}</span>
-                                        @endif
-
                                         @if ( $totalUnread > 0 )
                                         <span class="notify-badge">{{ $totalUnread }}</span>
                                         @endif

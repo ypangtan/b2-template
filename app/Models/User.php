@@ -13,6 +13,8 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
+use Helper;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, LogsActivity;
@@ -58,6 +60,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getEncryptedIdAttribute() {
+        return Helper::encode( $this->attributes['id'] );
+    }
 
     protected function serializeDate( DateTimeInterface $date ) {
         return $date->timezone( 'Asia/Kuala_Lumpur' )->format( 'Y-m-d H:i:s' );

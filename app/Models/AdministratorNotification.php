@@ -13,16 +13,16 @@ use Spatie\Activitylog\LogOptions;
 
 use App\Traits\HasTranslations;
 
-class AdminNotification extends Model
+class AdministratorNotification extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes, HasTranslations;
 
     public function admin() {
-        return $this->belongsTo( admin::class, 'admin_id' )->withTrashed();
+        return $this->belongsTo( Admin::class, 'administrator_id' )->withTrashed();
     }
 
     protected $fillable = [
-        'admin_id',
+        'administrator_id',
         'role_id',
         'title',
         'content',
@@ -40,7 +40,7 @@ class AdminNotification extends Model
     }
 
     protected static $logAttributes = [
-        'admin_id',
+        'administrator_id',
         'role_id',
         'title',
         'content',
@@ -51,7 +51,7 @@ class AdminNotification extends Model
         'type',
     ];
 
-    protected static $logName = 'admin_notifications';
+    protected static $logName = 'administrator_notifications';
 
     protected static $logOnlyDirty = true;
 

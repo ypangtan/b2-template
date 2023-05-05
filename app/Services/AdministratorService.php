@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\{
     DB,
     Hash,
@@ -12,7 +13,7 @@ use Illuminate\Validation\Rules\Password;
 
 use App\Models\{
     Administrator,
-    AdminNotificationSeen,
+    AdministratorNotificationSeen,
     Role as RoleModel
 };
 
@@ -136,13 +137,27 @@ class AdministratorService {
 
     public static function createAdministrator( $request ) {
 
-        $request->validate( [
+        $validator = Validator::make( $request->all(), [
             'username' => [ 'required', 'max:25', 'unique:administrators,username', 'alpha_dash', new CheckASCIICharacter ],
             'email' => [ 'required', 'max:25', 'unique:administrators,email', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
             'fullname' => [ 'required' ],
             'role' => [ 'required' ],
             'password' => [ 'required', Password::min( 8 ) ],
         ] );
+
+        $attributeName = [
+            'username' => __( 'administrator.username' ),
+            'email' => __( 'administrator.email' ),
+            'fullname' => __( 'administrator.fullname' ),
+            'role' => __( 'administrator.role' ),
+            'password' => __( 'administrator.password' ),
+        ];
+
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();
 
         DB::beginTransaction();
         
@@ -172,7 +187,7 @@ class AdministratorService {
         }
 
         return response()->json( [
-            'message' => __( 'administrator.administrator_created' ),
+            'message' => __( 'template.new_x_created', [ 'title' => Str::singular( __( 'template.administrators' ) ) ] ),
         ] );
     }
 
@@ -182,13 +197,27 @@ class AdministratorService {
             'id' => Helper::decode( $request->id ),
         ] );
 
-        $request->validate( [
+        $validator = Validator::make( $request->all(), [
             'username' => [ 'required', 'max:25', 'unique:administrators,username,' . $request->id, 'alpha_dash', new CheckASCIICharacter ],
             'email' => [ 'required', 'max:25', 'unique:administrators,email,' . $request->id, 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
             'fullname' => [ 'required' ],
             'role' => [ 'required' ],
             'password' => [ 'nullable', Password::min( 8 ) ],
         ] );
+
+        $attributeName = [
+            'username' => __( 'administrator.username' ),
+            'email' => __( 'administrator.email' ),
+            'fullname' => __( 'administrator.fullname' ),
+            'role' => __( 'administrator.role' ),
+            'password' => __( 'administrator.password' ),
+        ];
+
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();
 
         DB::beginTransaction();
         
@@ -221,7 +250,7 @@ class AdministratorService {
         }
 
         return response()->json( [
-            'message' => __( 'administrator.administrator_updated' ),
+            'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.administrators' ) ) ] ),
         ] );
     }
 
@@ -272,9 +301,9 @@ class AdministratorService {
 
     public static function updateNotificationSeen( $request ) {
 
-        AdminNotificationSeen::firstOrCreate( [
-            'admin_notification_id' => $request->id,
-            'admin_id' => auth()->user()->id,
+        AdministratorNotificationSeen::firstOrCreate( [
+            'an_id' => $request->id,
+            'administrator_id' => auth()->user()->id,
         ] );
     }
 }

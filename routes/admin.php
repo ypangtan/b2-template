@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\{
     ProductController,
     ProfileController,
     RoleController,
+    UserController,
     SettingController,
 };
 
@@ -41,9 +42,13 @@ Route::prefix( 'backoffice' )->group( function() {
 
             Route::prefix( 'administrators' )->group( function() {
 
-                Route::group( [ 'middleware' => [ 'permission:add administrators|view administrators|edit administrators|delete administrators' ] ], function() {
+                Route::group( [ 'middleware' => [ 'permission:view administrators' ] ], function() {
                     Route::get( '/', [ AdministratorController::class, 'index' ] )->name( 'admin.module_parent.administrator.index' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:add administrators' ] ], function() {
                     Route::get( 'add', [ AdministratorController::class, 'add' ] )->name( 'admin.administrator.add' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:edit administrators' ] ], function() {
                     Route::get( 'edit', [ AdministratorController::class, 'edit' ] )->name( 'admin.administrator.edit' );
                 } );
 
@@ -55,9 +60,13 @@ Route::prefix( 'backoffice' )->group( function() {
 
             Route::prefix( 'roles' )->group( function() {
 
-                Route::group( [ 'middleware' => [ 'permission:add roles|view roles|edit roles|delete roles' ] ], function() {
+                Route::group( [ 'middleware' => [ 'permission:view roles' ] ], function() {
                     Route::get( '/', [ RoleController::class, 'index' ] )->name( 'admin.module_parent.role.index' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:add roles' ] ], function() {
                     Route::get( 'add', [ RoleController::class, 'add' ] )->name( 'admin.role.add' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:edit roles' ] ], function() {
                     Route::get( 'edit', [ RoleController::class, 'edit' ] )->name( 'admin.role.edit' );
                 } );
 
@@ -69,17 +78,18 @@ Route::prefix( 'backoffice' )->group( function() {
 
             Route::prefix( 'modules' )->group( function() {
 
-                Route::group( [ 'middleware' => [ 'permission:add modules|view modules|edit modules|delete modules' ] ], function() {
+                Route::group( [ 'middleware' => [ 'permission:view modules' ] ], function() {
                     Route::get( '/', [ ModuleController::class, 'index' ] )->name( 'admin.module_parent.module.index' );
                 } );
 
                 Route::post( 'create-module', [ ModuleController::class, 'createModule' ] )->name( 'admin.module.createModule' );
                 Route::post( 'all-modules', [ ModuleController::class, 'allModules' ] )->name( 'admin.module.allModules' );
-                Route::post( 'one-module', [ RoleModuleControllerController::class, 'oneModule' ] )->name( 'admin.module.oneModule' );
+                Route::post( 'one-module', [ ModuleController::class, 'oneModule' ] )->name( 'admin.module.oneModule' );
             } );
 
             Route::prefix( 'audit-logs' )->group( function() {
-                Route::group( [ 'middleware' => [ 'permission:add audits|view audits|edit audits|delete audits' ] ], function() {
+
+                Route::group( [ 'middleware' => [ 'permission:view audits' ] ], function() {
                     Route::get( '/', [ AuditController::class, 'index' ] )->name( 'admin.module_parent.audit.index' );
                 } );
 
@@ -87,10 +97,34 @@ Route::prefix( 'backoffice' )->group( function() {
                 Route::post( 'one-audit', [ AuditController::class, 'oneAudit' ] )->name( 'admin.audit.oneAudit' );
             } );
 
+            Route::prefix( 'users' )->group( function() {
+
+                Route::group( [ 'middleware' => [ 'permission:view users' ] ], function() {
+                    Route::get( '/', [ UserController::class, 'index' ] )->name( 'admin.module_parent.user.index' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:add users' ] ], function() {
+                    Route::get( 'add', [ UserController::class, 'add' ] )->name( 'admin.user.add' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:edit users' ] ], function() {
+                    Route::get( 'edit', [ UserController::class, 'edit' ] )->name( 'admin.user.edit' );
+                } );
+
+                Route::post( 'all-users', [ UserController::class, 'allUsers' ] )->name( 'admin.user.allUsers' );
+                Route::post( 'one-user', [ UserController::class, 'oneUser' ] )->name( 'admin.user.oneUser' );
+                Route::post( 'create-user', [ UserController::class, 'createUser' ] )->name( 'admin.user.createUser' );
+                Route::post( 'update-user', [ UserController::class, 'updateUser' ] )->name( 'admin.user.updateUser' );
+            } );
+
+            if ( 1 == 2 ):
             Route::prefix( 'categories' )->group( function() {
-                Route::group( [ 'middleware' => [ 'permission:add categories|view categories|edit categories|delete categories' ] ], function() {
+
+                Route::group( [ 'middleware' => [ 'permission:view categories' ] ], function() {
                     Route::get( '/', [ CategoryController::class, 'index' ] )->name( 'admin.module_parent.category.index' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:add categories' ] ], function() {
                     Route::get( 'add', [ CategoryController::class, 'add' ] )->name( 'admin.category.add' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:edit categories' ] ], function() {
                     Route::get( 'edit', [ CategoryController::class, 'edit' ] )->name( 'admin.category.edit' );
                 } );
 
@@ -103,9 +137,14 @@ Route::prefix( 'backoffice' )->group( function() {
             } );
 
             Route::prefix( 'products' )->group( function() {
-                Route::group( [ 'middleware' => [ 'permission:add products|view products|edit products|delete products' ] ], function() {
+
+                Route::group( [ 'middleware' => [ 'permission:view products' ] ], function() {
                     Route::get( '/', [ ProductController::class, 'index' ] )->name( 'admin.module_parent.product.index' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:add products' ] ], function() {
                     Route::get( 'add', [ ProductController::class, 'add' ] )->name( 'admin.product.add' );
+                } );
+                Route::group( [ 'middleware' => [ 'permission:edit products' ] ], function() {
                     Route::get( 'edit', [ ProductController::class, 'edit' ] )->name( 'admin.product.edit' );
                 } );
 
@@ -122,6 +161,7 @@ Route::prefix( 'backoffice' )->group( function() {
                     Route::get( '/', [ OrderController::class, 'index' ] )->name( 'admin.module_parent.order.index' );
                 } );
             } );
+            endif;
 
             Route::prefix( 'settings' )->group( function() {
 

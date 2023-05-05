@@ -3,9 +3,8 @@
 namespace App\Helpers;
 
 use App\Models\{
-    AdminMeta,
-    AdminNotification,
-    AdminNotificationSeen,
+    AdministratorNotification,
+    AdministratorNotificationSeen,
 };
 
 use Hashids\Hashids;
@@ -695,29 +694,23 @@ class Helper {
         return $hashids->decode( $id )[0];
     }
 
-    public static function adminNotifications() {
+    public static function administratorNotifications() {
 
-        $notifications = AdminNotification::select( 
-            'admin_notifications.*',
-            \DB::raw( '( SELECT COUNT(*) FROM admin_notification_seens AS a WHERE a.admin_notification_id = admin_notifications.id AND a.admin_id = ' .auth()->user()->id. ' ) as is_read' )
+        $notifications = AdministratorNotification::select( 
+            'administrator_notifications.*',
+            \DB::raw( '( SELECT COUNT(*) FROM administrator_notification_seens AS a WHERE a.an_id = administrator_notifications.id AND a.administrator_id = ' .auth()->user()->id. ' ) as is_read' )
         )->where( function( $query ) {
-            $query->where( 'admin_id', auth()->user()->id );
+            $query->where( 'administrator_id', auth()->user()->id );
             $query->orWhere( 'role_id', auth()->user()->role );
         } )->orWhere( function( $query ) {
-            $query->whereNull( 'admin_id' );
+            $query->whereNull( 'administrator_id' );
             $query->whereNull( 'role_id' );
-        } )->orderBy( 'admin_notifications.created_at', 'DESC' )->get();
+        } )->orderBy( 'administrator_notifications.created_at', 'DESC' )->get();
 
-        $totalUnread = AdminNotificationSeen::where( 'admin_id', auth()->user()->id )->count();
+        $totalUnread = AdministratorNotificationSeen::where( 'administrator_id', auth()->user()->id )->count();
 
         $data['total_unread'] = count( $notifications ) - $totalUnread;
         $data['notifications'] = $notifications;
-
-        $data['is_notification_box_opened'] = 0;
-        $nbo = AdminMeta::where( 'meta_key', 'is_notification_box_opened' )->first();
-        if ( $nbo ) {
-            $data['is_notification_box_opened'] = $nbo->meta_value;
-        }
 
         return $data;
     }

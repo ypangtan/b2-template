@@ -31,12 +31,16 @@ return [
     'category' => '分类',
     'products' => '产品',
     'orders' => '订单',
+    'promotions' => '优惠',
+    'discount_rules' => '折扣方案',
     'marketings' => '营销',
     'first_setup' => '初次设置',
     'verify_account' => '验证账号',
     'profile' => '资料',
     'add_x' => '新增:title',
     'edit_x' => '编辑:title',
+    'view_x' => '查看:title',
+    'delete_x' => '删除:title',
     
     'leave_blank' => '密码 (留空保持不变)',
     'loading' => '载入中...',
@@ -69,4 +73,10 @@ return [
 
     'yes' => '是',
     'no' => '否',
+
+    'new_x' => '新增:title',
+    'edit_x' => '编辑:title',
+    'update_x' => '更新:title',
+    'new_x_created' => '已创建新:title。',
+    'x_updated' => '已更新:title。',
 ];

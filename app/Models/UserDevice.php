@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AdminMeta extends Model
+class UserDevice extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'admin_id',
-        'meta_key',
-        'meta_value',
+        'register_token',
+        'device_type',
+        'user_id',
     ];
 }

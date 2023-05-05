@@ -31,12 +31,16 @@ return [
     'category' => 'Category',
     'products' => 'Products',
     'orders' => 'Orders',
+    'promotions' => 'Promotions',
+    'discount_rules' => 'Discount Rules',
     'marketings' => 'Marketings',
     'first_setup' => 'First Setup',
     'verify_account' => 'Verify Account',
     'profile' => 'Profile',
     'add_x' => 'Add :title',
     'edit_x' => 'Edit :title',
+    'view_x' => 'View :title',
+    'delete_x' => 'Delete :title',
 
     'leave_blank' => 'Password (leave blank to leave unchanged)',
     'loading' => 'Loading...',
@@ -69,4 +73,10 @@ return [
 
     'yes' => 'Yes',
     'no' => 'No',
+
+    'new_x' => 'New :title',
+    'edit_x' => 'Edit :title',
+    'update_x' => 'Update :title',
+    'new_x_created' => 'New :title Created.',
+    'x_updated' => ':title Updated.',
 ];

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\{
     DB,
     Validator,
@@ -128,10 +129,21 @@ class RoleService {
 
     public static function createRole( $request ) {
 
-        $request->validate( [
+        $validator = Validator::make( $request->all(), [
             'role_name' => 'required|unique:roles,name',
             'guard_name' => 'required',
         ] );
+
+        $attributeName = [
+            'role_name' => __( 'role.role_name' ),
+            'guard_name' => __( 'role.guard_name' ),
+        ];
+
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();
 
         DB::beginTransaction();
         
@@ -188,7 +200,7 @@ class RoleService {
         }
 
         return response()->json( [
-            'message' => __( 'role.role_created' ),
+            'message' => __( 'template.new_x_created', [ 'title' => Str::singular( __( 'template.roles' ) ) ] ),
         ] );
     }
 
@@ -251,7 +263,7 @@ class RoleService {
         }
 
         return response()->json( [
-            'message' => __( 'role.role_updated' ),
+            'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.roles' ) ) ] ),
         ] );
     }
 }

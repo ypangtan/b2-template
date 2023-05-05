@@ -16,7 +16,6 @@
                             <div class="menu-title">{{ __( 'template.dashboard' ) }}</div>
                         </a>
                     </li>
-                    @if ( auth()->user()->role == 1 )
                     @can( 'view administrators' )
                     <li class="{{ $controller == 'App\Http\Controllers\Admin\AdministratorController' ? 'mm-active' : '' }}">
                         <a href="{{ route( 'admin.module_parent.administrator.index' ) }}">
@@ -41,33 +40,24 @@
                         </a>
                     </li>
                     @endcan
+                    @can( 'view audits' )
                     <li class="{{ $controller == 'App\Http\Controllers\Admin\AuditController' ? 'mm-active' : '' }}">
                         <a href="{{ route( 'admin.module_parent.audit.index' ) }}">
                             <div class="parent-icon"><i class="align-middle feather" icon-name="file-search"></i></div>
                             <div class="menu-title">{{ __( 'template.audit_logs' ) }}</div>
                         </a>
                     </li>
-                    @endif
+                    @endcan
 
                     <li class="menu-label">{{ __( 'template.operations' ) }}</li>
-                    <li class="{{ $controller == 'App\Http\Controllers\Admin\CategoryController' ? 'mm-active' : '' }}">
-                        <a href="{{ route( 'admin.module_parent.category.index' ) }}">
-                            <div class="parent-icon"><i class="align-middle feather" icon-name="boxes"></i></div>
-                            <div class="menu-title">{{ __( 'template.categories' ) }}</div>
+                    @can( 'view users' )
+                    <li class="{{ $controller == 'App\Http\Controllers\Admin\UserController' ? 'mm-active' : '' }}">
+                        <a href="{{ route( 'admin.module_parent.user.index' ) }}">
+                            <div class="parent-icon"><i class="align-middle feather" icon-name="users"></i></div>
+                            <div class="menu-title">{{ __( 'template.users' ) }}</div>
                         </a>
                     </li>
-                    <li class="{{ $controller == 'App\Http\Controllers\Admin\ProductController' ? 'mm-active' : '' }}">
-                        <a href="{{ route( 'admin.module_parent.product.index' ) }}">
-                            <div class="parent-icon"><i class="align-middle feather" icon-name="box"></i></div>
-                            <div class="menu-title">{{ __( 'template.products' ) }}</div>
-                        </a>
-                    </li>
-                    <li class="{{ $controller == 'App\Http\Controllers\Admin\OrderController' ? 'mm-active' : '' }}">
-                        <a href="{{ route( 'admin.module_parent.order.index' ) }}">
-                            <div class="parent-icon"><i class="align-middle feather" icon-name="building-2"></i></div>
-                            <div class="menu-title">{{ __( 'template.orders' ) }}</div>
-                        </a>
-                    </li>
+                    @endcan
                 </ul>
                 <!--end navigation-->
             </aside>

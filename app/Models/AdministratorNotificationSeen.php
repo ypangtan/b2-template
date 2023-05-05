@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AdminNotificationSeen extends Model
+class AdministratorNotificationSeen extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'admin_notification_id',
-        'admin_id',
+        'an_id',
+        'administrator_id',
     ];
 }

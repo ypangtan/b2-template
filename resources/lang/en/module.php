@@ -20,6 +20,7 @@ return [
     'roles' => 'Roles',
     'modules' => 'Modules',
     'audits' => 'Audits',
+    'users' => 'Users',
     'categories' => 'Categories',
     'products' => 'Products',
     'orders' => 'Orders',

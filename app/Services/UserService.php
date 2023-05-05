@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\{
     Crypt,
+    DB,
     Hash,
     Http,
     Validator,
@@ -25,6 +27,218 @@ use App\Rules\CheckASCIICharacter;
 use Helper;
 
 class UserService {
+
+    public static function allUsers( $request ) {
+
+        $user = User::select( 'users.*' );
+
+        $filterObject = self::filter( $request, $user );
+        $user = $filterObject['model'];
+        $filter = $filterObject['filter'];
+
+        if ( $request->input( 'order.0.column' ) != 0 ) {
+            $dir = $request->input( 'order.0.dir' );
+            switch ( $request->input( 'order.0.column' ) ) {
+                case 1:
+                    $user->orderBy( 'created_at', $dir );
+                    break;
+                case 2:
+                    $user->orderBy( 'name', $dir );
+                    break;
+                case 3:
+                    $user->orderBy( 'email', $dir );
+                    break;
+                case 4:
+                    $user->orderBy( 'status', $dir );
+                    break;
+            }
+        }
+
+        $userCount = $user->count();
+
+        $limit = $request->length;
+        $offset = $request->start;
+
+        $users = $user->skip( $offset )->take( $limit )->get();
+
+        if ( $users ) {
+            $users->append( [
+                'encrypted_id',
+            ] );
+        }
+
+        $totalRecord = User::count();
+
+        $data = [
+            'users' => $users,
+            'draw' => $request->draw,
+            'recordsFiltered' => $filter ? $userCount : $totalRecord,
+            'recordsTotal' => $totalRecord,
+        ];
+
+        return response()->json( $data );
+    }
+
+    private static function filter( $request, $model ) {
+
+        $filter = false;
+
+        if ( !empty( $request->registered_date ) ) {
+            if ( str_contains( $request->registered_date, 'to' ) ) {
+                $dates = explode( ' to ', $request->registered_date );
+
+                $startDate = explode( '-', $dates[0] );
+                $start = Carbon::create( $startDate[0], $startDate[1], $startDate[2], 0, 0, 0, 'Asia/Kuala_Lumpur' );
+                
+                $endDate = explode( '-', $dates[1] );
+                $end = Carbon::create( $endDate[0], $endDate[1], $endDate[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
+
+                $model->whereBetween( 'administrators.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
+            } else {
+
+                $dates = explode( '-', $request->registered_date );
+
+                $start = Carbon::create( $dates[0], $dates[1], $dates[2], 0, 0, 0, 'Asia/Kuala_Lumpur' );
+                $end = Carbon::create( $dates[0], $dates[1], $dates[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
+
+                $model->whereBetween( 'administrators.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
+            }
+            $filter = true;
+        }
+
+        if ( !empty( $request->username ) ) {
+            $model->where( 'name', $request->username );
+            $filter = true;
+        }
+
+        if ( !empty( $request->email ) ) {
+            $model->where( 'email', $request->email );
+            $filter = true;
+        }
+
+        if ( !empty( $request->status ) ) {
+            $model->where( 'status', $request->status );
+            $filter = true;
+        }
+
+        return [
+            'filter' => $filter,
+            'model' => $model,
+        ];
+    }
+
+    public static function oneUser( $request ) {
+
+        $request->merge( [
+            'id' => Helper::decode( $request->id ),
+        ] );
+        
+        $user = User::find( $request->id );
+
+        return response()->json( $user );
+    }
+
+    public static function createUserAdmin( $request ) {
+
+        $validator = Validator::make( $request->all(), [
+            'username' => [ 'required', 'unique:users,username', 'alpha_dash', new CheckASCIICharacter ],
+            'email' => [ 'required', 'unique:users,email', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
+            'password' => [ 'required', Password::min( 8 ) ],
+        ] );
+
+        $attributeName = [
+            'username' => __( 'user.username' ),
+            'email' => __( 'user.email' ),
+            'password' => __( 'user.password' ),
+        ];
+
+        foreach( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();
+
+        DB::beginTransaction();
+
+        try {
+
+            $createUser = User::create( [
+                'country_id' => 136,
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make( $request->password ),
+                'invitation_code' => strtoupper( \Str::random( 6 ) ),
+                'referral_structure' => '-',
+                'status' => 10,
+            ] );
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollBack();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+            ] );
+        }
+
+        return response()->json( [
+            'message' => __( 'template.new_x_created', [ 'title' => Str::singular( __( 'template.users' ) ) ] ),
+        ] );
+    }
+
+    public static function updateUserAdmin( $request ) {
+
+        $request->merge( [
+            'id' => Helper::decode( $request->id ),
+        ] );
+
+        $validator = Validator::make( $request->all(), [
+            'username' => [ 'required', 'unique:users,username,' . $request->id, 'alpha_dash', new CheckASCIICharacter ],
+            'email' => [ 'required', 'unique:users,email,' . $request->id, 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
+            'password' => [ 'nullable', Password::min( 8 ) ],
+        ] );
+
+        $attributeName = [
+            'username' => __( 'user.username' ),
+            'email' => __( 'user.email' ),
+            'password' => __( 'user.password' ),
+        ];
+
+        foreach( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();
+
+        DB::beginTransaction();
+
+        try {
+
+            $updateUser = User::find( $request->id );
+            $updateUser->username = $request->username;
+            $updateUser->email = $request->email;
+            if ( !empty( $request->password ) ) {
+                $updateUser->password = Hash::make( $request->password );
+            }
+            $updateUser->save();
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollBack();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+            ] );
+        }
+
+        return response()->json( [
+            'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.users' ) ) ] ),
+        ] );
+    }
 
     public static function requestOtp( $request ) {
 
@@ -337,9 +551,9 @@ class UserService {
             \DB::commit();
 
             return response()->json( [
-                'data' => [],
                 'message' => __( 'api.register_success' ),
                 'message_key' => 'register_success',
+                'data' => [],
             ] );
 
         } catch ( \Throwable $th ) {
@@ -380,11 +594,11 @@ class UserService {
         }
 
         return response()->json( [
-            'data' => [
-                'token' => $user->createToken( 'birdnest_api' )->plainTextToken
-            ],
             'message' => __( 'api.login_success' ),
             'message_key' => 'login_success',
+            'data' => [
+                'token' => $user->createToken( 'x_api' )->plainTextToken
+            ],
         ] );
     }
 
@@ -448,7 +662,7 @@ class UserService {
             self::registerOneSignal( $user->id, $request->device_type, $request->register_token );
         }
 
-        return response()->json( [ 'data' => $user, 'token' => $user->createToken( 'birdnest_api' )->plainTextToken ] );
+        return response()->json( [ 'data' => $user, 'token' => $user->createToken( 'x_api' )->plainTextToken ] );
     }
 
     public static function getUser( $request ) {

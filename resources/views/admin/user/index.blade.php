@@ -1,12 +1,4 @@
 <?php
-$administrator_create = 'administrator_create';
-$administrator_edit = 'administrator_edit';
-
-$multiSelect = 0;
-?>
-
-<?php
-array_unshift( $data['roles'],[ 'title' => __( 'datatables.all_x', [ 'title' => __( 'administrator.role' ) ] ), 'value' => '' ] );
 $columns = [
     [
         'type' => 'default',
@@ -21,21 +13,25 @@ $columns = [
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'administrator.username' ) ] ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'user.username' ) ] ),
         'id' => 'username',
-        'title' => __( 'administrator.username' ),
+        'title' => __( 'user.username' ),
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'administrator.email' ) ] ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'user.email' ) ] ),
         'id' => 'email',
-        'title' => __( 'administrator.email' ),
+        'title' => __( 'user.email' ),
     ],
     [
         'type' => 'select',
-        'options' => $data['roles'],
-        'id' => 'role',
-        'title' => __( 'administrator.role' ),
+        'options' => [
+            [ 'value' => '', 'title' => __( 'datatables.all_x', [ 'title' => __( 'datatables.status' ) ] ) ],
+            [ 'value' => 10, 'title' => __( 'datatables.activated' ) ],
+            [ 'value' => 20, 'title' => __( 'datatables.suspended' ) ],
+        ],
+        'id' => 'status',
+        'title' => __( 'datatables.status' ),
     ],
     [
         'type' => 'default',
@@ -48,49 +44,13 @@ $columns = [
 <div class="card">
     <div class="card-body">
         <div class="mb-3 text-end">
-            @can( 'add administrators' )
-            <a class="btn btn-sm btn-success" href="{{ route( 'admin.administrator.add' ) }}">{{ __( 'template.create' ) }}</a>
+            @can( 'add users' )
+            <a class="btn btn-sm btn-success" href="{{ route( 'admin.user.add' ) }}">{{ __( 'template.create' ) }}</a>
             @endcan
         </div>
-        <x-data-tables id="administrator_table" enableFilter="true" enableFooter="false" columns="{{ json_encode( $columns ) }}" />
+        <x-data-tables id="user_table" enableFilter="true" enableFooter="false" columns="{{ json_encode( $columns ) }}" />
     </div>
 </div>
-
-<?php
-array_shift( $data['roles'] );
-$contents = [
-    [
-        'id' => '_username',
-        'title' => __( 'administrator.username' ),
-        'placeholder' => __( 'administrator.username' ),
-        'type' => 'text',
-        'mandatory' => true,
-    ],
-    [
-        'id' => '_email',
-        'title' => __( 'administrator.email' ),
-        'placeholder' => __( 'administrator.email' ),
-        'type' => 'text',
-        'mandatory' => true,
-    ],
-    [
-        'id' => '_role',
-        'title' => __( 'administrator.role' ),
-        'placeholder' => __( 'administrator.role' ),
-        'type' => 'select',
-        'options' => $data['roles'],
-        'mandatory' => true,
-    ],
-    [
-        'id' => '_password',
-        'title' => __( 'administrator.password' ),
-        'placeholder' => __( 'administrator.password' ),
-        'type' => 'password',
-        'autocomplete' => 'new-password',
-        'mandatory' => true,
-    ],
-];
-?>
 
 <script>
 
@@ -102,9 +62,12 @@ $contents = [
     @endif
     @endforeach
     
-    var roles = @json( $data['roles'] ),
+    var statusMapper = {
+        '10': '{{ __( 'datatables.activated' ) }}',
+        '20': '{{ __( 'datatables.suspended' ) }}'
+        },
         dt_table,
-        dt_table_name = '#administrator_table',
+        dt_table_name = '#user_table',
         dt_table_config = {
             language: {
                 'lengthMenu': '{{ __( "datatables.lengthMenu" ) }}',
@@ -118,11 +81,11 @@ $contents = [
                 }
             },
             ajax: {
-                url: '{{ route( 'admin.administrator.allAdministrators' ) }}',
+                url: '{{ route( 'admin.user.allUsers' ) }}',
                 data: {
                     '_token': '{{ csrf_token() }}',
                 },
-                dataSrc: 'administrators',
+                dataSrc: 'users',
             },
             lengthMenu: [[10, 1],[10, 1]],
             order: [[ 1, 'desc' ]],
@@ -131,7 +94,7 @@ $contents = [
                 { data: 'created_at' },
                 { data: 'username' },
                 { data: 'email' },
-                { data: 'role.name' },
+                { data: 'status' },
                 { data: 'encrypted_id' },
             ],
             columnDefs: [
@@ -143,9 +106,9 @@ $contents = [
                     },
                 },
                 {
-                    targets: parseInt( '{{ Helper::columnIndex( $columns, "role" ) }}' ),
-                    render: function( data, type, row, meta ) {             
-                        return data;
+                    targets: parseInt( '{{ Helper::columnIndex( $columns, "status" ) }}' ),
+                    render: function( data, type, row, meta ) {
+                        return statusMapper[data];
                     },
                 },
                 {
@@ -154,7 +117,7 @@ $contents = [
                     width: '10%',
                     className: 'text-center',
                     render: function( data, type, row, meta ) {
-                        @can( 'edit administrators' )
+                        @can( 'edit users' )
                         return '<strong class="dt-edit table-action link-primary" data-id="' + data + '">{{ __( 'datatables.edit' ) }}</strong>';
                         @else
                         return '-';
@@ -169,7 +132,7 @@ $contents = [
         document.addEventListener( 'DOMContentLoaded', function() {
        
        $( document ).on( 'click', '.dt-edit', function() {
-           window.location.href = '{{ route( 'admin.administrator.edit' ) }}?id=' + $( this ).data( 'id' );
+           window.location.href = '{{ route( 'admin.user.edit' ) }}?id=' + $( this ).data( 'id' );
        } );
 
        $( '#registered_date' ).flatpickr( {
