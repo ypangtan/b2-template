@@ -21,6 +21,7 @@ return [
     'transaction_type' => 'Transaction Type',
     'remark' => 'Remark',
     'amount' => 'Amount',
+    'adjust_balance' => 'Adjust Balance',
 
     'topup' => 'Topup',
     'refund' => 'Refund',

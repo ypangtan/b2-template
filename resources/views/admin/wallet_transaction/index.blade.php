@@ -90,7 +90,7 @@ $columns = [
             columns: [
                 { data: null },
                 { data: 'created_at' },
-                { data: 'user.name' },
+                { data: 'user.username' },
                 { data: 'type' },
                 { data: 'transaction_type' },
                 { data: 'converted_remark' },

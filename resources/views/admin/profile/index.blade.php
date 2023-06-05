@@ -70,33 +70,18 @@ $profile = 'profile';
                 },
                 success: function( response ) {
 
-                    $( 'main.page-content' ).prepend( `
-                    <div class="alert border-0 border-success border-start border-4 bg-light-success fade show py-2">
-                        <div class="d-flex align-items-center">
-                            <div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i>
-                            </div>
-                            <div class="ms-3">
-                                <div class="text-success">{{ __( 'user.user_updated' ) }}</div>
-                            </div>
-                        </div>
-                    </div>` );
-                    $( window ).scrollTop( 0 );
-
-                    setTimeout(function(){
-                        $( '.alert' ).fadeTo( 250, 0.01, function() { 
-                            $( this ).slideUp( 50, function() {
-                                $( this ).remove();
-                                location.reload();
-                            } ); 
-                        } );
-                    }, 2000 );
+                    $( '#modal_success .caption-text' ).html( response.message );
+                    modalSuccess.toggle();
                 },
                 error: function( error ) {
                     if ( error.status === 422 ) {
-                        var errors = error.responseJSON.errors;
+                        let errors = error.responseJSON.errors;
                         $.each( errors, function( key, value ) {
                             $( p + '_' + key ).addClass( 'is-invalid' ).next().text( value );
                         } );
+                    } else {
+                        $( '#modal_danger .caption-text' ).html( error.responseJSON.message );
+                        modalDanger.toggle();       
                     }
                 }
             } )

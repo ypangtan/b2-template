@@ -29,7 +29,7 @@ class Administrator extends Authenticatable
     ];
 
     public function role() {
-        return $this->BelongsTo( Role::class, 'id' );
+        return $this->BelongsTo( Role::class, 'role' );
     }
 
     public function getEncryptedIdAttribute() {

@@ -21,6 +21,7 @@ return [
     'transaction_type' => '交易类型',
     'remark' => '备注',
     'amount' => '金额',
+    'adjust_balance' => '调整余额',
 
     'topup' => '充值',
     'refund' => '退款',

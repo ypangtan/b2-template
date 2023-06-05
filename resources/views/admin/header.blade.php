@@ -41,6 +41,18 @@
             url('{{ asset( 'admin/font/montserrat-v25-latin-regular.ttf' ) }}') format('truetype'), /* Safari, Android, iOS */
             url('{{ asset( 'admin/font/montserrat-v25-latin-regular.svg#Montserrat' ) }}') format('svg'); /* Legacy iOS */
         }
+        @font-face {
+        font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+        font-family: 'Montserrat';
+        font-style: normal;
+        font-weight: 600;
+        src: url('{{ asset( 'admin/font/montserrat-v25-latin-600.eot' ) }}'); /* IE9 Compat Modes */
+        src: url('{{ asset( 'admin/font/montserrat-v25-latin-600.eot?#iefix' ) }}') format('embedded-opentype'), /* IE6-IE8 */
+            url('{{ asset( 'admin/font/montserrat-v25-latin-600.woff2' ) }}') format('woff2'), /* Super Modern Browsers */
+            url('{{ asset( 'admin/font/montserrat-v25-latin-600.woff' ) }}') format('woff'), /* Modern Browsers */
+            url('{{ asset( 'admin/font/montserrat-v25-latin-600.ttf' ) }}') format('truetype'), /* Safari, Android, iOS */
+            url('{{ asset( 'admin/font/montserrat-v25-latin-600.svg#Montserrat' ) }}') format('svg'); /* Legacy iOS */
+        }
         </style>
 
         @if ( @$header )

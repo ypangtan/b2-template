@@ -45,8 +45,8 @@ class AdministratorController extends Controller {
         $this->data['breadcrumbs'] = [
             'enabled' => true,
             'main_title' => __( 'template.administrators' ),
-            'title' => __( 'template.add_x', [ 'title' => __( 'template.administrators' ) ] ),
-            'mobile_title' => __( 'template.add_x', [ 'title' => __( 'template.administrators' ) ] ),
+            'title' => __( 'template.add_x', [ 'title' => \Str::singular( __( 'template.administrators' ) ) ] ),
+            'mobile_title' => __( 'template.add_x', [ 'title' => \Str::singular( __( 'template.administrators' ) ) ] ),
         ];
         $roles = [];
         foreach( RoleModel::orderBy( 'id', 'ASC' )->get() as $role ) {
@@ -65,8 +65,8 @@ class AdministratorController extends Controller {
         $this->data['breadcrumbs'] = [
             'enabled' => true,
             'main_title' => __( 'template.administrators' ),
-            'title' => __( 'template.edit_x', [ 'title' => __( 'template.administrators' ) ] ),
-            'mobile_title' => __( 'template.edit_x', [ 'title' => __( 'template.administrators' ) ] ),
+            'title' => __( 'template.edit_x', [ 'title' => \Str::singular( __( 'template.administrators' ) ) ] ),
+            'mobile_title' => __( 'template.edit_x', [ 'title' => \Str::singular( __( 'template.administrators' ) ) ] ),
         ];
         $roles = [];
         foreach( RoleModel::orderBy( 'id', 'ASC' )->get() as $role ) {

@@ -61,7 +61,7 @@ class WalletService
         $filter = false;
 
         if ( !empty( $request->username ) ) {
-            $model->where( 'users.name', $request->username );
+            $model->where( 'users.username', $request->username );
             $filter = true;
         }
 
@@ -217,7 +217,7 @@ class WalletService
         }
 
         if ( !empty( $request->username ) ) {
-            $model->where( 'users.name', $request->username );
+            $model->where( 'users.username', $request->username );
             $filter = true;
         }
 

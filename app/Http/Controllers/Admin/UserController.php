@@ -32,8 +32,8 @@ class UserController extends Controller
         $this->data['breadcrumbs'] = [
             'enabled' => true,
             'main_title' => __( 'template.users' ),
-            'title' => __( 'template.add_x', [ 'title' => __( 'template.users' ) ] ),
-            'mobile_title' => __( 'template.add_x', [ 'title' => __( 'template.users' ) ] ),
+            'title' => __( 'template.add_x', [ 'title' => \Str::singular( __( 'template.users' ) ) ] ),
+            'mobile_title' => __( 'template.add_x', [ 'title' => \Str::singular( __( 'template.users' ) ) ] ),
         ];
 
         return view( 'admin.main' )->with( $this->data );
@@ -46,8 +46,8 @@ class UserController extends Controller
         $this->data['breadcrumbs'] = [
             'enabled' => true,
             'main_title' => __( 'template.users' ),
-            'title' => __( 'template.edit_x', [ 'title' => __( 'template.users' ) ] ),
-            'mobile_title' => __( 'template.edit_x', [ 'title' => __( 'template.users' ) ] ),
+            'title' => __( 'template.edit_x', [ 'title' => \Str::singular( __( 'template.users' ) ) ] ),
+            'mobile_title' => __( 'template.edit_x', [ 'title' => \Str::singular( __( 'template.users' ) ) ] ),
         ];
 
         return view( 'admin.main' )->with( $this->data );

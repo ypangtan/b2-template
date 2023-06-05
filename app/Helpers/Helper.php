@@ -13,7 +13,7 @@ use Carbon\Carbon;
 class Helper {
 
     public static function websiteName() {
-        return 'MeCar';
+        return 'Template';
     }
 
     public static function baseUrl() {

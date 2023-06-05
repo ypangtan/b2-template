@@ -32,8 +32,8 @@ class RoleController extends Controller
         $this->data['breadcrumbs'] = [
             'enabled' => true,
             'main_title' => __( 'template.roles' ),
-            'title' => __( 'template.add_x', [ 'title' => __( 'template.roles' ) ] ),
-            'mobile_title' => __( 'template.add_x', [ 'title' => __( 'template.roles' ) ] ),
+            'title' => __( 'template.add_x', [ 'title' => \Str::singular( __( 'template.roles' ) ) ] ),
+            'mobile_title' => __( 'template.add_x', [ 'title' => \Str::singular( __( 'template.roles' ) ) ] ),
         ];
 
         return view( 'admin.main' )->with( $this->data );
@@ -46,8 +46,8 @@ class RoleController extends Controller
         $this->data['breadcrumbs'] = [
             'enabled' => true,
             'main_title' => __( 'template.roles' ),
-            'title' => __( 'template.edit_x', [ 'title' => __( 'template.roles' ) ] ),
-            'mobile_title' => __( 'template.edit_x', [ 'title' => __( 'template.roles' ) ] ),
+            'title' => __( 'template.edit_x', [ 'title' => \Str::singular( __( 'template.roles' ) ) ] ),
+            'mobile_title' => __( 'template.edit_x', [ 'title' => \Str::singular( __( 'template.roles' ) ) ] ),
         ];
 
         return view( 'admin.main' )->with( $this->data );
