@@ -48,13 +48,14 @@ $columns = [
 
 <div class="card">
     <div class="card-body">
-        <x-data-tables id="transaction_table" enableFilter="true" enableFooter="false" columns="{{ json_encode( $columns ) }}" />
+        <x-data-tables id="transaction_table" enableFilter="true" enableFooter="true" columns="{{ json_encode( $columns ) }}" />
     </div>
 </div>
 
 <script>
 
     window['columns'] = @json( $columns );
+    window['ids'] = [];
         
     @foreach ( $columns as $column )
     @if ( $column['type'] != 'default' )
@@ -159,4 +160,4 @@ $columns = [
 
 </script>
 
-<script src="{{ asset( 'admin/js/dataTable.init.js' ) }}"></script>
+<script src="{{ asset( 'admin/js/dataTable.init.js' ) . Helper::assetVersion() }}"></script>

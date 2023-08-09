@@ -103,6 +103,7 @@ class WalletService
         $validator = Validator::make( $request->all(), [
             'amount' => [ 'required', 'numeric' ],
             'remark' => [ 'required', 'string' ],
+            'action' => [ 'required', 'in:topup,deduct' ],
         ] );
 
         $attributeName = [
@@ -122,13 +123,63 @@ class WalletService
 
             $userWallet = UserWallet::lockForUpdate()->find( $request->id );
             self::transact( $userWallet, [
-                'amount' => $request->amount,
+                'amount' => $request->action == 'topup' ? $request->amount : ( $request->amount * -1 ),
                 'remark' => $request->remark,
                 'type' => $userWallet->type,
                 'transaction_type' => 3,
             ] );
 
             DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollback();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine(),
+            ], 500 );
+        }
+
+        return response()->json( [
+            'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.wallets' ) ) ] ),
+        ] );
+    }
+
+    public static function updateWalletMultiple( $request ) {
+
+        $validator = Validator::make( $request->all(), [
+            'amount' => [ 'required', 'numeric' ],
+            'remark' => [ 'required', 'string' ],
+            'action' => [ 'required', 'in:topup,deduct' ],
+        ] );
+
+        $attributeName = [
+            'amount' => __( 'wallet.amount' ),
+            'remark' => __( 'wallet.remark' ),
+        ];
+
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();
+
+        DB::beginTransaction();
+
+        try {
+
+            foreach ( $request->ids as $id ) {
+
+                $userWallet = UserWallet::lockForUpdate()->find( $id );
+                self::transact( $userWallet, [
+                    'amount' => $request->action == 'topup' ? $request->amount : ( $request->amount * -1 ),
+                    'remark' => $request->remark,
+                    'type' => $userWallet->type,
+                    'transaction_type' => 3,
+                ] );
+
+                DB::commit();
+            }
 
         } catch ( \Throwable $th ) {
 
@@ -169,20 +220,35 @@ class WalletService
 
         $transactions = $transaction->skip( $offset )->take( $limit )->get();
 
+        $subTotal = 0;
+
         if ( $transactions ) {
             $transactions->append( [
                 'converted_remark',
                 'listing_amount',
             ] );
+
+            foreach ( $transactions as $transaction ) {
+                $subTotal += $transaction->amount;
+            }
         }
 
         $totalRecord = UserWalletTransaction::count();
+        $userWalletTransactionObject = UserWalletTransaction::select( DB::raw( 'COUNT(*) as total, SUM(amount) AS grand_total' ) )->first();
+        $grandTotal = $userWalletTransactionObject->grand_total;
+        $totalRecord = $userWalletTransactionObject->total;
 
         $data = [
             'transactions' => $transactions,
             'draw' => $request->draw,
             'recordsFiltered' => $filter ? $transactionCount : $totalRecord,
             'recordsTotal' => $totalRecord,
+            'subTotal' => [
+                Helper::numberFormat( $subTotal, 2 )
+            ],
+            'grandTotal' => [ 
+                Helper::numberFormat( $grandTotal, 2 )
+            ],
         ];
 
         return response()->json( $data );

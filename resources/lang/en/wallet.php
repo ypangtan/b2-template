@@ -13,16 +13,19 @@ return [
     |
     */
 
-    'username' => 'Username',
+    'user' => 'User',
     'wallet' => 'Wallet',
     'wallet_1' => 'Wallet 1',
     'wallet_2' => 'Wallet 2',
     'balance' => 'Balance',
+    'balance_after_submit' => 'Balance After Submit',
     'transaction_type' => 'Transaction Type',
     'remark' => 'Remark',
     'amount' => 'Amount',
     'adjust_balance' => 'Adjust Balance',
 
+    'adjust_balance_x' => 'Adjust Balance <strong>(:title)</strong>',
+    'deduct' => 'Deduct',
     'topup' => 'Topup',
     'refund' => 'Refund',
     'manual_adjustment' => 'Manual Adjustment',

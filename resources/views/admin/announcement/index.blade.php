@@ -60,6 +60,7 @@ $columns = [
 
 <script>
     window['columns'] = @json( $columns );
+    window['ids'] = [];
     
     @foreach ( $columns as $column )
     @if ( $column['type'] != 'default' )
@@ -88,7 +89,10 @@ $columns = [
                 },
                 dataSrc: 'notifications',
             },
-            lengthMenu: [[10, 2],[10, 2]],
+            lengthMenu: [
+                [ 10, 25, 50, 999999 ],
+                [ 10, 25, 50, '{{ __( 'datatables.all' ) }}' ]
+            ],
             order: [[ 1, 'desc' ]],
             columns: [
                 { data: null },
@@ -198,4 +202,4 @@ $columns = [
     } );
 </script>
 
-<script src="{{ asset( 'admin/js/dataTable.init.js' ) }}"></script>
+<script src="{{ asset( 'admin/js/dataTable.init.js' ) . Helper::assetVersion() }}"></script>

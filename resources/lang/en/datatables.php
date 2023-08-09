@@ -22,6 +22,7 @@ return [
     'previous' => 'Previous',
     'next' => 'Next',
     'last' => 'Last',
+    'rows' => '%d rows selected',
 
     'search_x' => 'Search :title',
     'select_x' => 'Select :title',

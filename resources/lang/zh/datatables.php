@@ -22,6 +22,7 @@ return [
     'previous' => '上一页',
     'next' => '下一页',
     'last' => '最后一页',
+    'rows' => '已选择 %d 行',
 
     'search_x' => '查找:title',
     'select_x' => '选择:title',

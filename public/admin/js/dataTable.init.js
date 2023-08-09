@@ -22,6 +22,7 @@ document.addEventListener( 'DOMContentLoaded', function() {
         searchCols: dt_table_config.searchCols ? dt_table_config.searchCols : [],
         columns: dt_table_config.columns,
         columnDefs: dt_table_config.columnDefs,
+        select: dt_table_config.select,
         initComplete: function() {
             $( dt_table_name + '_filter' ).remove();
         },
@@ -37,6 +38,9 @@ document.addEventListener( 'DOMContentLoaded', function() {
                     } );
                 }
             }
+
+            window['ids'].length = 0;
+            $( '.multiselect-action' ).addClass( 'hidden' );
         }
     } );
 
@@ -69,5 +73,64 @@ document.addEventListener( 'DOMContentLoaded', function() {
         window[that.data( 'id' )] = that.val();
         dt_table.draw();
     } );
+    
+    let dtSelected = false;
+    $( '.select-all' ).on( 'click', function() {
 
+        multiselect = $( '.dt-multiselect' );
+
+        if ( multiselect.length == 0 ) {
+            return 0;
+        }
+
+        if ( $( this ).prop( 'checked' ) ) {
+            dtSelected = true;
+            $( '.dt-multiselect' ).prop( 'checked', true );
+            $( '.multiselect-action' ).removeClass( 'hidden' );
+            dt_table.rows().select();
+        } else {
+            dtSelected = false;
+            $( '.multiselect-action' ).addClass( 'hidden' );
+            $( '.dt-multiselect' ).prop( 'checked', false );
+            dt_table.rows().deselect();
+        }
+
+        window['ids'].length = 0;
+        $( '.dt-multiselect' ).each( function( i ) {
+            if ( $( this ).prop( 'checked' ) ) {
+                dtSelected = true;
+                window['ids'].push( $( this ).data( 'id' ) );
+            }
+        } );
+    } );
+
+    dt_table.on( 'select', function( e, dt, type, indexes ) {
+
+        dtSelected = true;
+        let selectedCheckbox = $( $( dt_table_name + ' tbody tr' )[indexes] ).find( 'input' );
+        if ( selectedCheckbox.length == 0 ) {
+            return 0;
+        }
+        selectedCheckbox.prop( 'checked', true );
+        $( '.multiselect-action' ).removeClass( 'hidden' );
+        window['ids'].push( selectedCheckbox.data( 'id' ) );
+    } )
+    .on( 'deselect', function ( e, dt, type, indexes ) {
+        dtSelected = false;
+        let selectedCheckbox = $( $( dt_table_name + ' tbody tr' )[indexes] ).find( 'input' );
+        if ( selectedCheckbox.length == 0 ) {
+            return 0;
+        }
+        selectedCheckbox.prop( 'checked', false );
+        window['ids'].length = 0;
+        $( '.dt-multiselect' ).each( function( i ) {
+            if ( $( this ).prop( 'checked' ) ) {
+                dtSelected = true;
+                window['ids'].push( $( this ).data( 'id' ) );
+            }
+        } );
+        if ( !dtSelected ) {
+            $( '.multiselect-action' ).addClass( 'hidden' );
+        }
+    } );
 } );

@@ -41,4 +41,8 @@ class WalletController extends Controller
     public function updateWallet( Request $request ) {
         return WalletService::updateWallet( $request );
     }
+
+    public function updateWalletMultiple( Request $request ) {
+        return WalletService::updateWalletMultiple( $request );
+    }
 }
