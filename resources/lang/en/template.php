@@ -82,4 +82,7 @@ return [
     'update_x' => 'Update :title',
     'new_x_created' => 'New :title Created.',
     'x_updated' => ':title Updated.',
+
+    'drop_file_or_click_to_upload' => 'Drop file here or click to upload.',
+    'drop_files_or_click_to_upload' => 'Drop files here or click to upload.',
 ];

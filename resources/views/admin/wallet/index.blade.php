@@ -385,7 +385,9 @@ if ( $multiSelect ) {
 
         $( wt + '_multi_submit' ).click( function() {
 
-            multiSubmit( wt );
+            $( this ).addClass( 'disabled' );
+
+            multiSubmit( wt, $( this ) );
         } );
 
         $( document ).on( 'click', '.dt-topup', function() {
@@ -404,12 +406,16 @@ if ( $multiSelect ) {
 
         $( wt + '_submit' ).click( function() {
 
-            submit( wt );    
+            $( this ).addClass( 'disabled' );
+
+            submit( wt, $( this ) );
         } );
 
         $( wd + '_submit' ).click( function() {
 
-            submit( wd );
+            $( this ).addClass( 'disabled' );
+
+            submit( wd, $( this ) );
         } );
 
         $( wt + '_amount' ).on( 'change keyup', function() {
@@ -454,7 +460,7 @@ if ( $multiSelect ) {
             } );
         }
 
-        function submit( scope ) {
+        function submit( scope, button ) {
 
             $.ajax( {
                 url: '{{ route( 'admin.wallet.updateWallet' ) }}',
@@ -467,17 +473,19 @@ if ( $multiSelect ) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function( response ) {
+
+                    button.removeClass( 'disabled' );
                     
                     scope == '#wallet_topup' ? wtm.hide() : wdm.hide();
-                    
-                    $( 'body' ).loading( 'stop' );
+
                     $( '#modal_success .caption-text' ).html( response.message );
                     modalSuccess.toggle();
 
                     dt_table.draw( false );
                 },
                 error: function( error ) {
-                    $( 'body' ).loading( 'stop' );
+
+                    button.removeClass( 'disabled' );
 
                     if ( error.status === 422 ) {
                         let errors = error.responseJSON.errors;
@@ -493,7 +501,7 @@ if ( $multiSelect ) {
             } );
         }
 
-        function multiSubmit( scope ) {
+        function multiSubmit( scope, button ) {
 
             $.ajax( {
                 url: '{{ route( 'admin.wallet.updateWalletMultiple' ) }}',
@@ -506,17 +514,19 @@ if ( $multiSelect ) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function( response ) {
+
+                    button.removeClass( 'disabled' );
                     
                     scope == '#wallet_topup' ? wmtm.hide() : wdm.hide();
-                    
-                    $( 'body' ).loading( 'stop' );
+
                     $( '#modal_success .caption-text' ).html( response.message );
                     modalSuccess.toggle();
 
                     dt_table.draw( false );
                 },
                 error: function( error ) {
-                    $( 'body' ).loading( 'stop' );
+                    
+                    button.removeClass( 'disabled' );
 
                     if ( error.status === 422 ) {
                         let errors = error.responseJSON.errors;

@@ -2,6 +2,8 @@
 
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
+use App\Http\Controllers\FileManagerController;
+
 use App\Http\Controllers\Admin\{
     AdministratorController,
     AnnouncementController,
@@ -13,8 +15,8 @@ use App\Http\Controllers\Admin\{
     ProductController,
     ProfileController,
     RoleController,
-    UserController,
     SettingController,
+    UserController,
     WalletController,
     WalletTransactionController,
 };
@@ -36,6 +38,9 @@ Route::prefix( 'backoffice' )->group( function() {
         } );
         
         Route::group( [ 'middleware' => [ 'checkAdminIsMFA', 'checkMFA' ] ], function() {
+
+            Route::post( 'file/upload', [ FileManagerController::class, 'upload' ] )->withoutMiddleware( [\App\Http\Middleware\VerifyCsrfToken::class] )->name( 'admin.file.upload' );
+            Route::post( 'file/cke-upload', [ FileManagerController::class, 'ckeUpload' ] )->withoutMiddleware( [\App\Http\Middleware\VerifyCsrfToken::class] )->name( 'admin.file.ckeUpload' );
             
             Route::prefix( 'dashboard' )->group( function() {
                 Route::get( '/', [ DashboardController::class, 'index' ] )->name( 'admin.dashboard.index' );
@@ -150,9 +155,12 @@ Route::prefix( 'backoffice' )->group( function() {
                 } );
 
                 Route::post( 'all-announcements', [ AnnouncementController::class, 'allAnnouncements' ] )->name( 'admin.announcement.allAnnouncements' );
+                Route::post( 'one-announcement', [ AnnouncementController::class, 'oneAnnouncement' ] )->name( 'admin.announcement.oneAnnouncement' );
                 Route::post( 'create-announcement', [ AnnouncementController::class, 'createAnnouncement' ] )->name( 'admin.announcement.createAnnouncement' );
                 Route::post( 'update-announcement', [ AnnouncementController::class, 'updateAnnouncement' ] )->name( 'admin.announcement.updateAnnouncement' );
                 Route::post( 'update-announcement-status', [ AnnouncementController::class, 'updateAnnouncementStatus' ] )->name( 'admin.announcement.updateAnnouncementStatus' );
+
+                Route::post( 'cke-upload', [ AnnouncementController::class, 'ckeUpload' ] )->name( 'admin.announcement.ckeUpload' );
             } );
 
             if ( 1 == 2 ):

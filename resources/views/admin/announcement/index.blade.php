@@ -31,8 +31,8 @@ $columns = [
         'type' => 'select',
         'options' => [
             [ 'title' => __( 'datatables.all_x', [ 'title' => __( 'datatables.status' ) ] ), 'value' => '' ],
-            [ 'title' => __( 'datatables.published' ), 'value' => 'published' ],
-            [ 'title' => __( 'datatables.unpublished' ), 'value' => 'unpublished' ],
+            [ 'title' => __( 'datatables.published' ), 'value' => 10 ],
+            [ 'title' => __( 'datatables.unpublished' ), 'value' => 20 ],
         ],
         'id' => 'status',
         'title' => __( 'datatables.status' ),
@@ -136,16 +136,33 @@ $columns = [
                     className: 'text-center',
                     render: function( data, type, row, meta ) {
 
+                        @canany( [ 'edit announcements', 'view announcements'. 'approve announcements' ] )
+
+                        let view = '',
+                            edit = '',
+                            status = '';
+
                         @can( 'edit announcements' )
-
-                        @else
-
+                        view += '<li class="dropdown-item click-action dt-edit" data-id="' + data + '">{{ __( 'datatables.edit' ) }}</li>';
+                        status = row['status'] == 10 ? 
+                        '<li class="dropdown-item click-action dt-status" data-id="' + data + '" data-status="20">{{ __( 'datatables.unpublish' ) }}</li>':
+                        '<li class="dropdown-item click-action dt-status" data-id="' + data + '" data-status="10">{{ __( 'datatables.publish' ) }}</li>' ;
                         @endcan
 
-                        let editable = '<strong class="dt-edit table-action link-primary" data-id="' + data + '">{{ __( 'datatables.edit' ) }}</strong> ',
-                            statusable = row.status == 10 ? '<strong class="dt-status table-action link-danger" data-id="' + data + '" data-status="20">{{ __( 'datatables.unpublish' ) }}</strong> ' : '<strong class="dt-status table-action link-success" data-id="' + data + '" data-status="10">{{ __( 'datatables.publish' ) }}</strong> ';
-
-                        return editable + statusable;
+                        let html = 
+                        `
+                        <div class="dropdown">
+                            <i class="text-primary click-action" icon-name="more-horizontal" data-bs-toggle="dropdown"></i>
+                            <ul class="dropdown-menu">
+                            ` + view + `
+                            ` + status + `
+                            </ul>
+                        </div>
+                        `;
+                        return html;
+                        @else
+                        return '<i class="text-secondary" icon-name="more-horizontal" data-bs-toggle="dropdown"></i>';
+                        @endcanany
                     },
                 },
             ],

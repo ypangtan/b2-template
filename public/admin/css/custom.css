@@ -185,6 +185,13 @@
     padding: 5px 10px 5px;
 }
 
+.dropzone {
+    border: 1px dashed #ced4da;
+    border-radius: 4px;
+    background: #fff;
+    padding: 20px 20px;
+}
+
 table.dataTable>tbody>tr.selected>* {
     box-shadow: unset;
     color: black;

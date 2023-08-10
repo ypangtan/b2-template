@@ -31,6 +31,7 @@ return [
     'created_date' => 'Created Date',
     'registered_date' => 'Registered Date',
     'thumbnail' => 'Thumbnail',
+    'photo' => 'Photo',
     'title' => 'Title',
     'type' => 'Type',
     'description' => 'Description',

@@ -30,11 +30,6 @@ class UserNotification extends Model
         'type',
     ];
 
-    protected $appends = [
-        'path',
-        'encrypted_id',
-    ];
-
     public function user() {
         return $this->belongsTo( User::class, 'user_id' )->withTrashed();
     }
@@ -43,19 +38,30 @@ class UserNotification extends Model
         return $this->attributes['image'] ? asset( 'storage/' . $this->attributes['image'] ) : null;
     }
 
+    public function getDisplayStatusAttribute() {
+
+        $status = [
+            '1' => __( 'datatables.pending' ),
+            '10' => __( 'datatables.published' ),
+            '20' => __( 'promotion.unpublished' ),
+        ];
+
+        return $status[ $this->attributes['status'] ];
+    }
+
     public function getEncryptedIdAttribute() {
         return Helper::encode( $this->attributes['id'] );
     }
 
-    public function getSystemTitleAttribute() {
-        $metaData = json_decode( $this->attributes['meta_data'], true );
-        return __( $this->attributes['system_title'], $metaData ? $metaData : [] );
-    }
+    // public function getSystemTitleAttribute() {
+    //     $metaData = json_decode( $this->attributes['meta_data'], true );
+    //     return __( $this->attributes['system_title'], $metaData ? $metaData : [] );
+    // }
 
-    public function getSystemContentAttribute() {
-        $metaData = json_decode( $this->attributes['meta_data'], true );
-        return __( $this->attributes['system_content'], $metaData ? $metaData : [] );
-    }
+    // public function getSystemContentAttribute() {
+    //     $metaData = json_decode( $this->attributes['meta_data'], true );
+    //     return __( $this->attributes['system_content'], $metaData ? $metaData : [] );
+    // }
 
     public $translatable = [ 'title', 'content' ];
 

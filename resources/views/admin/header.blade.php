@@ -10,6 +10,7 @@
         <link href="{{ asset( 'admin/plugins/simplebar/css/simplebar.css' ) .Helper::assetVersion() }}" rel="stylesheet" />
         <link href="{{ asset( 'admin/plugins/perfect-scrollbar/css/perfect-scrollbar.css' ) .Helper::assetVersion() }}" rel="stylesheet" />
         <link href="{{ asset( 'admin/plugins/metismenu/css/metisMenu.min.css' ) .Helper::assetVersion() }}" rel="stylesheet" />
+        <link href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" rel="stylesheet" type="text/css" />
         <!-- <link href="https://fonts.cdnfonts.com/css/montserrat" rel="stylesheet"> -->
         <!-- Bootstrap CSS -->
         <link href="{{ asset( 'admin/css/bootstrap.min.css' ) . Helper::assetVersion() }}" rel="stylesheet" />

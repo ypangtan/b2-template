@@ -5,7 +5,16 @@ $announcement_create = 'announcement_create';
 <div class="card">
     <div class="card-body">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-9">
+                <div class="mb-3">
+                    <label class="mb-1">{{ __( 'announcement.image' ) }}</label>
+                    <div class="dropzone" id="{{ $announcement_create }}_image" style="min-height: 0px;">
+                        <div class="dz-message needsclick">
+                            <h3 class="fs-5 fw-bold text-gray-900 mb-1">{{ __( 'template.drop_file_or_click_to_upload' ) }}</h3>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback"></div>
+                </div>
                 <div class="mb-3 row">
                     <label for="{{ $announcement_create }}_title" class="col-sm-4 col-form-label">{{ __( 'datatables.type' ) }}</label>
                     <div class="col-sm-8">
@@ -30,17 +39,6 @@ $announcement_create = 'announcement_create';
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
-                <div class="mb-3 row">
-                    <label for="{{ $announcement_create }}_image" class="col-sm-4 col-form-label">{{ __( 'announcement.image' ) }}</label>
-                    <div class="col-sm-8">
-                        <div style="position: relative; text-align: right">
-                            <img src="{{ asset( 'admin/img/placeholder/fff.jpg' ) }}" id="{{ $announcement_create }}_image_preview" style="width: 50%;">
-                            <i class="hidden click-action" id="{{ $announcement_create }}_image_remove" style="position: absolute; top: 5px; right: 5px; stroke-width: 3; width: 24px; height: 24px" icon-name="x-circle" color="#f50d0d"></i>
-                        </div>
-                        <input type="file" id="{{ $announcement_create }}_image" class="hidden" accept="image/png, image/gif, image/jpeg">
-                        <div class="invalid-feedback"></div>
-                    </div>
-                </div>
                 <div class="text-end">
                     <button id="{{ $announcement_create }}_cancel" type="button" class="btn btn-sm btn-outline-secondary">{{ __( 'template.cancel' ) }}</button>
                     &nbsp;
@@ -51,41 +49,28 @@ $announcement_create = 'announcement_create';
     </div>
 </div>
 
+<link rel="stylesheet" href="{{ asset( 'admin/css/ckeditor/styles.css' ) }}">
+<script src="{{ asset( 'admin/js/ckeditor/ckeditor.js' ) }}"></script>
+<script src="{{ asset( 'admin/js/ckeditor/upload-adapter.js' ) }}"></script>
+
+<script>
+window.ckeupload_path = '{{ route( 'admin.file.ckeUpload' ) }}';
+window.csrf_token = '{{ csrf_token() }}';
+window.cke_element = 'announcement_create_content';
+</script>
+
+<script src="{{ asset( 'admin/js/ckeditor/ckeditor-init.js' ) }}"></script>
+
 <script>
     document.addEventListener( 'DOMContentLoaded', function() {
         
-        let ac = '#announcement_create';
+        console.log( editor );
+
+        let ac = '#announcement_create',
+            fileID = '';
 
         $( ac + '_cancel' ).click( function() {
             window.location.href = '{{ route( 'admin.module_parent.announcement.index' ) }}';
-        } );
-
-        $( document ).on( 'click', ac + '_image_remove', function() {
-
-            $( this ).addClass( 'hidden' );
-            $( ac + '_image' ).val( '' );
-            $( ac + '_image_preview' ).attr( 'src', "{{ asset( 'admin/img/placeholder/fff.jpg' ) }}" );
-
-        } );
-
-        $( ac + '_image_preview' ).click( function() {
-
-            var that = $( this ),
-                target = $( ac + '_image' );
-
-            target.trigger( 'click' );
-
-            target.change( function() {
-
-                if( $( this ).prop('files')[0] != undefined ) {
-                    that.attr( 'src', URL.createObjectURL( $( this ).prop('files')[0] ) );
-                    $( ac + '_image_remove' ).removeClass( 'hidden' );
-                    target.next().text( '' );
-                } else {
-                    $( ac + '_image_remove' ).addClass( 'hidden' );
-                    that.attr( 'src', "{{ asset( 'admin/img/placeholder/fff.jpg' ) }}" );
-                }
-            } );
         } );
 
         $( ac + '_submit' ).click( function() {
@@ -100,14 +85,8 @@ $announcement_create = 'announcement_create';
 
             formData.append( 'type', $( ac + '_type' ).val() );
             formData.append( 'title', $( ac + '_title' ).val() );
-            formData.append( 'content', $( ac + '_content' ).val() );
-
-            if( $( ac + '_image' )[0].files.length != 0 ) {
-                formData.append( 'image', $( ac + '_image' )[0].files[0] );
-            } else {
-                formData.append( 'image', '' );
-            }
-
+            formData.append( 'content', editor.getData() );
+            formData.append( 'image', fileID );
             formData.append( '_token', '{{ csrf_token() }}' );
 
             $.ajax( {
@@ -139,6 +118,23 @@ $announcement_create = 'announcement_create';
                     }
                 }
             } );
+        } );
+
+        Dropzone.autoDiscover = false;
+        const dropzone = new Dropzone( ac + '_image', { 
+            url: '{{ route( 'admin.file.upload' ) }}',
+            maxFiles: 1,
+            acceptedFiles: 'image/jpg,image/jpeg,image/png',
+            addRemoveLinks: true,
+            removedfile: function( file ) {
+                fileID = null;
+                file.previewElement.remove();
+            },
+            success: function( file, response ) {
+                if ( response.status == 200 )  {
+                    fileID = response.data.id;
+                }
+            }
         } );
     } );
 </script>

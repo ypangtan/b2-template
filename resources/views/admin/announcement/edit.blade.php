@@ -5,47 +5,45 @@ $announcement_edit = 'announcement_edit';
 <div class="card">
     <div class="card-body">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-9">
                 <div class="mb-3 row">
                     <label for="{{ $announcement_edit }}_status" class="col-sm-4 col-form-label">{{ __( 'datatables.status' ) }}</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control form-control-sm form-control-plaintext" id="{{ $announcement_edit }}_status" value="{{ $data['announcement']['deleted_at'] ? __( 'datatables.unpublished' ) : __( 'datatables.published' ) }}">
+                        <input type="text" class="form-control-plaintext" id="{{ $announcement_edit }}_status">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
+                <div class="mb-3">
+                        <label class="mb-1">{{ __( 'datatables.photo' ) }}</label>
+                        <div class="dropzone" id="{{ $announcement_edit }}_photo" style="min-height: 0px;">
+                            <div class="dz-message needsclick">
+                                <h3 class="fs-5 fw-bold text-gray-900 mb-1">{{ __( 'template.drop_file_or_click_to_upload' ) }}</h3>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback"></div>
+                    </div>
                 <div class="mb-3 row">
-                    <label for="{{ $announcement_edit }}_title" class="col-sm-4 col-form-label">{{ __( 'announcement.type' ) }}</label>
+                    <label for="{{ $announcement_edit }}_title" class="col-sm-4 col-form-label">{{ __( 'datatables.type' ) }}</label>
                     <div class="col-sm-8">
                         <select class="form-control form-control-sm" id="{{ $announcement_edit }}_type">
-                            <option value="2" {{ $data['announcement']['type'] == 2 ? 'selected' : '' }}>{{ __( 'announcement.news' ) }}</option>
-                            <option value="3" {{ $data['announcement']['type'] == 3 ? 'selected' : '' }}>{{ __( 'announcement.event' ) }}</option>
+                            <option value="2">{{ __( 'announcement.news' ) }}</option>
+                            <option value="3">{{ __( 'announcement.event' ) }}</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $announcement_edit }}_title" class="col-sm-4 col-form-label">{{ __( 'announcement.title' ) }}</label>
+                    <label for="{{ $announcement_edit }}_title" class="col-sm-4 col-form-label">{{ __( 'datatables.title' ) }}</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control form-control-sm" id="{{ $announcement_edit }}_title" value="{{ $data['announcement']['title'] }}">
+                        <input type="text" class="form-control form-control-sm" id="{{ $announcement_edit }}_title"">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="mb-3 row">
                     <label for="{{ $announcement_edit }}_content" class="col-sm-4 col-form-label">{{ __( 'announcement.content' ) }}</label>
                     <div class="col-sm-8">
-                        <textarea class="form-control form-control-sm" id="{{ $announcement_edit }}_content" rows="10">{{ $data['announcement']['content'] }}</textarea>
+                        <textarea class="form-control form-control-sm" id="{{ $announcement_edit }}_content" rows="10"></textarea>
                         <div class="invalid-feedback"></div>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="{{ $announcement_edit }}_image" class="col-sm-4 col-form-label">{{ __( 'announcement.image' ) }}</label>
-                    <div class="col-sm-8">
-                    <div style="position: relative; text-align: right">
-                        <img src="{{ $data['announcement']['image'] ? $data['announcement']['path'] : asset( 'admin/img/placeholder/fff.jpg' ) }}" id="{{ $announcement_edit }}_image_preview" style="width: 50%;">
-                        <i class="{{ $data['announcement']['image'] ? '' : 'hidden' }} click-action" id="{{ $announcement_edit }}_image_remove" style="position: absolute; top: 5px; right: 5px; stroke-width: 3; width: 24px; height: 24px" icon-name="x-circle" color="#f50d0d"></i>
-                    </div>
-                    <input type="file" id="{{ $announcement_edit }}_image" class="hidden" accept="image/png, image/gif, image/jpeg">
-                    <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="text-end">
@@ -58,42 +56,26 @@ $announcement_edit = 'announcement_edit';
     </div>
 </div>
 
+<link rel="stylesheet" href="{{ asset( 'admin/css/ckeditor/styles.css' ) }}">
+<script src="{{ asset( 'admin/js/ckeditor/ckeditor.js' ) }}"></script>
+<script src="{{ asset( 'admin/js/ckeditor/upload-adapter.js' ) }}"></script>
+
+<script>
+window.ckeupload_path = '{{ route( 'admin.file.ckeUpload' ) }}';
+window.csrf_token = '{{ csrf_token() }}';
+window.cke_element = 'announcement_edit_content';
+</script>
+
+<script src="{{ asset( 'admin/js/ckeditor/ckeditor-init.js' ) }}"></script>
+
 <script>
     document.addEventListener( 'DOMContentLoaded', function() {
 
-        let originalImage = '{{ $data['announcement']['path'] }}',
-            ae = '#announcement_edit';
+        let ae = '#{{ $announcement_edit }}',
+            fileID = '';
 
         $( ae + '_cancel' ).click( function() {
             window.location.href = '{{ route( 'admin.module_parent.announcement.index' ) }}';
-        } );
-
-        $( ae + '_image_preview' ).click( function() {
-
-            var that = $( this ),
-                target = $( ae + '_image' );
-
-            target.trigger( 'click' );
-
-            target.change( function() {
-
-                if( $( this ).prop('files')[0] != undefined ) {
-                    that.attr( 'src', URL.createObjectURL( $( this ).prop('files')[0] ) );
-                    $( ae + '_image_remove' ).removeClass( 'hidden' );
-                    target.next().text( '' );
-                } else {
-                    $( ae + '_image_remove' ).addClass( 'hidden' );
-                    that.attr( 'src', "{{ asset( 'admin/img/placeholder/fff.jpg' ) }}" );
-                }
-            } );
-        } );
-
-        $( document ).on( 'click', ae + '_image_remove', function() {
-
-            $( this ).addClass( 'hidden' );
-            $( ae + '_image' ).val( '' );
-            $( ae + '_image_preview' ).attr( 'src', "{{ asset( 'admin/img/placeholder/fff.jpg' ) }}" );
-
         } );
 
         $( ae + '_submit' ).click( function() {
@@ -102,20 +84,11 @@ $announcement_edit = 'announcement_edit';
 
             let formData = new FormData();
 
-            formData.append( 'id', '{{ Helper::encode( request( 'id' ) ) }}' );
+            formData.append( 'id', '{{ request( 'id' ) }}' );
             formData.append( 'type', $( ae + '_type' ).val() );
             formData.append( 'title', $( ae + '_title' ).val() );
-            formData.append( 'content', $( ae + '_content' ).val() );
-
-            if( $( ae + '_image' )[0].files.length != 0 ) {
-                formData.append( 'image', $( ae + '_image' )[0].files[0] );
-            } else {
-                if ( $( ae + '_image_preview' ).attr( 'src' ) == "{{ asset( 'admin/img/placeholder/fff.jpg' ) }}" ) {
-                    formData.append( 'image_remove', '1' );    
-                }
-                formData.append( 'image', '' );
-            }
-
+            formData.append( 'content', editor.getData() );
+            formData.append( 'image', fileID );
             formData.append( '_token', '{{ csrf_token() }}' );
 
             $.ajax( {
@@ -149,5 +122,62 @@ $announcement_edit = 'announcement_edit';
                 }
             } );
         } );
+
+        getAnnouncement();
+
+        function getAnnouncement() {
+
+            Dropzone.autoDiscover = false;
+
+            $( 'body' ).loading( {
+                message: '{{ __( 'template.loading' ) }}'
+            } );
+
+            $.ajax( {
+                url: '{{ route( 'admin.announcement.oneAnnouncement' ) }}',
+                type: 'POST',
+                data: {
+                    'id': '{{ request( 'id' ) }}',
+                    '_token': '{{ csrf_token() }}'
+                },
+                success: function( response ) {
+
+                    $( ae + '_title' ).val( response.title );
+                    editor.setData( response.content );
+                    $( ae + '_type' ).val( response.type ).change();
+
+                    fileID = response.path;
+
+                    let imagePath = response.path;
+
+                    const dropzone = new Dropzone( ae + '_photo', {
+                        url: '{{ route( 'admin.file.upload' ) }}',
+                        maxFiles: 1,
+                        acceptedFiles: 'image/jpg,image/jpeg,image/png',
+                        addRemoveLinks: true,
+                        init: function() {
+                            if ( imagePath ) {
+                                let myDropzone = this,
+                                    mockFile = { name: 'Default', size: 1024, accepted: true };
+
+                                myDropzone.files.push( mockFile );
+                                myDropzone.displayExistingFile( mockFile, imagePath );
+                            }
+                        },
+                        removedfile: function( file, b ) {
+                            fileID = null;
+                            file.previewElement.remove();
+                        },
+                        success: function( file, response ) {
+                            if ( response.status == 200 )  {
+                                fileID = response.data.id;
+                            }
+                        }
+                    } );
+
+                    $( 'body' ).loading( 'stop' );
+                }
+            } );
+        }
     } );
 </script>

@@ -31,6 +31,7 @@ return [
     'created_date' => '创建日期',
     'registered_date' => '注册日期',
     'thumbnail' => '缩略图',
+    'photo' => '照片',
     'title' => '标题',
     'type' => '类型',
     'description' => '描述',

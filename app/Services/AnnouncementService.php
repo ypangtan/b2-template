@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\{
 };
 
 use App\Models\{
+    FileManager,
     UserNotification,
 };
 
@@ -124,7 +125,14 @@ class AnnouncementService {
 
         $userNotification = UserNotification::find( $request->id );
 
-        return $userNotification;
+        if ( $userNotification ) {
+            $userNotification->append( [
+                'path',
+                'display_status'
+            ] );
+        }
+
+        return response()->json( $userNotification );
     }
 
     public static function createAnnouncement( $request ) {
@@ -133,14 +141,14 @@ class AnnouncementService {
             'type' => [ 'required', 'in:2,3' ],
             'title' => [ 'required' ],
             'content' => [ 'required' ],
-            'image' => [ 'nullable', 'image' ],
+            'image' => [ 'nullable'],
         ] );
 
         $attributeName = [
             'type' => __( 'datatables.type' ),
             'title' => __( 'datatables.title' ),
-            'type' => __( 'announcement.content' ),
-            'type' => __( 'announcement.image' ),
+            'content' => __( 'announcement.content' ),
+            'image' => __( 'announcement.image' ),
         ];
 
         foreach( $attributeName as $key => $aName ) {
@@ -161,11 +169,22 @@ class AnnouncementService {
 
         try {
 
-            if ( $request->hasFile( 'image' ) ) {
-                $createAnnouncementObject['image'] = $request->file( 'image' )->store( 'announcements' , ['disk' => 'public'] );
+            $createAnnouncement = UserNotification::create( $createAnnouncementObject );
+
+            $file = FileManager::find( $request->image );
+            if ( $file ) {
+                $fileName = explode( '/', $file->file );
+                $target = 'announcement/' . $createAnnouncement->id . '/' . $fileName[1];
+                Storage::disk( 'public' )->move( $file->file, $target );
+
+                $createAnnouncement->image = $target;
+                $createAnnouncement->save();
+
+                $file->status = 10;
+                $file->save();
             }
 
-            UserNotification::create( $createAnnouncementObject );
+            // Check the content for image(s) and mark status 10 in FileManager
 
             DB::commit();
 
@@ -193,14 +212,14 @@ class AnnouncementService {
             'type' => [ 'required', 'in:2,3' ],
             'title' => [ 'required' ],
             'content' => [ 'required' ],
-            'image' => [ 'nullable', 'image' ],
+            'image' => [ 'nullable' ],
         ] );
 
         $attributeName = [
             'type' => __( 'datatables.type' ),
             'title' => __( 'datatables.title' ),
-            'type' => __( 'announcement.content' ),
-            'type' => __( 'announcement.image' ),
+            'content' => __( 'announcement.content' ),
+            'image' => __( 'announcement.image' ),
         ];
 
         foreach( $attributeName as $key => $aName ) {
@@ -217,15 +236,25 @@ class AnnouncementService {
             $updateAnnouncement->title = $request->title;
             $updateAnnouncement->content = $request->content;
 
-            if ( $request->hasFile( 'image' ) ) {
-                Storage::disk( 'public' )->delete( $updateAnnouncement->image );
-                $updateAnnouncement->image = $request->file( 'image' )->store( 'announcements' , ['disk' => 'public'] );
-            } else {
-                if ( $request->image_remove ) {
-                    Storage::disk( 'public' )->delete( $updateAnnouncement->image );
-                    $updateAnnouncement->image = null;
+            if ( $request->image ) {
+                $file = FileManager::find( $request->image );
+                if ( $file ) {
+
+                    Storage::disk( 'public' )->delete( $updateAnnouncement->photo );
+
+                    $fileName = explode( '/', $file->file );
+                    $target = 'announcement/' . $updateAnnouncement->id . '/' . $fileName[1];
+                    Storage::disk( 'public' )->move( $file->file, $target );
+    
+                    $updateAnnouncement->image = $target;
+                    $updateAnnouncement->save();
+    
+                    $file->status = 10;
+                    $file->save();
                 }
             }
+
+            // Check the content for image(s) and mark status 10 in FileManager
             
             $updateAnnouncement->type = $request->type;
             $updateAnnouncement->save();

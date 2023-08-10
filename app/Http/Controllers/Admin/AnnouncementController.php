@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Services\{
-    AnnouncementService
+    AnnouncementService,
+    FileManagerService,
 };
 
 class AnnouncementController extends Controller
@@ -49,7 +50,6 @@ class AnnouncementController extends Controller
             'title' => __( 'template.edit_x', [ 'title' => \Str::singular( __( 'template.announcements' ) ) ] ),
             'mobile_title' => __( 'template.edit_x', [ 'title' => \Str::singular( __( 'template.announcements' ) ) ] ),
         ];
-        $this->data['data']['announcement'] = AnnouncementService::oneAnnouncement( $request );
 
         return view( 'admin.main' )->with( $this->data );  
     }
@@ -72,5 +72,9 @@ class AnnouncementController extends Controller
 
     public function updateAnnouncementStatus( Request $request ) {
         return AnnouncementService::updateAnnouncementStatus( $request );
+    }
+
+    public function ckeUpload( Request $request ) {
+        return FileManagerService::ckeUpload( $request );
     }
 }

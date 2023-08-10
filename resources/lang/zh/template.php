@@ -82,4 +82,7 @@ return [
     'update_x' => '更新:title',
     'new_x_created' => '已创建新:title。',
     'x_updated' => '已更新:title。',
+
+    'drop_file_or_click_to_upload' => '拖拽文件或点击上传。',
+    'drop_files_or_click_to_upload' => '拖拽文件或点击上传。',
 ];
