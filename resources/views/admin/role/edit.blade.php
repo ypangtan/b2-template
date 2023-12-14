@@ -38,7 +38,7 @@ $role_edit = 'role_edit';
                 <div class="text-end">
                     <button id="{{ $role_edit }}_cancel" type="button" class="btn btn-sm btn-outline-secondary">{{ __( 'template.cancel' ) }}</button>
                     &nbsp;
-                    <button id="{{ $role_edit }}_submit" type="button" class="btn btn-sm btn-success">{{ __( 'template.save_changes' ) }}</button>
+                    <button id="{{ $role_edit }}_submit" type="button" class="btn btn-sm btn-sucscess">{{ __( 'template.save_changes' ) }}</button>
                 </div>
             </div>
         </div>

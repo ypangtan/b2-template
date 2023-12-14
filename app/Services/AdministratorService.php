@@ -29,7 +29,9 @@ class AdministratorService {
     
     public static function allAdministrators( $request ) {
 
-        $administrator = Administrator::with( [ 'role' ] )->select( 'administrators.*' );
+        $administrator = Administrator::with( [
+            'role'
+        ] )->select( 'administrators.*' );
 
         $filterObject = self::filter( $request, $administrator );
         $administrator = $filterObject['model'];
@@ -50,6 +52,9 @@ class AdministratorService {
                 case 4:
                     $administrator->orderBy( 'role', $dir );
                     break;
+                case 5:
+                    $administrator->orderBy( 'status', $dir );
+                    break;
             }
         }
 
@@ -60,25 +65,37 @@ class AdministratorService {
 
         $administrators = $administrator->skip( $offset )->take( $limit )->get();
 
-        if ( $administrators ) {
-            $administrators->append( [
-                'encrypted_id',
-            ] );
-        }
+        $administrators->append( [
+            'encrypted_id',
+        ] );
 
-        $totalRecord = Administrator::count();
+        $administrator = Administrator::select(
+            DB::raw( 'COUNT(administrators.id) as total'
+        ) );
+
+        $filterObject = self::filter( $request, $administrator );
+        $administrator = $filterObject['model'];
+        $filter = $filterObject['filter'];
+
+        $administrator = $administrator->first();
 
         $data = [
             'administrators' => $administrators,
             'draw' => $request->draw,
-            'recordsFiltered' => $filter ? $administratorCount : $totalRecord,
-            'recordsTotal' => $totalRecord,
+            'recordsFiltered' => $filter ? $administratorCount : $administrator->total,
+            'recordsTotal' => $filter ? Administrator::when( auth()->user()->role != 1, function( $query ) {
+                $query->where( 'role', '!=', 1 );
+            } )->count() : $administratorCount,
         ];
 
-        return response()->json( $data );
+        return $data;
     }
 
     private static function filter( $request, $model ) {
+
+        if ( auth()->user()->role != 1 ) {
+            $model->where( 'role', '!=', 1 );
+        }
 
         $filter = false;
 
@@ -106,17 +123,22 @@ class AdministratorService {
         }
 
         if ( !empty( $request->username ) ) {
-            $model->where( 'name', $request->username );
+            $model->where( 'administrators.name', $request->username );
             $filter = true;
         }
 
         if ( !empty( $request->email ) ) {
-            $model->where( 'email', $request->email );
+            $model->where( 'administrators.email', $request->email );
             $filter = true;
         }
 
         if ( !empty( $request->role ) ) {
             $model->where( 'administrators.role', $request->role );
+            $filter = true;
+        }
+
+        if ( !empty( $request->status ) ) {
+            $model->where( 'administrators.status', $request->status );
             $filter = true;
         }
 
@@ -132,14 +154,24 @@ class AdministratorService {
             'id' => Helper::decode( $request->id ),
         ] );
 
-        return Administrator::find( $request->id );
+        $administrator = Administrator::find( $request->id );
+
+        if ( $administrator ) {
+            $administrator->append( [
+                'encrypted_id',
+            ] );
+        }
+
+        return $administrator;
     }
 
     public static function createAdministrator( $request ) {
 
+        DB::beginTransaction();
+
         $validator = Validator::make( $request->all(), [
-            'username' => [ 'required', 'max:25', 'unique:administrators,username', 'alpha_dash', new CheckASCIICharacter ],
-            'email' => [ 'required', 'max:25', 'unique:administrators,email', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
+            'username' => [ 'required', 'unique:administrators,username', 'alpha_dash', new CheckASCIICharacter ],
+            'email' => [ 'required', 'unique:administrators,email', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
             'fullname' => [ 'required' ],
             'role' => [ 'required' ],
             'password' => [ 'required', Password::min( 8 ) ],
@@ -158,8 +190,6 @@ class AdministratorService {
         }
 
         $validator->setAttributeNames( $attributeName )->validate();
-
-        DB::beginTransaction();
         
         try {
 
@@ -193,13 +223,15 @@ class AdministratorService {
 
     public static function updateAdministrator( $request ) {
 
+        DB::beginTransaction();
+
         $request->merge( [
             'id' => Helper::decode( $request->id ),
         ] );
 
         $validator = Validator::make( $request->all(), [
-            'username' => [ 'required', 'max:25', 'unique:administrators,username,' . $request->id, 'alpha_dash', new CheckASCIICharacter ],
-            'email' => [ 'required', 'max:25', 'unique:administrators,email,' . $request->id, 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
+            'username' => [ 'required', 'unique:administrators,username,' . $request->id, 'alpha_dash', new CheckASCIICharacter ],
+            'email' => [ 'required', 'unique:administrators,email,' . $request->id, 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
             'fullname' => [ 'required' ],
             'role' => [ 'required' ],
             'password' => [ 'nullable', Password::min( 8 ) ],
@@ -218,12 +250,12 @@ class AdministratorService {
         }
 
         $validator->setAttributeNames( $attributeName )->validate();
-
-        DB::beginTransaction();
         
         try {
 
-            $updateAdministrator = Administrator::find( $request->id );
+            $updateAdministrator = Administrator::lockForUpdate()
+                ->find( $request->id );
+
             $updateAdministrator->id = $request->id;
             $updateAdministrator->username = strtolower( $request->username );
             $updateAdministrator->email = strtolower( $request->email );
@@ -246,6 +278,42 @@ class AdministratorService {
 
             return response()->json( [
                 'message' => $th->getMessage() . ' in line: ' . $th->getLine(),
+            ], 500 );
+        }
+
+        return response()->json( [
+            'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.administrators' ) ) ] ),
+        ] );
+    }
+
+    public static function updateAdministratorStatus( $request ) {
+
+        DB::beginTransaction();
+
+        $request->merge( [
+            'id' => Helper::decode( $request->id ),
+        ] );
+
+        $validator = Validator::make( $request->all(), [
+            'status' => 'required',
+        ] );
+        
+        $validator->validate();
+
+        try {
+
+            $updateUser = Administrator::lockForUpdate()->find( $request->id );
+            $updateUser->status = $request->status;
+            $updateUser->save();
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollBack();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine()
             ], 500 );
         }
 

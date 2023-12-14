@@ -51,19 +51,25 @@ class RoleService {
         
         $roles = $role->skip( $offset )->take( $limit )->get();
 
-        if ( $roles ) {
-            $roles->append( [
-                'encrypted_id',
-            ] );
-        }
+        $roles->append( [
+            'encrypted_id',
+        ] );
 
-        $totalRecord = RoleModel::count();
+        $role = RoleModel::select(
+            DB::raw( 'COUNT(roles.id) as total'
+        ) );
+
+        $filterObject = self::filter( $request, $role );
+        $role = $filterObject['model'];
+        $filter = $filterObject['filter'];
+
+        $role = $role->first();
 
         $data = array(
             'roles' => $roles,
             'draw' => $request->draw,
-            'recordsFiltered' => $filter ? $roleCount : $totalRecord,
-            'recordsTotal' => $totalRecord,
+            'recordsFiltered' => $filter ? $roleCount : $role->total,
+            'recordsTotal' => $filter ? RoleModel::count() : $roleCount,
         );
 
         return $data;

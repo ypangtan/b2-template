@@ -72,4 +72,9 @@ class UserController extends Controller
 
         return UserService::updateUserAdmin( $request );
     }
+
+    public function updateUserStatus( Request $request ) {
+
+        return UserService::updateUserStatus( $request );
+    }
 }

@@ -23,7 +23,6 @@ class AnnouncementService {
     public static function allAnnouncements( $request ) {
 
         $notification = UserNotification::select( 'user_notifications.*' );
-        $notification->whereNull( 'user_id' );
 
         $filterObject = self::filter( $request, $notification );
         $notification = $filterObject['model'];
@@ -33,13 +32,13 @@ class AnnouncementService {
             $dir = $request->input( 'order.0.dir' );
             switch ( $request->input( 'order.0.column' ) ) {
                 case 1:
-                    $notification->orderBy( 'created_at', $dir );
+                    $notification->orderBy( 'user_notifications.created_at', $dir );
                     break;
                 case 3:
-                    $notification->orderBy( 'type', $dir );
+                    $notification->orderBy( 'user_notifications.type', $dir );
                     break;
                 case 4:
-                    $notification->orderBy( 'status', $dir );
+                    $notification->orderBy( 'user_notifications.status', $dir );
                     break;
             }
         }
@@ -51,25 +50,35 @@ class AnnouncementService {
 
         $notifications = $notification->skip( $offset )->take( $limit )->get();
 
-        if ( $notifications ) {
-            $notifications->append( [
-                'encrypted_id',
-            ] );
-        }
+        $notifications->append( [
+            'encrypted_id',
+        ] );
 
-        $totalRecord = UserNotification::whereNull( 'user_id' )->count();
+        $notification = UserNotification::select(
+            DB::raw( 'COUNT(user_notifications.id) as total'
+        ) );
+
+        $filterObject = self::filter( $request, $notification );
+        $notification = $filterObject['model'];
+        $filter = $filterObject['filter'];
+
+        $notification = $notification->first();
+
+        $totalRecord = 
 
         $data = [
             'notifications' => $notifications,
             'draw' => $request->draw,
-            'recordsFiltered' => $filter ? $notificationCount : $totalRecord,
-            'recordsTotal' => $totalRecord,
+            'recordsFiltered' => $filter ? $notificationCount : $notification->total,
+            'recordsTotal' => $filter ? UserNotification::whereNull( 'user_id' )->count() : $notificationCount,
         ];
 
-        return response()->json( $data );
+        return $data;
     }
 
     private static function filter( $request, $model ) {
+
+        $model->whereNull( 'user_id' );
 
         $filter = false;
 
@@ -97,17 +106,17 @@ class AnnouncementService {
         }
 
         if ( !empty( $title = $request->title ) ) {
-            $model->where( 'title', 'LIKE', "%$title%" );
+            $model->where( 'user_notifications.title', 'LIKE', '%' . $request->title . '%' );
             $filter = true;
         }
 
         if ( !empty( $request->type ) ) {
-            $model->where( 'type', $request->type );
+            $model->where( 'user_notifications.type', $request->type );
             $filter = true;
         }
 
         if ( !empty( $request->status ) ) {
-            $model->where( 'status', $request->status );
+            $model->where( 'user_notifications.status', $request->status );
             $filter = true;
         }
 
@@ -132,7 +141,7 @@ class AnnouncementService {
             ] );
         }
 
-        return response()->json( $userNotification );
+        return $userNotification;
     }
 
     public static function createAnnouncement( $request ) {
@@ -161,7 +170,7 @@ class AnnouncementService {
             'type' => $request->type,
             'title' => $request->title,
             'content' => $request->content,
-            'url_slug' => \Str::slug( $request->title ),
+            'url_slug' => Str::slug( $request->title ),
             'type' => 2,
         ];
 
@@ -277,13 +286,34 @@ class AnnouncementService {
 
     public static function updateAnnouncementStatus( $request ) {
 
+        DB::beginTransaction();
+
         $request->merge( [
             'id' => Helper::decode( $request->id ),
         ] );
 
-        $updateAnnouncement = UserNotification::where( 'id', $request->id )->first();
-        $updateAnnouncement->status = $request->status;
-        $updateAnnouncement->save();
+        $validator = Validator::make( $request->all(), [
+            'status' => 'required',
+        ] );
+        
+        $validator->validate();
+
+        try {
+
+            $updateAnnouncement = UserNotification::lockForUpdate()->find( $request->id );
+            $updateAnnouncement->status = $request->status;
+            $updateAnnouncement->save();
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollBack();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+            ], 500 );
+        }
 
         return response()->json( [
             'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.announcements' ) ) ] ),

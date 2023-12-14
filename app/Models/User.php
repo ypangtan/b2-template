@@ -19,6 +19,14 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, LogsActivity;
 
+    public function country() {
+        return $this->hasOne( Country::class, 'id', 'country_id' );
+    }
+
+    public function userDetail() {
+        return $this->hasOne( UserDetail::class, 'user_id' );
+    }
+
     public function referral() {
         return $this->hasOne( User::class, 'id', 'referral_id' );
     }
@@ -31,15 +39,18 @@ class User extends Authenticatable
     protected $fillable = [
         'country_id',
         'referral_id',
+        'ranking_id',
+        'old_id',
         'username',
         'email',
+        'calling_code',
         'phone_number',
         'password',
-        'is_social_account',
         'invitation_code',
         'referral_structure',
-        'birthday',
+        'capital',
         'status',
+        'is_free',
     ];
 
     /**
@@ -72,15 +83,18 @@ class User extends Authenticatable
     protected static $logAttributes = [
         'country_id',
         'referral_id',
+        'ranking_id',
+        'old_id',
         'username',
         'email',
+        'calling_code',
         'phone_number',
         'password',
-        'is_social_account',
         'invitation_code',
         'referral_structure',
-        'birthday',
+        'capital',
         'status',
+        'is_free'
     ];
 
     protected static $logName = 'users';

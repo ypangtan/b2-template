@@ -10,6 +10,7 @@ use App\Services\{
 };
 
 use App\Models\{
+    Administrator,
     Role as RoleModel,
 };
 
@@ -29,8 +30,8 @@ class AdministratorController extends Controller {
         ];
 
         $roles = [];
-        foreach( \DB::table( 'roles' )->select( 'id', 'name' )->orderBy( 'id', 'ASC' )->get() as $role ) {
-            array_push( $roles, [ 'key' => $role->name, 'value' => $role->id, 'title' => __( 'administrator.' . $role->name ) ] );
+        foreach( RoleModel::orderBy( 'id', 'ASC' )->get() as $role ) {
+            $roles[] = [ 'key' => $role->name, 'value' => $role->id, 'title' => __( 'role.' . $role->name ) ];
         }
 
         $this->data['data']['roles'] = $roles;
@@ -49,7 +50,9 @@ class AdministratorController extends Controller {
             'mobile_title' => __( 'template.add_x', [ 'title' => \Str::singular( __( 'template.administrators' ) ) ] ),
         ];
         $roles = [];
-        foreach( RoleModel::orderBy( 'id', 'ASC' )->get() as $role ) {
+        foreach( RoleModel::orderBy( 'id', 'ASC' )->when( auth()->user()->role != 1, function( $query ) {
+            $query->where( 'name', '!=', 'super_admin' );
+        } )->get() as $role ) {
             $roles[] = [ 'key' => $role->name, 'value' => $role->id, 'title' => __( 'role.' . $role->name ) ];
         }
 
@@ -58,7 +61,16 @@ class AdministratorController extends Controller {
         return view( 'admin.main' )->with( $this->data );
     }
 
-    public function edit() {
+    public function edit( Request $request ) {
+
+        try {
+            $selectedAdmin = Administrator::find( Helper::decode( $request->id ) );
+            if ( auth()->user()->role != 1 && $selectedAdmin->role == 1 ) {
+                return redirect()->route( 'admin.module_parent.administrator.index' );
+            }
+        } catch ( \Throwable $th ) {
+            return redirect()->route( 'admin.module_parent.administrator.index' );
+        }
 
         $this->data['header']['title'] = __( 'template.administrators' );
         $this->data['content'] = 'admin.administrator.edit';
@@ -69,7 +81,9 @@ class AdministratorController extends Controller {
             'mobile_title' => __( 'template.edit_x', [ 'title' => \Str::singular( __( 'template.administrators' ) ) ] ),
         ];
         $roles = [];
-        foreach( RoleModel::orderBy( 'id', 'ASC' )->get() as $role ) {
+        foreach( RoleModel::orderBy( 'id', 'ASC' )->when( auth()->user()->role != 1, function( $query ) {
+            $query->where( 'name', '!=', 'super_admin' );
+        } )->get() as $role ) {
             $roles[] = [ 'key' => $role->name, 'value' => $role->id, 'title' => __( 'role.' . $role->name ) ];
         }
 
@@ -96,6 +110,11 @@ class AdministratorController extends Controller {
     public function updateAdministrator( Request $request ) {
         
         return AdministratorService::updateAdministrator( $request );
+    }
+
+    public function updateAdministratorStatus( Request $request ) {
+        
+        return AdministratorService::updateAdministratorStatus( $request );
     }
 
     public function logoutLog( Request $request ) {

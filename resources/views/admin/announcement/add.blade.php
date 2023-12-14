@@ -42,7 +42,7 @@ $announcement_create = 'announcement_create';
                 <div class="text-end">
                     <button id="{{ $announcement_create }}_cancel" type="button" class="btn btn-sm btn-outline-secondary">{{ __( 'template.cancel' ) }}</button>
                     &nbsp;
-                    <button id="{{ $announcement_create }}_submit" type="button" class="btn btn-sm btn-success">{{ __( 'template.save_changes' ) }}</button>
+                    <button id="{{ $announcement_create }}_submit" type="button" class="btn btn-sm btn-primary">{{ __( 'template.save_changes' ) }}</button>
                 </div>
             </div>
         </div>

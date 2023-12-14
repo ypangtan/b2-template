@@ -9,11 +9,8 @@ $administrator_create = 'administrator_create';
                 <div class="mb-3 row">
                     <label for="{{ $administrator_create }}_username" class="col-sm-5 col-form-label">{{ __( 'administrator.username' ) }}</label>
                     <div class="col-sm-7">
-                        <div class="input-group input-group-sm has-validation">
-                            <span class="input-group-text" id="{{ $administrator_create }}_prefix"></span>
-                            <input type="text" class="form-control form-control-sm" id="{{ $administrator_create }}_username">
-                            <div class="invalid-feedback"></div>
-                        </div>
+                        <input type="text" class="form-control form-control-sm" id="{{ $administrator_create }}_username">
+                        <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="mb-3 row">
@@ -51,8 +48,7 @@ $administrator_create = 'administrator_create';
                 </div>
                 <div class="text-end">
                     <button id="{{ $administrator_create }}_cancel" type="button" class="btn btn-sm btn-outline-secondary">{{ __( 'template.cancel' ) }}</button>
-                    &nbsp;
-                    <button id="{{ $administrator_create }}_submit" type="button" class="btn btn-sm btn-success">{{ __( 'template.save_changes' ) }}</button>
+                    <button id="{{ $administrator_create }}_submit" type="button" class="btn btn-sm btn-primary">{{ __( 'template.save_changes' ) }}</button>
                 </div>
             </div>
         </div>
@@ -69,17 +65,6 @@ $administrator_create = 'administrator_create';
             window.location.href = '{{ route( 'admin.module_parent.administrator.index' ) }}';
         } );
 
-        $( ac + '_role' ).on( 'change', function() {
-
-            const pos = roleMapper.map( e => e.value ).indexOf( parseInt( $( this ).val() ) );
-
-            if ( [ 'jpj', 'puspakom' ].includes( roleMapper[pos].key ) ) {
-                $( ac + '_prefix' ).html( roleMapper[pos].key + '-' );
-            } else {
-                $( ac + '_prefix' ).html( '' );
-            }
-        } );
-
         $( ac + '_submit' ).click( function() {
 
             resetInputValidation();
@@ -89,7 +74,7 @@ $administrator_create = 'administrator_create';
             } );
 
             let formData = new FormData();
-            formData.append( 'username', $( ac + '_prefix' ).html() + $( ac + '_username' ).val() );
+            formData.append( 'username', $( ac + '_username' ).val() );
             formData.append( 'email', $( ac + '_email' ).val() );
             formData.append( 'fullname', $( ac + '_fullname' ).val() );
             formData.append( 'password', $( ac + '_password' ).val() );

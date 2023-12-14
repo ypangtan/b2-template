@@ -2,15 +2,28 @@
 
 namespace App\Providers;
 
-use App\Actions\Fortify\CreateNewUser;
-use App\Actions\Fortify\ResetUserPassword;
-use App\Actions\Fortify\UpdateUserPassword;
-use App\Actions\Fortify\UpdateUserProfileInformation;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
+
 use Illuminate\Support\ServiceProvider;
+
+use Illuminate\Support\Facades\{
+    Hash,
+    RateLimiter,
+    Validator,
+};
+
 use Laravel\Fortify\Fortify;
+
+use App\Models\{
+    Administrator,
+    ActivityLog,
+    User,
+};
+
+use Helper;
+
+Use Carbon\Carbon;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -25,11 +38,6 @@ class FortifyServiceProvider extends ServiceProvider
             config()->set( 'fortify.guard', 'admin' );
             config()->set( 'fortify.home', '/admin/home' );
         }
-
-        if( request()->is( 'base2_branch/*' ) ) {
-            config()->set( 'fortify.guard', 'branch' );
-            config()->set( 'fortify.home', '/branch/home' );
-        }
     }
 
     /**
@@ -39,19 +47,61 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Fortify::createUsersUsing(CreateNewUser::class);
-        Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
-        Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
-        Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+        Fortify::authenticateUsing( function ( Request $request ) {
 
-        Fortify::loginView( function () {
-            return redirect()->route( 'admin.dashboard.index' );
+            if ( request()->is( 'backoffice/*' ) ) {
+
+                $validator = Validator::make( $request->all(), [
+                    'username' => [ 'required', function( $attribute, $value, $fail ) use ( $request, &$administrator ) {
+                        $administrator = Administrator::where( 'email', $request->username )
+                            ->where( 'status', 10 )
+                            ->first();
+
+                        if ( !$administrator || !Hash::check( $request->password, $administrator->password ) ) {
+                            $fail( __( 'auth.failed' ) );
+                        }
+                    } ],
+                    'password' => 'required',
+                ] );
+
+                $attributeName = [
+                    'username' => __( 'administrator.email' ),
+                ];
+        
+                foreach( $attributeName as $key => $aName ) {
+                    $attributeName[$key] = strtolower( $aName );
+                }
+                
+                $validator->setAttributeNames( $attributeName )->validate();
+                
+                return $administrator;
+
+            } else {
+
+                $request->validate( [
+                    'username' => [ 'required', function( $attribute, $value, $fail ) use ( $request, &$user ) {
+                        $user = User::where( 'username', $request->username )
+                            ->where( 'status', 10 )
+                            ->first();
+
+                        if ( !$user || !Hash::check( $request->password, $user->password ) ) {
+                            $fail( __( 'auth.failed' ) );
+                        }
+                    } ],
+                    'password' => 'required',
+                ] );
+
+                return $user;
+            }
         } );
 
-        RateLimiter::for('login', function (Request $request) {
-            $email = (string) $request->email;
+        // Fortify::loginView( function () {
+        //     return redirect()->route( 'admin.dashboard.index' );
+        // } );
 
-            return Limit::perMinute(5)->by($email.$request->ip());
+        RateLimiter::for('login', function (Request $request) {
+            $identifier = empty( $request->email ) ? (string) $request->username : (string) $request->email;
+            return Limit::perMinute(50)->by($identifier.$request->ip());
         });
 
         RateLimiter::for('two-factor', function (Request $request) {
@@ -61,6 +111,11 @@ class FortifyServiceProvider extends ServiceProvider
         $this->app->singleton(
             \Laravel\Fortify\Contracts\LoginResponse::class,
             \App\Http\Responses\LoginResponse::class
+        );
+
+        $this->app->singleton(
+            \Laravel\Fortify\Http\Requests\LoginRequest::class,
+            \App\Http\Requests\LoginRequest::class
         );
     }
 }

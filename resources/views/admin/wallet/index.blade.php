@@ -24,11 +24,13 @@ $columns = [
         'options' => $data['wallet'],
         'id' => 'wallet',
         'title' => __( 'wallet.wallet' ),
+        'preAmount' => true,
     ],
     [
         'type' => 'default',
         'id' => 'balance',
         'title' => __( 'wallet.balance' ),
+        'amount' => true,
     ],
     [
         'type' => 'default',
@@ -49,7 +51,7 @@ if ( $multiSelect ) {
 
 <div class="card">
     <div class="card-body">
-        <x-data-tables id="wallet_table" enableFilter="true" enableFooter="false" columns="{{ json_encode( $columns ) }}" />
+        <x-data-tables id="wallet_table" enableFilter="true" enableFooter="true" columns="{{ json_encode( $columns ) }}" />
     </div>
 </div>
 
@@ -57,7 +59,7 @@ if ( $multiSelect ) {
     <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{!! __( 'wallet.adjust_balance_x', [ 'title' => __( 'wallet.topup' ) ] ) !!}</h5>
+                <h5 class="modal-title">{!! __( 'wallet.adjust_balance' ) !!}</h5>
             </div>
             <div class="modal-body">
                 <div class="mb-3 row">
@@ -94,10 +96,7 @@ if ( $multiSelect ) {
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{!! __( 'wallet.adjust_balance_x', [ 'title' => __( 'wallet.topup' ) ] ) !!}</h5>
-                <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <em class="icon ni ni-cross"></em>
-                </a>
+                <h5 class="modal-title">{!! __( 'wallet.adjust_balance' ) !!}</h5>
             </div>
             <div class="modal-body">
                 <div class="mb-3 row">
@@ -255,7 +254,7 @@ if ( $multiSelect ) {
             order: false,
             columns: [
                 { data: null },
-                { data: 'user.email' },
+                { data: 'user' },
                 { data: 'type' },
                 { data: 'listing_balance' },
                 { data: 'encrypted_id' },
@@ -272,7 +271,20 @@ if ( $multiSelect ) {
                     targets: parseInt( '{{ Helper::columnIndex( $columns, "user" ) }}' ),
                     orderable: false,
                     render: function( data, type, row, meta ) {
-                        return data;
+
+                        let email = data.email ?? '-';
+                            fullname = data.user_detail?.fullname ?? '-',
+                            html = '';
+
+                        html +=
+                        `
+                        <span>
+                        <strong>` + fullname + `</strong><br>
+                        <strong>{{ __( 'user.email' ) }}</strong>: ` + email + `
+                        </span>
+                        `;
+
+                        return html;
                     },
                 },
                 {
@@ -301,15 +313,13 @@ if ( $multiSelect ) {
 
                         let edit = '';
 
-                        edit += '<li class="dropdown-item click-action dt-topup" data-id="' + data + '">{{ __( 'wallet.topup' ) }}</li>';
-                        edit += '<li class="dropdown-item click-action dt-deduct" data-id="' + data + '">{{ __( 'wallet.deduct' ) }}</li>';
+                        edit += '<li class="dropdown-item click-action dt-topup" data-id="' + data + '">{{ __( 'wallet.adjust_balance' ) }}</li>';
                         let html = 
                         `
                         <div class="dropdown">
                             <i class="text-primary click-action" icon-name="more-horizontal" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu">
                             ` + edit + `
-                            ` + status + `
                             </ul>
                         </div>
                         `;
@@ -360,7 +370,7 @@ if ( $multiSelect ) {
 
         multiTopupHTML += 
         `
-        <button id="multiselect_topup" type="button" class="btn btn-sm btn-outline-primary">{{ __( 'wallet.topup' ) }}</button>
+        <button id="multiselect_topup" type="button" class="btn btn-sm btn-outline-primary">{{ __( 'wallet.adjust_balance' ) }}</button>
         `;
     
         $( '.multiselect-action > div' ).append( multiTopupHTML );
@@ -397,25 +407,11 @@ if ( $multiSelect ) {
             getBalance( id, wt );
         } );
 
-        $( document ).on( 'click', '.dt-deduct', function() {
-
-            let id = $( this ).data( 'id' );
-
-            getBalance( id, wd );
-        } );
-
         $( wt + '_submit' ).click( function() {
 
             $( this ).addClass( 'disabled' );
 
             submit( wt, $( this ) );
-        } );
-
-        $( wd + '_submit' ).click( function() {
-
-            $( this ).addClass( 'disabled' );
-
-            submit( wd, $( this ) );
         } );
 
         $( wt + '_amount' ).on( 'change keyup', function() {
@@ -428,18 +424,6 @@ if ( $multiSelect ) {
             }
 
             $( wt + '_balance_after_submit' ).val( priceFormatter.format( currentBalance + amount ) );
-        } );
-
-        $( wd + '_amount' ).on( 'change keyup', function() {
-
-            let amount = parseFloat( $( this ).val() ),
-                currentBalance = parseFloat( $( wd + '_balance' ).val().replace( ',', '' ) );
-
-            if ( isNaN( amount ) ) {
-                amount = 0;
-            }
-
-            $( wd + '_balance_after_submit' ).val( priceFormatter.format( currentBalance - amount ) );
         } );
 
         function getBalance( id, scope ) {
@@ -469,18 +453,15 @@ if ( $multiSelect ) {
                     'id': $( scope + '_id' ).val(),
                     'amount': $( scope + '_amount' ).val(),
                     'remark': $( scope + '_remark' ).val(),
-                    'action': scope == '#wallet_topup' ? 'topup' : 'deduct',
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function( response ) {
 
                     button.removeClass( 'disabled' );
-                    
-                    scope == '#wallet_topup' ? wtm.hide() : wdm.hide();
 
+                    scope == '#wallet_topup' ? wtm.hide() : wdm.hide();
                     $( '#modal_success .caption-text' ).html( response.message );
                     modalSuccess.toggle();
-
                     dt_table.draw( false );
                 },
                 error: function( error ) {
@@ -510,7 +491,6 @@ if ( $multiSelect ) {
                     'ids': window['ids'],
                     'amount': $( scope + '_multi_amount' ).val(),
                     'remark': $( scope + '_multi_remark' ).val(),
-                    'action': scope == '#wallet_topup' ? 'topup' : 'deduct',
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function( response ) {
@@ -518,10 +498,8 @@ if ( $multiSelect ) {
                     button.removeClass( 'disabled' );
                     
                     scope == '#wallet_topup' ? wmtm.hide() : wdm.hide();
-
                     $( '#modal_success .caption-text' ).html( response.message );
                     modalSuccess.toggle();
-
                     dt_table.draw( false );
                 },
                 error: function( error ) {

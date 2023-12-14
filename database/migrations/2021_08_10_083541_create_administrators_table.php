@@ -20,6 +20,7 @@ class CreateAdministratorsTable extends Migration
             $table->string( 'password' );
             $table->string( 'name', 50 )->nullable();
             $table->tinyInteger( 'role' );
+            $table->tinyInteger( 'status' )->default(10);
             $table->text( 'mfa_secret' )->nullable();
             $table->rememberToken();
             $table->timestamp('email_verified_at')->nullable();

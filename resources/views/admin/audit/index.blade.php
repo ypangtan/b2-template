@@ -183,11 +183,28 @@ $columns = [
                     width: '10%',
                     className: 'text-center',
                     render: function( data, type, row, meta ) {
-                        @can( 'edit audits' )
-                        return '<strong class="dt-edit table-action link-primary" data-id="' + data + '">{{ __( 'datatables.view' ) }}</strong>';
-                        @else
-                        return '-';
+
+                        @canany( [ 'edit audits', 'view audits' ] )
+
+                        let view = '';
+
+                        @can( 'edit roles' )
+                        view += '<li class="dropdown-item click-action dt-edit" data-id="' + data + '">{{ __( 'datatables.view' ) }}</li>';
                         @endcan
+
+                        let html = 
+                        `
+                        <div class="dropdown">
+                            <i class="text-primary click-action" icon-name="more-horizontal" data-bs-toggle="dropdown"></i>
+                            <ul class="dropdown-menu">
+                            ` + view + `
+                            </ul>
+                        </div>
+                        `;
+                        return html;
+                        @else
+                        return '<i class="text-secondary" icon-name="more-horizontal" data-bs-toggle="dropdown"></i>';
+                        @endcanany
                     },
                 },
             ],
@@ -198,8 +215,7 @@ $columns = [
     document.addEventListener( 'DOMContentLoaded', function() {
 
         var av = '#{{ $audit_view }}',
-            audit_view_canvas = new bootstrap.Offcanvas( document.getElementById( 'audit_view_canvas' ) ),
-            toast = new bootstrap.Toast( document.getElementById( 'toast' ) );
+            audit_view_canvas = new bootstrap.Offcanvas( document.getElementById( 'audit_view_canvas' ) );
 
         document.getElementById( 'audit_view_canvas' ).addEventListener( 'hidden.bs.offcanvas', function() {
             $( '.offcanvas-body .form-control' ).removeClass( 'is-invalid' ).val( '' );

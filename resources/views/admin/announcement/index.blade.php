@@ -49,7 +49,7 @@ $columns = [
     <div class="card-body">
         <div class="mb-3 text-end">
             @can( 'add announcements' )
-            <button id="add" class="btn btn-sm btn-success" type="button">{{ __( 'template.create' ) }}</button>
+            <a class="btn btn-sm btn-primary" href="{{ route( 'admin.announcement.add' ) }}">{{ __( 'template.create' ) }}</a>
             @endcan
         </div>
         <x-data-tables id="announcement_table" enableFilter="true" enableFooter="false" columns="{{ json_encode( $columns ) }}" />
@@ -68,7 +68,17 @@ $columns = [
     @endif
     @endforeach
 
-    var dt_table,
+    var statusMapper = {
+            '10': {
+                'text': '{{ __( 'datatables.published' ) }}',
+                'color': 'badge rounded-pill bg-success',
+            },
+            '20': {
+                'text': '{{ __( 'datatables.unpublished' ) }}',
+                'color': 'badge rounded-pill bg-danger',
+            },
+        },
+        dt_table,
         dt_table_name = '#announcement_table',
         dt_table_config = {
             language: {
@@ -126,7 +136,7 @@ $columns = [
                 {
                     targets: parseInt( '{{ Helper::columnIndex( $columns, "status" ) }}' ),
                     render: function( data, type, row, meta ) {
-                        return data == 20 ? '{{ __( 'datatables.unpublished' ) }}' : '{{ __( 'datatables.published' ) }}';
+                        return '<span class="' + statusMapper[data].color + '">' + statusMapper[data].text + '</span>';
                     },
                 },
                 {
@@ -136,17 +146,16 @@ $columns = [
                     className: 'text-center',
                     render: function( data, type, row, meta ) {
 
-                        @canany( [ 'edit announcements', 'view announcements'. 'approve announcements' ] )
+                        @canany( [ 'edit announcements', 'view announcements' ] )
 
                         let view = '',
-                            edit = '',
                             status = '';
 
                         @can( 'edit announcements' )
                         view += '<li class="dropdown-item click-action dt-edit" data-id="' + data + '">{{ __( 'datatables.edit' ) }}</li>';
                         status = row['status'] == 10 ? 
-                        '<li class="dropdown-item click-action dt-status" data-id="' + data + '" data-status="20">{{ __( 'datatables.unpublish' ) }}</li>':
-                        '<li class="dropdown-item click-action dt-status" data-id="' + data + '" data-status="10">{{ __( 'datatables.publish' ) }}</li>' ;
+                        '<li class="dropdown-item click-action dt-suspend" data-id="' + data + '">{{ __( 'datatables.unpublish' ) }}</li>':
+                        '<li class="dropdown-item click-action dt-activate" data-id="' + data + '">{{ __( 'datatables.publish' ) }}</li>' ;
                         @endcan
 
                         let html = 
@@ -172,38 +181,63 @@ $columns = [
 
     document.addEventListener( 'DOMContentLoaded', function() {
 
-        let toast = new bootstrap.Toast( document.getElementById( 'toast' ) );
-
-        $( document ).on( 'click', '#add', function() {
-
-            window.open( '{{ route( 'admin.announcement.add' ) }}', '_blank' );
-        } );
-        
         $( document ).on( 'click', '.dt-edit', function() {
-
-            let id = $( this ).data( 'id' );
-
-            window.open( '{{ route( 'admin.announcement.edit' ) }}/' + id, '_blank' );
+            window.location.href = '{{ route( 'admin.announcement.edit' ) }}?id=' + $( this ).data( 'id' );
         } );
 
-         $( document ).on( 'click', '.dt-status', function() {
+        let aid = 0,
+            status = '',
+            scope = '';
 
-            let data = {
-                id: $( this ).data( 'id' ),
-                status: $( this ).data( 'status' ),
-                _token: '{{ csrf_token() }}',
+        $( document ).on( 'click', '.dt-suspend', function() {
+
+            aid = $( this ).data( 'id' );
+            status = 20,
+            scope = 'status';
+
+            $( '#modal_confirmation_title' ).html( '{{ __( 'template.x_y', [ 'action' => __( 'datatables.unpublish' ), 'title' => Str::singular( __( 'template.announcements' ) ) ] ) }}' );
+            $( '#modal_confirmation_description' ).html( '{{ __( 'template.are_you_sure_to_x_y', [ 'action' => __( 'datatables.unpublish' ), 'title' => Str::singular( __( 'template.announcements' ) ) ] ) }}' );
+
+            modalConfirmation.show();
+        } );
+
+        $( document ).on( 'click', '.dt-activate', function() {
+
+            aid = $( this ).data( 'id' );
+            status = 10,
+            scope = 'status';
+
+            $( '#modal_confirmation_title' ).html( '{{ __( 'template.x_y', [ 'action' => __( 'datatables.publish' ), 'title' => Str::singular( __( 'template.announcements' ) ) ] ) }}' );
+            $( '#modal_confirmation_description' ).html( '{{ __( 'template.are_you_sure_to_x_y', [ 'action' => __( 'datatables.publish' ), 'title' => Str::singular( __( 'template.announcements' ) ) ] ) }}' );
+
+            modalConfirmation.show();
+        } );
+
+        $( document ).on( 'click', '#modal_confirmation_submit', function() {
+
+            switch ( scope ) {
+                case 'status':
+                    $.ajax( {
+                        url: '{{ route( 'admin.announcement.updateAnnouncementStatus' ) }}',
+                        type: 'POST',
+                        data: {
+                            id: aid,
+                            status,
+                            _token: '{{ csrf_token() }}',
+                        },
+                        success: function( response ) {
+                            modalConfirmation.hide();
+                            $( '#modal_success .caption-text' ).html( response.message );
+                            modalSuccess.show();
+                            dt_table.draw( false );
+                        },
+                        error: function( error ) {
+                            modalConfirmation.hide();
+                            $( '#modal_danger .caption-text' ).html( error.responseJSON.message );
+                            modalDanger.show();
+                        },
+                    } );        
             }
-
-            $.ajax( {
-                url: '{{ route( 'admin.announcement.updateAnnouncementStatus' ) }}',
-                type: 'POST',
-                data: data,
-                success: function( response ) {
-                    $( '#modal_success .caption-text' ).html( response.message );
-                    modalSuccess.toggle();
-                    dt_table.draw( false );
-                },
-            } );
         } );
 
         $( '#created_date' ).flatpickr( {

@@ -21,8 +21,10 @@ class WalletService
 {
     public static function allWallets( $request ) {
 
-        $userWallet = UserWallet::with( [ 'user' ] )->select( 'user_wallets.*' );
-        $userWallet->leftJoin( 'users', 'users.id', '=', 'user_wallets.user_id' );
+        $userWallet = UserWallet::with( [
+            'user',
+            'user.userDetail',
+        ] )->select( 'user_wallets.*' );
 
         $filterObject = self::filterWallet( $request, $userWallet );
         $userWallet = $filterObject['model'];
@@ -37,31 +39,53 @@ class WalletService
 
         $userWallets = $userWallet->skip( $offset )->take( $limit )->get();
 
-        if ( $userWallets ) {
-            $userWallets->append( [
-                'listing_balance',
-                'encrypted_id',
-            ] );
-        }
+        $pageTotalAmount1 = 0;
+        $userWallets->each( function( $uw ) use ( &$pageTotalAmount1 ) {
+            $pageTotalAmount1 += $uw->balance;
+        } );
+        $userWallets->append( [
+            'listing_balance',
+            'encrypted_id',
+        ] );
 
-        $totalRecord = UserWallet::count();
+        $userWallet = UserWallet::select(
+            DB::raw( 'COUNT(user_wallets.id) as total,
+            SUM(user_wallets.balance) as grandTotal1'
+        ) );
+
+        $filterObject = self::filterWallet( $request, $userWallet );
+        $userWallet = $filterObject['model'];
+        $filter = $filterObject['filter'];
+
+        $userWallet = $userWallet->first();
 
         $data = [
             'user_wallets' => $userWallets,
             'draw' => $request->draw,
-            'recordsFiltered' => $filter ? $userWalletCount : $totalRecord,
-            'recordsTotal' => $totalRecord,
+            'recordsFiltered' => $filter ? $userWalletCount : $userWallet->total,
+            'recordsTotal' => $filter ? UserWallet::count() : $userWalletCount,
+            'subTotal' => [
+                Helper::numberFormat( $pageTotalAmount1, 2, true )
+            ],
+            'grandTotal' => [ 
+                Helper::numberFormat( $userWallet->grandTotal1, 2, true )
+            ],
         ];
 
-        return response()->json( $data );
+        return $data;
     }
 
     private static function filterWallet( $request, $model ) {
 
         $filter = false;
 
-        if ( !empty( $request->username ) ) {
-            $model->where( 'users.username', $request->username );
+        if ( !empty( $request->user ) ) {
+            $model->whereHas( 'user', function( $query ) use ( $request ) {
+                $query->where( 'users.email', $request->user );
+            } );
+            $model->orWhereHas( 'user.userDetail', function( $query ) use ( $request ) {
+                $query->where( 'user_details.fullname', $request->user );
+            } );
             $filter = true;
         }
 
@@ -96,6 +120,8 @@ class WalletService
 
     public static function updateWallet( $request ) {
 
+        DB::beginTransaction();
+
         $request->merge( [
             'id' => Helper::decode( $request->id ),
         ] );
@@ -103,7 +129,6 @@ class WalletService
         $validator = Validator::make( $request->all(), [
             'amount' => [ 'required', 'numeric' ],
             'remark' => [ 'required', 'string' ],
-            'action' => [ 'required', 'in:topup,deduct' ],
         ] );
 
         $attributeName = [
@@ -117,16 +142,14 @@ class WalletService
         
         $validator->setAttributeNames( $attributeName )->validate();
 
-        DB::beginTransaction();
-
         try {
 
             $userWallet = UserWallet::lockForUpdate()->find( $request->id );
             self::transact( $userWallet, [
-                'amount' => $request->action == 'topup' ? $request->amount : ( $request->amount * -1 ),
+                'amount' => $request->amount,
                 'remark' => $request->remark,
                 'type' => $userWallet->type,
-                'transaction_type' => 3,
+                'transaction_type' => 10,
             ] );
 
             DB::commit();
@@ -150,7 +173,6 @@ class WalletService
         $validator = Validator::make( $request->all(), [
             'amount' => [ 'required', 'numeric' ],
             'remark' => [ 'required', 'string' ],
-            'action' => [ 'required', 'in:topup,deduct' ],
         ] );
 
         $attributeName = [
@@ -164,18 +186,18 @@ class WalletService
 
         $validator->setAttributeNames( $attributeName )->validate();
 
-        DB::beginTransaction();
-
         try {
 
             foreach ( $request->ids as $id ) {
 
+                DB::beginTransaction();
+
                 $userWallet = UserWallet::lockForUpdate()->find( $id );
                 self::transact( $userWallet, [
-                    'amount' => $request->action == 'topup' ? $request->amount : ( $request->amount * -1 ),
+                    'amount' => $request->amount,
                     'remark' => $request->remark,
                     'type' => $userWallet->type,
-                    'transaction_type' => 3,
+                    'transaction_type' => 10,
                 ] );
 
                 DB::commit();
@@ -197,8 +219,10 @@ class WalletService
 
     public static function allWalletTransactions( $request ) {
 
-        $transaction = UserWalletTransaction::with( [ 'user' ] )->select( 'user_wallet_transactions.*' );
-        $transaction->leftJoin( 'users', 'users.id', '=', 'user_wallet_transactions.user_id' );
+        $transaction = UserWalletTransaction::with([
+            'user',
+            'user.userDetail',
+        ] )->select( 'user_wallet_transactions.*' );
 
         $filterObject = self::filterTransaction( $request, $transaction );
         $transaction = $filterObject['model'];
@@ -220,38 +244,40 @@ class WalletService
 
         $transactions = $transaction->skip( $offset )->take( $limit )->get();
 
-        $subTotal = 0;
+        $pageTotalAmount1 = 0;
+        $transactions->each( function( $t ) use ( &$pageTotalAmount1 ) {
+            $pageTotalAmount1 += $t->amount;
+        } );
+        $transactions->append( [
+            'converted_remark',
+            'listing_amount',
+        ] );
 
-        if ( $transactions ) {
-            $transactions->append( [
-                'converted_remark',
-                'listing_amount',
-            ] );
+        $transaction = UserWalletTransaction::select(
+            DB::raw( 'COUNT(user_wallet_transactions.id) as total,
+            SUM(user_wallet_transactions.amount) as grandTotal1'
+        ) );
 
-            foreach ( $transactions as $transaction ) {
-                $subTotal += $transaction->amount;
-            }
-        }
+        $filterObject = self::filterTransaction( $request, $transaction );
+        $transaction = $filterObject['model'];
+        $filter = $filterObject['filter'];
 
-        $totalRecord = UserWalletTransaction::count();
-        $userWalletTransactionObject = UserWalletTransaction::select( DB::raw( 'COUNT(*) as total, SUM(amount) AS grand_total' ) )->first();
-        $grandTotal = $userWalletTransactionObject->grand_total;
-        $totalRecord = $userWalletTransactionObject->total;
+        $transaction = $transaction->first();
 
         $data = [
             'transactions' => $transactions,
             'draw' => $request->draw,
-            'recordsFiltered' => $filter ? $transactionCount : $totalRecord,
-            'recordsTotal' => $totalRecord,
+            'recordsFiltered' => $filter ? $transactionCount : $transaction->total,
+            'recordsTotal' => $filter ? UserWalletTransaction::where( 'status', 10 )->count() : $transactionCount,
             'subTotal' => [
-                Helper::numberFormat( $subTotal, 2 )
+                Helper::numberFormat( $pageTotalAmount1, 2, true )
             ],
             'grandTotal' => [ 
-                Helper::numberFormat( $grandTotal, 2 )
+                Helper::numberFormat( $transaction->grandTotal1, 2, true )
             ],
         ];
 
-        return response()->json( $data );
+        return $data;
     }
 
     private static function filterTransaction( $request, $model ) {
@@ -282,8 +308,13 @@ class WalletService
             $filter = true;
         }
 
-        if ( !empty( $request->username ) ) {
-            $model->where( 'users.username', $request->username );
+        if ( !empty( $request->user ) ) {
+            $model->whereHas( 'user', function( $query ) use ( $request ) {
+                $query->where( 'users.email', $request->user );
+            } );
+            $model->orWhereHas( 'user.userDetail', function( $query ) use ( $request ) {
+                $query->where( 'user_details.fullname', $request->user );
+            } );
             $filter = true;
         }
 
@@ -317,7 +348,7 @@ class WalletService
             'amount' => $data['amount'],
             'closing_balance' => $userWallet->balance,
             'remark' => isset( $data['remark'] ) ? $data['remark'] : null,
-            'type' => $data['type'],
+            'type' => $userWallet->type,
             'transaction_type' => $data['transaction_type'],
         ] );
 

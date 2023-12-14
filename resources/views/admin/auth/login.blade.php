@@ -16,8 +16,8 @@
                                         @csrf
                                         <div class="mb-3">
                                             <label class="form-label">{{ __('auth.email') }}</label>
-                                            <input class="form-control form-control-sm @error('email') is-invalid @enderror" type="text" name="email" placeholder="{{ __( 'auth.enter_your_x', [ 'type' => strtolower( __( 'auth.email' ) ) ] ) }}" value="{{ old( 'email' ) ? old( 'email' ) : '' }}" />
-                                            @error('email')
+                                            <input class="form-control form-control-sm @error('username') is-invalid @enderror" type="text" name="username" placeholder="{{ __( 'auth.enter_your_x', [ 'type' => strtolower( __( 'auth.email' ) ) ] ) }}" value="{{ old( 'username' ) ? old( 'username' ) : '' }}" />
+                                            @error('username')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
                                             </span>

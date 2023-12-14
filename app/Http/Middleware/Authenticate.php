@@ -12,21 +12,15 @@ class Authenticate extends Middleware
      * @param  \Illuminate\Http\Request  $request
      * @return string|null
      */
-    protected function redirectTo($request)
+    protected function redirectTo( $request )
     {
-        if (! $request->expectsJson()) {
+        if ( !$request->expectsJson() ) {
 
-            if( request()->is( 'backoffice/*' ) ) {
-                \Session::put( 'redirect', \URL::full() );
+            if ( request()->is( 'backoffice/*' ) ) {
                 return route( 'admin.login' );
             }
-
-            if( request()->is( 'base2_branch/*' ) ) {
-                \Session::put( 'redirect', \URL::full() );
-                return route( 'branch.login' );
-            }
             
-            return route('login');
+            return route( 'web.login' );
         }
     }
 }

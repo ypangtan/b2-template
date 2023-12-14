@@ -9,14 +9,10 @@ $administrator_edit = 'administrator_edit';
                 <div class="mb-3 row">
                     <label for="{{ $administrator_edit }}_username" class="col-sm-5 col-form-label">{{ __( 'administrator.username' ) }}</label>
                     <div class="col-sm-7">
-                        <div class="input-group input-group-sm has-validation">
-                            <span class="input-group-text" id="{{ $administrator_edit }}_prefix"></span>
-                            <input type="text" class="form-control form-control-sm" id="{{ $administrator_edit }}_username">
-                            <div class="invalid-feedback"></div>
-                        </div>
+                        <input type="text" class="form-control form-control-sm" id="{{ $administrator_edit }}_username">
+                        <div class="invalid-feedback"></div>
                     </div>
-                </div>
-                <div class="mb-3 row">
+                </div><div class="mb-3 row">
                     <label for="{{ $administrator_edit }}_email" class="col-sm-5 col-form-label">{{ __( 'administrator.email' ) }}</label>
                     <div class="col-sm-7">
                         <input type="text" class="form-control form-control-sm" id="{{ $administrator_edit }}_email">
@@ -52,7 +48,7 @@ $administrator_edit = 'administrator_edit';
                 <div class="text-end">
                     <button id="{{ $administrator_edit }}_cancel" type="button" class="btn btn-sm btn-outline-secondary">{{ __( 'template.cancel' ) }}</button>
                     &nbsp;
-                    <button id="{{ $administrator_edit }}_submit" type="button" class="btn btn-sm btn-success">{{ __( 'template.save_changes' ) }}</button>
+                    <button id="{{ $administrator_edit }}_submit" type="button" class="btn btn-sm btn-primary">{{ __( 'template.save_changes' ) }}</button>
                 </div>
             </div>
         </div>
@@ -69,17 +65,6 @@ $administrator_edit = 'administrator_edit';
             window.location.href = '{{ route( 'admin.module_parent.administrator.index' ) }}';
         } );
 
-        $( ae + '_role' ).on( 'change', function() {
-
-            const pos = roleMapper.map( e => e.value ).indexOf( parseInt( $( this ).val() ) );
-
-            if ( [ 'jpj', 'puspakom' ].includes( roleMapper[pos].key ) ) {
-                $( ae + '_prefix' ).html( roleMapper[pos].key + '-' );
-            } else {
-                $( ae + '_prefix' ).html( '' );
-            }
-        } );
-
         $( ae + '_submit' ).click( function() {
 
             resetInputValidation();
@@ -90,7 +75,7 @@ $administrator_edit = 'administrator_edit';
 
             let formData = new FormData();
             formData.append( 'id', '{{ request( 'id' ) }}' );
-            formData.append( 'username', $( ae + '_prefix' ).html() + $( ae + '_username' ).val() );
+            formData.append( 'username', $( ae + '_username' ).val() );
             formData.append( 'email', $( ae + '_email' ).val() );
             formData.append( 'fullname', $( ae + '_fullname' ).val() );
             formData.append( 'password', $( ae + '_password' ).val() );
@@ -145,17 +130,7 @@ $administrator_edit = 'administrator_edit';
                 },
                 success: function( response ) {
 
-                    const pos = roleMapper.map( e => e.value ).indexOf( parseInt( response.role ) );
-
-                    if ( [ 'jpj', 'puspakom' ].includes( roleMapper[pos].key ) ) {
-                        $( ae + '_prefix' ).html( roleMapper[pos].key + '-' );
-                    } else {
-                        $( ae + '_prefix' ).html( '' );
-                    }
-
-                    let username = response.username.replace( $( ae + '_prefix' ).html(), '' );
-
-                    $( ae + '_username' ).val( username );
+                    $( ae + '_username' ).val( response.username );
                     $( ae + '_email' ).val( response.email );
                     $( ae + '_fullname' ).val( response.name );
                     $( ae + '_role' ).val( response.role );

@@ -17,4 +17,10 @@ return [
     'email' => 'Email',
     'password' => 'Password',
     'request_type' => 'Request Type',
+    'user' => 'User',
+    'fullname' => 'Fullname',
+    'phone_number' => 'Phone Number',
+    'invitation_code' => 'Invitation Code',
+    'capital' => 'Capital',
+    'referral' => 'Referral',
 ];

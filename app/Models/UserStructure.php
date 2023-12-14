@@ -10,33 +10,31 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class CategoryStructure extends Model
+class UserStructure extends Model
 {
     use HasFactory, LogsActivity;
 
     protected $fillable = [
-        'parent_id',
-        'child_id',
-        'level',
-        'status',
+        'user_id',
+        'referral_id',
+        'level'
     ];
 
-    public function category() {
-        return $this->belongsTo( Category::class, 'child_id' );
+    public function user() {
+        return $this->belongsTo( User::class, 'user_id' )->withTrashed();
     }
 
-    protected function serializeDate( DateTimeInterface $date ) {
+    protected function serializeDate(DateTimeInterface $date) {
         return $date->timezone( 'Asia/Kuala_Lumpur' )->format( 'Y-m-d H:i:s' );
     }
 
     protected static $logAttributes = [
-        'parent_id',
-        'child_id',
-        'level',
-        'status',
+        'user_id',
+        'referral_id',
+        'level'
     ];
 
-    protected static $logName = 'category_structures';
+    protected static $logName = 'users_structure';
 
     protected static $logOnlyDirty = true;
 
@@ -45,6 +43,6 @@ class CategoryStructure extends Model
     }
 
     public function getDescriptionForEvent( string $eventName ): string {
-        return "{$eventName} category structure";
+        return "{$eventName} user structure";
     }
 }

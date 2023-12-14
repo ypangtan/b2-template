@@ -8,11 +8,8 @@ use App\Http\Controllers\Admin\{
     AdministratorController,
     AnnouncementController,
     AuditController,
-    CategoryController,
     DashboardController,
     ModuleController,
-    OrderController,
-    ProductController,
     ProfileController,
     RoleController,
     SettingController,
@@ -64,6 +61,7 @@ Route::prefix( 'backoffice' )->group( function() {
                 Route::post( 'all-administrators', [ AdministratorController::class, 'allAdministrators' ] )->name( 'admin.administrator.allAdministrators' );
                 Route::post( 'one-administrator', [ AdministratorController::class, 'oneAdministrator' ] )->name( 'admin.administrator.oneAdministrator' );
                 Route::post( 'update-administrator', [ AdministratorController::class, 'updateAdministrator' ] )->name( 'admin.administrator.updateAdministrator' );
+                Route::post( 'update-administrator-status', [ AdministratorController::class, 'updateAdministratorStatus' ] )->name( 'admin.administrator.updateAdministratorStatus' );
             } );
 
             Route::prefix( 'roles' )->group( function() {
@@ -121,6 +119,7 @@ Route::prefix( 'backoffice' )->group( function() {
                 Route::post( 'one-user', [ UserController::class, 'oneUser' ] )->name( 'admin.user.oneUser' );
                 Route::post( 'create-user', [ UserController::class, 'createUser' ] )->name( 'admin.user.createUser' );
                 Route::post( 'update-user', [ UserController::class, 'updateUser' ] )->name( 'admin.user.updateUser' );
+                Route::post( 'update-user-status', [ UserController::class, 'updateUserStatus' ] )->name( 'admin.user.updateUserStatus' );
             } );
 
             Route::prefix( 'wallets' )->group( function() {
@@ -249,7 +248,7 @@ Route::prefix( 'backoffice' )->group( function() {
 
     $limiter = config( 'fortify.limiters.login' );
 
-    Route::post( '/login', [ AuthenticatedSessionController::class, 'store' ] )->middleware( array_filter( [ 'guest:admin', $limiter ? 'throttle:'.$limiter : null ] ) );
+    Route::post( '/login', [ AuthenticatedSessionController::class, 'store' ] )->middleware( array_filter( [ 'guest:admin', $limiter ? 'throttle:'.$limiter : null ] ) )->name( 'admin._login' );
 
     Route::post( '/logout', [ AuthenticatedSessionController::class, 'destroy' ] )->middleware( 'auth:admin' )->name( 'admin.logout' );
 } );

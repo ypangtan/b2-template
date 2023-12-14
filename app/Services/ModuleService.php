@@ -2,6 +2,11 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\{
+    DB,
+};
+
 use App\Models\{
     Module,
 };
@@ -39,16 +44,24 @@ class ModuleService
         
         $modules = $module->skip( $offset )->take( $limit )->get();
 
-        $totalRecord = Module::count();
+        $module = Module::select(
+            DB::raw( 'COUNT(modules.id) as total'
+        ) );
+
+        $filterObject = self::filter( $request, $module );
+        $module = $filterObject['model'];
+        $filter = $filterObject['filter'];
+
+        $module = $module->first();
 
         $data = [
             'modules' => $modules,
             'draw' => $request->draw,
-            'recordsFiltered' => $filter ? $moduleCount : $totalRecord,
-            'recordsTotal' => $totalRecord,
+            'recordsFiltered' => $filter ? $moduleCount : $module->total,
+            'recordsTotal' => $filter ? Module::count() : $moduleCount,
         ];
 
-        return response()->json( $data );
+        return $data;
     }
 
     private static function filter( $request, $model ) {

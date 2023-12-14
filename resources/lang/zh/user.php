@@ -17,4 +17,10 @@ return [
     'email' => '电子邮件',
     'password' => '密码',
     'request_type' => '请求类型',
+    'user' => '用户',
+    'fullname' => '全名',
+    'phone_number' => '电话号码',
+    'invitation_code' => '邀请码',
+    'capital' => '本金',
+    'referral' => '推荐人',
 ];

@@ -7,8 +7,6 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
@@ -17,7 +15,7 @@ use Helper;
 
 class Administrator extends Authenticatable
 {
-    use HasFactory, LogsActivity, HasRoles, SoftDeletes;
+    use HasFactory, LogsActivity, HasRoles;
 
     protected $fillable = [
         'username',
@@ -25,11 +23,12 @@ class Administrator extends Authenticatable
         'name',
         'role',
         'mfa_secret',
-        'password'
+        'password',
+        'status',
     ];
 
     public function role() {
-        return $this->BelongsTo( Role::class, 'role' );
+        return $this->belongsTo( Role::class, 'role' );
     }
 
     public function getEncryptedIdAttribute() {
@@ -46,7 +45,8 @@ class Administrator extends Authenticatable
         'name',
         'role',
         'mfa_secret',
-        'password'
+        'password',
+        'status',
     ];
 
     protected static $logName = 'administrators';

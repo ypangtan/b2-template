@@ -1,11 +1,4 @@
 <?php
-$role_create = 'role_create';
-$role_edit = 'role_edit';
-
-$multiSelect = 0;
-?>
-
-<?php
 $columns = [
     [
         'type' => 'default',
@@ -42,7 +35,7 @@ $columns = [
     <div class="card-body">
         <div class="mb-3 text-end">
             @can( 'add roles' )
-            <a class="btn btn-sm btn-success" href="{{ route( 'admin.role.add' ) }}">{{ __( 'template.create' ) }}</a>
+            <a class="btn btn-sm btn-primary" href="{{ route( 'admin.role.add' ) }}">{{ __( 'template.create' ) }}</a>
             @endcan
         </div>
         <x-data-tables id="role_table" enableFilter="true" enableFooter="false" columns="{{ json_encode( $columns ) }}" />
@@ -135,11 +128,30 @@ $contents = [
                     width: '10%',
                     className: 'text-center',
                     render: function( data, type, row, meta ) {
+
+                        @canany( [ 'edit roles', 'view roles' ] )
+
+                        let view = '',
+                            edit = '',
+                            status = '';
+
                         @can( 'edit roles' )
-                        return '<strong class="dt-edit table-action link-primary" data-id="' + data + '">{{ __( 'datatables.edit' ) }}</strong>';
-                        @else
-                        return '-';
+                        view += '<li class="dropdown-item click-action dt-edit" data-id="' + data + '">{{ __( 'datatables.edit' ) }}</li>';
                         @endcan
+
+                        let html = 
+                        `
+                        <div class="dropdown">
+                            <i class="text-primary click-action" icon-name="more-horizontal" data-bs-toggle="dropdown"></i>
+                            <ul class="dropdown-menu">
+                            ` + view + `
+                            </ul>
+                        </div>
+                        `;
+                        return html;
+                        @else
+                        return '<i class="text-secondary" icon-name="more-horizontal" data-bs-toggle="dropdown"></i>';
+                        @endcanany
                     },
                 },
             ],
@@ -148,10 +160,6 @@ $contents = [
         timeout = null;
 
     document.addEventListener( 'DOMContentLoaded', function() {
-
-        var rc = '#{{ $role_create }}',
-            re = '#{{ $role_edit }}',
-            toast = new bootstrap.Toast( document.getElementById( 'toast' ) );
 
         $( document ).on( 'click', '.dt-edit', function() {
             window.location.href = '{{ route( 'admin.role.edit' ) }}?id=' + $( this ).data( 'id' );

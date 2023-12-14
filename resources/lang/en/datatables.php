@@ -39,6 +39,7 @@ return [
     'active' => 'Active',
     'inactive' => 'Inactive',
     'suspend' => 'Suspend',
+    'activate' => 'Activate',
     'activated' => 'Activated',
     'suspended' => 'Suspended',
     'enabled' => 'Enabled',
@@ -47,6 +48,7 @@ return [
     'unpublish' => 'Unpublish',
     'published' => 'Published',
     'unpublished' => 'Unpublished',
+
     'yes' => 'Yes',
     'no' => 'No',
     'action' => 'Action',

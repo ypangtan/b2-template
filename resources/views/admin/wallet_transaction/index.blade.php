@@ -15,9 +15,9 @@ $columns = [
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'wallet.username' ) ] ),
-        'id' => 'username',
-        'title' => __( 'wallet.username' ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'wallet.user' ) ] ),
+        'id' => 'user',
+        'title' => __( 'wallet.user' ),
     ],
     [
         'type' => 'select',
@@ -86,12 +86,15 @@ $columns = [
                 },
                 dataSrc: 'transactions',
             },
-            lengthMenu: [[10, 25],[10, 25]],
+            lengthMenu: [
+                [ 10, 25, 50, 999999 ],
+                [ 10, 25, 50, '{{ __( 'datatables.all' ) }}' ]
+            ],
             order: [[ 1, 'desc' ]],
             columns: [
                 { data: null },
                 { data: 'created_at' },
-                { data: 'user.username' },
+                { data: 'user' },
                 { data: 'type' },
                 { data: 'transaction_type' },
                 { data: 'converted_remark' },
@@ -106,10 +109,23 @@ $columns = [
                     },
                 },
                 {
-                    targets: parseInt( '{{ Helper::columnIndex( $columns, "username" ) }}' ),
+                    targets: parseInt( '{{ Helper::columnIndex( $columns, "user" ) }}' ),
                     orderable: false,
                     render: function( data, type, row, meta ) {
-                        return data;
+
+                        let email = data.email ?? '-';
+                            fullname = data.user_detail?.fullname ?? '-',
+                            html = '';
+
+                        html +=
+                        `
+                        <span>
+                        <strong>` + fullname + `</strong><br>
+                        <strong>{{ __( 'user.email' ) }}</strong>: ` + email + `
+                        </span>
+                        `;
+
+                        return html;
                     },
                 },
                 {

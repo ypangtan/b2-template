@@ -13,8 +13,7 @@ return [
     |
     */
 
-    'search_order' => '查找订单',
-    'logout' => '登出',
+    // Sidebar
     'operations' => '运营管理',
     'dashboard' => '仪表板',
     'administrators' => '管理员',
@@ -22,35 +21,40 @@ return [
     'list' => '列表',
     'roles' => '角色',
     'modules' => '模块',
-    'branches' => '分行',
     'users' => '用户',
-    'customers' => '客户',
     'wallets' => '钱包',
     'wallet_transactions' => '钱包账单',
     'announcements' => '公告',
     'reports' => '报告',
     'settings' => '设定',
-    'categories' => '分类',
-    'category' => '分类',
-    'products' => '产品',
-    'orders' => '订单',
-    'promotions' => '优惠',
-    'discount_rules' => '折扣方案',
-    'marketings' => '营销',
-    'first_setup' => '初次设置',
-    'verify_account' => '验证账号',
-    'profile' => '资料',
+
+    // Title
     'add_x' => '新增:title',
     'edit_x' => '编辑:title',
     'view_x' => '查看:title',
     'delete_x' => '删除:title',
-    
-    'leave_blank' => '密码 (留空保持不变)',
+    'new_x' => '新增:title',
+    'edit_x' => '编辑:title',
+    'update_x' => '更新:title',
+    'new_x_created' => '已创建新:title。',
+    'x_updated' => '已更新:title。',
+    'x_y' => ':action:title',
+    'title_x_action_y' => ':title:action',
+    'are_you_sure_to_x_y' => '你确定要:action:title?',
+
+    // Message
+    'leave_blank' => '留空保持不变',
     'loading' => '载入中...',
+    'drag_n_drop' => '拖拽文件或点击浏览',
+    'drop_file_or_click_to_upload' => '拖拽文件或点击上传。',
+    'drop_files_or_click_to_upload' => '拖拽文件或点击上传。',
+
+    // Button
     'export' => '导出',
     'create' => '创建',
     'update' => '更新',
     'delete' => '删除',
+    'view' => '查看',
     'add' => '添加',
     'edit' => '编辑',
     'submit' => '提交',
@@ -58,11 +62,22 @@ return [
     'confirm' => '确定',
     'cancel' => '取消',
     'no_changes' => '没有改变。',
+    'logout' => '登出',
+
+    // Status
+    'yes' => '是',
+    'no' => '否',
+
+    // Modal
     'confirmation' => '确认',
     'success' => '成功',
     'error' => '错误',
+    
+    // Others
     'optional' => '选填',
-
+    'first_setup' => '初次设置',
+    'verify_account' => '验证账号',
+    'profile' => '资料',
     'general_info' => '基本信息',
     'description' => '描述',
     'short_description' => '短描述',
@@ -70,19 +85,5 @@ return [
     'friendly_url' => '友好URL',
     'meta_title' => '元标题',
     'meta_description' => '元描述',
-    
     'gallery' => '相册',
-    'drag_n_drop' => '拖拽文件或点击浏览',
-
-    'yes' => '是',
-    'no' => '否',
-
-    'new_x' => '新增:title',
-    'edit_x' => '编辑:title',
-    'update_x' => '更新:title',
-    'new_x_created' => '已创建新:title。',
-    'x_updated' => '已更新:title。',
-
-    'drop_file_or_click_to_upload' => '拖拽文件或点击上传。',
-    'drop_files_or_click_to_upload' => '拖拽文件或点击上传。',
 ];

@@ -13,8 +13,7 @@ return [
     |
     */
 
-    'search_order' => 'Search Order',
-    'logout' => 'Logout',
+    // Sidebar
     'operations' => 'Operations',
     'dashboard' => 'Dashboard',
     'administrators' => 'Administrators',
@@ -22,35 +21,41 @@ return [
     'list' => 'List',
     'roles' => 'Roles',
     'modules' => 'Modules',
-    'branches' => 'Branches',
     'users' => 'Users',
-    'customers' => 'Customers',
     'wallets' => 'Wallets',
     'wallet_transactions' => 'Wallet Transactions',
     'announcements' => 'Announcements',
     'reports' => 'Reports',
     'settings' => 'Settings',
-    'categories' => 'Categories',
-    'category' => 'Category',
-    'products' => 'Products',
-    'orders' => 'Orders',
-    'promotions' => 'Promotions',
-    'discount_rules' => 'Discount Rules',
-    'marketings' => 'Marketings',
-    'first_setup' => 'First Setup',
-    'verify_account' => 'Verify Account',
-    'profile' => 'Profile',
+
+    // Title
     'add_x' => 'Add :title',
     'edit_x' => 'Edit :title',
     'view_x' => 'View :title',
     'delete_x' => 'Delete :title',
+    'new_x' => 'New :title',
+    'edit_x' => 'Edit :title',
+    'update_x' => 'Update :title',
+    'new_x_created' => 'New :title Created.',
+    'x_updated' => ':title Updated.',
+    'x_y' => ':action :title',
+    'title_x_action_y' => ':title :action',
+    'are_you_sure_to_x_y' => 'Are you sure to :action :title?',
 
-    'leave_blank' => 'Password (leave blank to leave unchanged)',
+    // Message
+    'leave_blank' => 'Leave blank to leave unchanged',
     'loading' => 'Loading...',
+    'drag_n_drop' => 'Drag & Drop files here or click to browse',
+    'drop_file_or_click_to_upload' => 'Drop file here or click to upload.',
+    'drop_files_or_click_to_upload' => 'Drop files here or click to upload.',
+
+    // Button
+    'logout' => 'Logout',
     'export' => 'Export',
     'create' => 'Create',
     'update' => 'Update',
     'delete' => 'Delete',
+    'view' => 'View',
     'add' => 'Add',
     'edit' => 'Edit',
     'submit' => 'Submit',
@@ -58,11 +63,21 @@ return [
     'confirm' => 'Confirm',
     'cancel' => 'Cancel',
     'no_changes' => 'No Changes.',
+
+    // Status
+    'yes' => 'Yes',
+    'no' => 'No',
+
+    // Modal
     'confirmation' => 'Confirmation',
     'success' => 'Success',
     'error' => 'Error',
+
+    // Others
     'optional' => 'Optional',
-    
+    'first_setup' => 'First Setup',
+    'verify_account' => 'Verify Account',
+    'profile' => 'Profile',
     'general_info' => 'General Info',
     'description' => 'Description',
     'short_description' => 'Short Description',
@@ -70,19 +85,5 @@ return [
     'friendly_url' => 'Friendly URL',
     'meta_title' => 'Meta Title',
     'meta_description' => 'Meta Description',
-    
     'gallery' => 'Gallery',
-    'drag_n_drop' => 'Drag & Drop files here or click to browse',
-
-    'yes' => 'Yes',
-    'no' => 'No',
-
-    'new_x' => 'New :title',
-    'edit_x' => 'Edit :title',
-    'update_x' => 'Update :title',
-    'new_x_created' => 'New :title Created.',
-    'x_updated' => ':title Updated.',
-
-    'drop_file_or_click_to_upload' => 'Drop file here or click to upload.',
-    'drop_files_or_click_to_upload' => 'Drop files here or click to upload.',
 ];

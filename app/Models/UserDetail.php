@@ -10,44 +10,37 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class ProductPrice extends Model
+use Helper;
+
+class UserDetail extends Model
 {
     use HasFactory, LogsActivity;
 
     protected $fillable = [
-        'product_id',
-        'display_price',
-        'regular_price',
-        'promo_price',
-        'promo_enabled',
-        'promo_date_from',
-        'promo_date_to',
+        'user_id',
+        'fullname',
+        'photo',
     ];
 
-    // public function getPromoEnabledAttribute() {
+    public function getPhotoPathAttribute() {
+        return $this->attributes['photo'] ? asset( 'storage/' . $this->attributes['photo'] ) : null;
+    }
 
-    //     if ( isset( $this->attributes['promo_date_to'] ) && $this->attributes['promo_date_to'] > date( 'Y-m-d H:i:s' ) ) {
-    //         return 'yes';
-    //     }
-
-    //     return 'no';
-    // }
+    public function getEncryptedIdAttribute() {
+        return Helper::encode( $this->attributes['id'] );
+    }
 
     protected function serializeDate( DateTimeInterface $date ) {
         return $date->timezone( 'Asia/Kuala_Lumpur' )->format( 'Y-m-d H:i:s' );
     }
 
     protected static $logAttributes = [
-        'product_id',
-        'display_price',
-        'regular_price',
-        'promo_price',
-        'promo_enabled',
-        'promo_date_from',
-        'promo_date_to',
+        'user_id',
+        'fullname',
+        'photo',
     ];
 
-    protected static $logName = 'product_prices';
+    protected static $logName = 'user_details';
 
     protected static $logOnlyDirty = true;
 
@@ -56,6 +49,6 @@ class ProductPrice extends Model
     }
 
     public function getDescriptionForEvent( string $eventName ): string {
-        return "{$eventName} product price";
+        return "{$eventName} user detail";
     }
 }

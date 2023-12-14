@@ -49,7 +49,7 @@ $announcement_edit = 'announcement_edit';
                 <div class="text-end">
                     <button id="{{ $announcement_edit }}_cancel" type="button" class="btn btn-sm btn-outline-secondary">{{ __( 'template.cancel' ) }}</button>
                     &nbsp;
-                    <button id="{{ $announcement_edit }}_submit" type="button" class="btn btn-sm btn-success">{{ __( 'template.save_changes' ) }}</button>
+                    <button id="{{ $announcement_edit }}_submit" type="button" class="btn btn-sm btn-primary">{{ __( 'template.save_changes' ) }}</button>
                 </div>
             </div>
         </div>

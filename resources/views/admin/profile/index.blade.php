@@ -21,7 +21,7 @@ $profile = 'profile';
                     </div>
                 </div>
                 <div class="text-end">
-                    <button id="{{ $profile }}_submit" type="button" class="btn btn-sm btn-success">{{ __( 'template.save_changes' ) }}</button>
+                    <button id="{{ $profile }}_submit" type="button" class="btn btn-sm btn-primary">{{ __( 'template.save_changes' ) }}</button>
                 </div>
             </div>
         </div>
