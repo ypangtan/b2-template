@@ -59,8 +59,6 @@
     </div>
 </div>
 
-<x-toast/>
-
 <script>
     document.addEventListener( 'DOMContentLoaded', function() {
         $( '.list-group-item-action' ).click( function() {

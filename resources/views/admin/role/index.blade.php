@@ -61,8 +61,6 @@ $contents = [
 ];
 ?>
 
-<x-toast/>
-
 <script>
 
     window['columns'] = @json( $columns );

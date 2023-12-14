@@ -31,8 +31,6 @@
     </div>
 </div>
 
-<x-toast/>
-
 <script>
     document.addEventListener( 'DOMContentLoaded', function() {
 

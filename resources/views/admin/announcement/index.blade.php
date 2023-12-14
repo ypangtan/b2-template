@@ -56,8 +56,6 @@ $columns = [
     </div>
 </div>
 
-<x-toast/>
-
 <script>
     window['columns'] = @json( $columns );
     window['ids'] = [];
