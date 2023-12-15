@@ -49,7 +49,7 @@ $profile = 'profile';
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
-                @if ( config( 'services.mfa.enabled' ) == false )
+                @if ( config( 'services.mfa.enabled' ) )
                 <div class="mb-3 row">
                     <label for="{{ $profile }}_mfa" class="col-sm-5 col-form-label">{{ __( 'mfa.mfa' ) }}</label>
                     <div class="col-sm-7">
