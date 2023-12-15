@@ -1,11 +1,11 @@
 <div class="card verify-mfa">
     <div class="card-body">
-        <h5 class="card-title mb-3">{{ __( 'setting.verify_mfa_title' ) }}</h5>
+        <h5 class="card-title mb-3">{{ __( 'mfa.verify_mfa_title' ) }}</h5>
         <div class="mb-3">
-            {{ __( 'setting.verify_mfa_subtitle' ) }}
+            {{ __( 'mfa.verify_mfa_subtitle' ) }}
         </div>
         <div class="mb-3">
-            <input type="text" class="form-control form-control-sm" id="authentication_code" placeholder="{{ __( 'setting.authentication_code' ) }}" value="" />
+            <input type="text" class="form-control form-control-sm" id="authentication_code" placeholder="XXXXXX" />
             <div class="invalid-feedback"></div>
         </div>    
         <div class="">
@@ -21,7 +21,7 @@
         $( '#submit' ).click( function() {
 
             $.ajax( {
-                url: '{{ route( 'admin.verifyCode' ) }}',
+                url: '{{ route( 'admin.mfa.verifyCode' ) }}',
                 type: 'POST',
                 data: {
                     authentication_code: $( '#authentication_code' ).val(),

@@ -59,6 +59,6 @@
         @if ( @$header )
             <title>{{ @$header['title'] }} - {{ Helper::websiteName() }}</title>
         @else
-            <title>{{ Helper::websiteName() }} Admin Panel</title>
+            <title>Backoffice - {{ Helper::websiteName() }}</title>
         @endif
     </head>

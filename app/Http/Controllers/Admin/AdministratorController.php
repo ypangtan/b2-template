@@ -199,24 +199,4 @@ class AdministratorController extends Controller {
         
         return RoleService::updateRole( $request );
     }
-
-    public function verify( Request $request ) {
-
-        $value = $request->session()->get( 'mfa-ed' );
-
-        if ( $value ) {
-            return redirect()->route( 'admin.dashboard' );
-        }
-        
-        $this->data['header']['title'] = __( 'template.verify_account' );
-        
-        $this->data['content'] = 'admin.administrator.verify';
-
-        return view( 'admin.main_blank' )->with( $this->data );
-    }
-
-    public function verifyCode( Request $request ) {
-
-        return AdministratorService::verifyCode( $request );
-    }
 }

@@ -9,6 +9,10 @@ use App\Services\{
     ProfileService,
 };
 
+use Helper;
+
+use PragmaRX\Google2FAQRCode\Google2FA;
+
 class ProfileController extends Controller
 {
     public function index() {
@@ -18,9 +22,22 @@ class ProfileController extends Controller
         $this->data['breadcrumbs'] = [
             'enabled' => true,
             'main_title' => __( 'template.profile' ),
-            'title' => __( 'template.list' ),
+            'title' => __( 'template.profile' ),
             'mobile_title' => __( 'template.profile' ),
         ];
+
+        $google2fa = new Google2FA();
+
+        $secretKey = $google2fa->generateSecretKey();
+
+        $qrCodeUrl = $google2fa->getQRCodeInline(
+            Helper::websiteName(),
+            auth()->user()->email,
+            $secretKey
+        );
+
+        $this->data['data']['mfa_qr'] = $qrCodeUrl;
+        $this->data['data']['mfa_secret'] = $secretKey;
 
         return view( 'admin.main' )->with( $this->data );
     }

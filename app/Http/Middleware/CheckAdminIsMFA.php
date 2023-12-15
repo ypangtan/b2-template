@@ -19,7 +19,7 @@ class CheckAdminIsMFA
         if ( config( 'services.mfa.enabled' ) ) {
             
             if ( empty( auth()->user()->mfa_secret ) ) {
-                return redirect()->route( 'admin.first_setup' );
+                return redirect()->route( 'admin.mfa.firstSetup' );
             }
         }
 

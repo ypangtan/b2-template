@@ -101,7 +101,7 @@ class FortifyServiceProvider extends ServiceProvider
 
         RateLimiter::for('login', function (Request $request) {
             $identifier = empty( $request->email ) ? (string) $request->username : (string) $request->email;
-            return Limit::perMinute(50)->by($identifier.$request->ip());
+            return Limit::perMinute(5)->by($identifier.$request->ip());
         });
 
         RateLimiter::for('two-factor', function (Request $request) {

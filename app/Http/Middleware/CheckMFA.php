@@ -21,7 +21,7 @@ class CheckMFA
             $value = $request->session()->get( 'mfa-ed' );
 
             if ( empty( $value ) ) {
-                return redirect()->route( 'admin.verify' );
+                return redirect()->route( 'admin.mfa.verify' );
             }
         }
 

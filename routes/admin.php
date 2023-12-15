@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\{
     AnnouncementController,
     AuditController,
     DashboardController,
+    MFAController,
     ModuleController,
     ProfileController,
     RoleController,
@@ -22,12 +23,13 @@ Route::prefix( 'backoffice' )->group( function() {
 
     Route::middleware( 'auth:admin' )->group( function() {
 
-        Route::get( 'setup', [ SettingController::class, 'firstSetup' ] )->name( 'admin.first_setup' );
-        Route::post( 'settings/setup-mfa', [ SettingController::class, 'setupMFA' ] )->name( 'admin.setupMFA' );
-        Route::post( 'settings/reset-mfa', [ SettingController::class, 'resetMFA' ] )->name( 'admin.resetMFA' );
+        Route::prefix( 'mfa' )->group( function() {
+            Route::get( 'first-setup', [ MFAController::class, 'firstSetup' ] )->name( 'admin.mfa.firstSetup' );
+            Route::post( 'setup-mfa', [ MFAController::class, 'setupMFA' ] )->name( 'admin.mfa.setupMFA' );
 
-        Route::get( 'verify', [ AdministratorController::class, 'verify' ] )->name( 'admin.verify' );
-        Route::post( 'verify-code', [ AdministratorController::class, 'verifyCode' ] )->name( 'admin.verifyCode' );
+            Route::get( 'verify', [ MFAController::class, 'verify' ] )->name( 'admin.mfa.verify' ); 
+            Route::post( 'verify-code', [ MFAController::class, 'verifyCode' ] )->name( 'admin.mfa.verifyCode' );
+        } );
 
         Route::prefix( 'administrators' )->group( function() {
             Route::post( 'logout', [ AdministratorController::class, 'logoutLog' ] )->name( 'admin.logoutLog' );

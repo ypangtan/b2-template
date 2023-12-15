@@ -256,6 +256,12 @@ class AdministratorService {
             $updateAdministrator = Administrator::lockForUpdate()
                 ->find( $request->id );
 
+            if ( $updateAdministrator->id == 1 && auth()->user()->id != 1 ) {
+                return response()->json( [
+                    'message' => 'You don\'t have permission to update this Super Admin.',
+                ], 500 );
+            }                
+
             $updateAdministrator->id = $request->id;
             $updateAdministrator->username = strtolower( $request->username );
             $updateAdministrator->email = strtolower( $request->email );
@@ -319,39 +325,6 @@ class AdministratorService {
 
         return response()->json( [
             'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.administrators' ) ) ] ),
-        ] );
-    }
-
-    public static function verifyCode( $request ) {
-
-        $request->validate( [
-            'authentication_code' => [ 'bail', 'required', 'numeric', 'digits:6', function( $attribute, $value, $fail ) {
-
-                $google2fa = new Google2FA();
-
-                $secret = \Crypt::decryptString( auth()->user()->mfa_secret );
-                $valid = $google2fa->verifyKey( $secret, $value );
-                if ( !$valid ) {
-                    $fail( __( 'setting.invalid_code' ) );
-                }
-            } ],
-        ] );
-
-        session( [
-            'mfa-ed' => true
-        ] );
-
-        activity()
-            ->useLog( 'administrators' )
-            ->withProperties( [
-                'attributes' => [
-                    'new_login' => date( 'Y-m-d H:i:s' ),
-                ]
-            ] )
-            ->log( 'admin login' );
-
-        return response()->json( [
-            'status' => true,
         ] );
     }
 

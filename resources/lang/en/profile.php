@@ -13,5 +13,14 @@ return [
     |
     */
 
+    'account_setting' => 'Account Setting',
+    'security_setting' => 'Security Setting',
+    'current_password' => 'Current Password',
+    'new_password' => 'New Password',
+    'confirm_new_password' => 'Confirm New Password',
+    'confirm_new_password_not_match' => ':attribute does not match.',
+    'bind_now' => 'Bind Now',
+    'unbind' => 'Unbind',
+    'language_setting' => 'Language Setting',
     'language' => 'Language',
 ];

@@ -56,10 +56,10 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 login-language-switcher">
+                        <div class="mb-3 login-language-switcher d-flex align-items-center">
                             <label for="select_language" class="">{{ __( 'auth.choose_language' ) }}</label>
                             <div>
-                                <select id="select_language" onchange="switchLanguage()">
+                                <select class="form-select form-select-sm" id="select_language" onchange="switchLanguage()">
                                     @foreach( Config::get( 'languages' ) as $lang => $language )
                                     @if( $lang != App::getLocale() )
                                     <option value="{{ $lang }}">{{ $language }}</option>
