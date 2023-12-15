@@ -230,7 +230,7 @@ Route::prefix( 'backoffice' )->group( function() {
 
     } );
 
-    Route::get( 'lang/{lang}', function( $lang ) {
+    Route::get( 'lang/{lang?}', function( $lang ) {
 
         if( array_key_exists( $lang, Config::get( 'languages' ) ) ) {
             Session::put( 'appLocale', $lang );

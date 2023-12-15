@@ -1,3 +1,19 @@
+                        <style>
+                            /* body {
+                                background: url( '{{ asset( 'admin/images/login_bg.jpg' ) }}' );
+                                background-position: center;
+                            } */
+                            .login .title {
+                                color: #fff;
+                            }
+                            .login .lead {
+                                color: #fff;
+                            }
+                            /* .login-language-switcher > label {
+                                color: #fff;
+                            } */
+                        </style>
+                        
                         <div class="text-center mt-4">
                             <!-- admin/img/icons/default.png -->
                             <img style="width: 50%;"src="{{ asset( 'admin/img/placeholder/fff.jpg' ) }}" />
@@ -89,6 +105,6 @@
                             }
 
                             function switchLanguage() {
-                                window.location.href = '{{ Helper::baseAdminUrl() }}' + document.getElementById( 'select_language' ).value
+                                window.location.href = '{{ route( 'admin.lang' ) }}/' + document.getElementById( 'select_language' ).value
                             }
                         </script>
