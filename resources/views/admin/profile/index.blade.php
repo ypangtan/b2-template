@@ -109,7 +109,7 @@ $profile = 'profile';
                 <div class="row">
                     <label for="{{ $profile }}_switch_language" class="col-sm-5 col-form-label">{{ __( 'profile.language' ) }}</label>
                     <div class="col-sm-7">
-                        <select class="form-control form-control-sm" id="{{ $profile }}_switch_language">
+                        <select class="form-select form-select-sm" id="{{ $profile }}_switch_language">
 @foreach( Config::get( 'languages' ) as $lang => $language )
 @if( $lang != App::getLocale() )
                             <option value="{{ $lang }}">{{ $language }}</option>

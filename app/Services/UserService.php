@@ -121,9 +121,11 @@ class UserService {
         }
 
         if ( !empty( $request->user ) ) {
-            $model->where( 'users.email', $request->user );
-            $model->orWhereHas( 'userDetail', function( $query ) use ( $request ) {
-                $query->where( 'user_details.fullname', $request->user );
+            $model->where( function( $query ) use ( $request ) {
+                $query->where( 'users.email', $request->user );
+                $query->orWhereHas( 'userDetail', function( $query ) use ( $request ) {
+                    $query->where( 'user_details.fullname', 'LIKE', '%' . $request->user . '%' );
+                } );
             } );
             $filter = true;
         }
@@ -132,6 +134,23 @@ class UserService {
             $model->where( function( $query ) use ( $request ) {
                 $query->where( 'phone_number', $request->phone_number );
                 $query->orWhere( DB::raw( "CONCAT( calling_code, phone_number )" ), 'LIKE', '%' . $request->phone_number );
+            } );
+            $filter = true;
+        }
+
+        if ( !empty( $request->referral ) ) {
+            $model->whereHas( 'referral', function( $query ) use ( $request ) {
+                $query->where( 'email', $request->referral );
+                $query->orWhereHas( 'userDetail', function( $query ) use ( $request ) {
+                    $query->where( 'user_details.fullname', 'LIKE', '%' . $request->referral . '%' );
+                } );
+            } );
+            $filter = true;
+        }
+
+        if ( !empty( $request->email ) ) {
+            $model->whereHas( 'userDetail', function( $query ) use ( $request ) {
+                $query->where( 'email', 'LIKE', '%' . $request->email . '%' );
             } );
             $filter = true;
         }

@@ -2,9 +2,20 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\{
+    Crypt,
+};
+
 use App\Models\{
     AdministratorNotification,
     AdministratorNotificationSeen,
+    OtpAction,
+    TmpUser,
+    UserWallet,
+};
+
+use App\Jobs\{
+    SendOTP,
 };
 
 use Hashids\Hashids;
@@ -49,24 +60,56 @@ class Helper {
     public static function wallets() {
         return [
             '1' => __( 'wallet.wallet_1' ),
-            '2' => __( 'wallet.wallet_2' ),
+            // '2' => __( 'wallet.wallet_2' ),
+            // '3' => __( 'wallet.wallet_3' ),
         ];
+    }
+
+    public static function walletInfos() {
+
+        $wallets = UserWallet::where( 'user_id', auth()->user()->id )->get();
+
+        $walletInfos = [];
+
+        foreach ( $wallets as $wallet ) {
+            $walletInfos[$wallet->type] = $wallet->balance;
+        }
+
+        return $walletInfos;
     }
 
     public static function trxTypes() {
-        return [
-            '1' => __( 'wallet.topup' ),
-            '2' => __( 'wallet.refund' ),
-            '3' => __( 'wallet.manual_adjustment' ),
+
+        return [            
+            '10' => __( 'wallet.system_adjustment' ),
+            '1' => __( 'wallet.deposit' ),
+            '2' => __( 'wallet.withdrawal' ),
+            '3' => __( 'wallet.refund_withdrawal' ),
         ];
     }
 
-    public static function numberFormat( $number, $decimal, $isRound = false ) {
+    public static function numberFormat( $number, $decimal, $displayComma = false, $isRound = false ) {
+        $formatted = '';
         if ( $isRound ) {
-            return number_format( $number, $decimal );    
+            $formatted = number_format( $number, $decimal );
         } else {
-            return number_format( bcdiv( $number, 1, $decimal ), $decimal );
+            $formatted = number_format( bcdiv( $number, 1, $decimal ), $decimal );
         }
+
+        if ( $displayComma ) {
+            return $formatted;
+        } else {
+            return str_replace( ',', '', $formatted );
+        }
+    }
+
+    public static function ordinal( $number ) {
+
+        $ends = [ 'th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th' ];
+        if ( ( ( $number % 100 ) >= 11 ) && ( ( $number % 100 ) <= 13 ) )
+            return 'th';
+        else
+            return $ends[$number % 10];
     }
 
     public static function hideTimestamp( $model, $columns ) {
@@ -103,6 +146,7 @@ class Helper {
         curl_setopt_array( $curl, array(
             CURLOPT_URL => $endpoint,
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => $header
         ) );
 
         $response = curl_exec ($curl );
@@ -751,5 +795,67 @@ class Helper {
         } else {
             return $created->setTimezone( 'Asia/Kuala_Lumpur' )->format( 'H:i' );
         }
+    }
+
+    public static function requestOtp( $action, $data = [] ) {
+
+        $expireOn = Carbon::now()->addMinutes( '15' );
+
+        if ( $action == 'register' ) {
+
+            $callingCode = $data['calling_code'];
+            $phoneNumber = $data['phone_number'];
+
+            $createOtp = TmpUser::create( [
+                'calling_code' => $data['calling_code'],
+                'phone_number' => $data['phone_number'],
+                // 'otp_code' => mt_rand( 100000, 999999 ),
+                'otp_code' => 112233,
+                'status' => 1,
+                'expire_on' => $expireOn,
+            ] );
+
+            $body = 'Your OTP for Uncle Roger ' . $action . ' is ' . $createOtp->otp_code;
+
+        } else if ( $action == 'forgot_password' ) {
+
+            $callingCode = $data['calling_code'];
+            $phoneNumber = $data['phone_number'];      
+            
+            $createOtp = OtpAction::create( [
+                'user_id' => $data['id'],
+                'action' => $action,
+                'otp_code' => mt_rand( 100000, 999999 ),
+                'expire_on' => $expireOn,
+            ] );
+
+            $body = 'Your OTP for Uncle Roger forgot password is ' . $createOtp->otp_code;
+
+        }else {
+
+            $currentUser = auth()->user();
+
+            $callingCode = $currentUser->calling_code;
+            $phoneNumber = $currentUser->phone_number;
+
+            $createOtp = OtpAction::create( [
+                'user_id' => $currentUser->id,
+                'action' => $action,
+                'otp_code' => mt_rand( 100000, 999999 ),
+                'expire_on' => $expireOn,
+            ] );
+
+            $body = 'Your OTP for Uncle Roger ' . $action . ' is ' . $createOtp->otp_code;
+        }
+
+        // SMS JOB
+        if ( config( 'services.sms.enabled' ) ) {
+            SendOTP::dispatch( $callingCode . $phoneNumber, $body );
+        }
+
+        return [
+            'identifier' => Crypt::encryptString( $createOtp->id ),
+            'otp_code' => config( 'services.sms.enabled' ) == false ? ( '#DEBUG - ' . $createOtp->otp_code ) : '-',
+        ];
     }
 }

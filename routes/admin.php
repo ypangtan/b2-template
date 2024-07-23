@@ -215,8 +215,14 @@ Route::prefix( 'backoffice' )->group( function() {
             Route::prefix( 'settings' )->group( function() {
 
                 Route::group( [ 'middleware' => [ 'permission:add settings|view settings|edit settings|delete settings' ] ], function() {
-                    Route::get( '/', [ SettingController::class, 'index' ] );
+                    Route::get( '/', [ SettingController::class, 'index' ] )->name( 'admin.module_parent.setting.index' );
                 } );
+
+                Route::post( 'settings', [ SettingController::class, 'settings' ] )->name( 'admin.setting.settings' );
+                Route::post( 'maintenance-settings', [ SettingController::class, 'maintenanceSettings' ] )->name( 'admin.setting.maintenanceSettings' );
+                Route::post( 'update-deposit-bank-detail', [ SettingController::class, 'updateDepositBankDetail' ] )->name( 'admin.setting.updateDepositBankDetail' );
+                Route::post( 'update-withdrawal-setting', [ SettingController::class, 'updateWithdrawalSetting' ] )->name( 'admin.setting.updateWithdrawalSetting' );
+                Route::post( 'update-maintenance-setting', [ SettingController::class, 'updateMaintenanceSetting' ] )->name( 'admin.setting.updateMaintenanceSetting' );
             } );
 
             Route::prefix( 'profile' )->group( function() {

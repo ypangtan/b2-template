@@ -18,7 +18,7 @@ $announcement_create = 'announcement_create';
                 <div class="mb-3 row">
                     <label for="{{ $announcement_create }}_title" class="col-sm-4 col-form-label">{{ __( 'datatables.type' ) }}</label>
                     <div class="col-sm-8">
-                        <select class="form-control form-control-sm" id="{{ $announcement_create }}_type">
+                        <select class="form-select form-select-sm" id="{{ $announcement_create }}_type">
                             <option value="2">{{ __( 'announcement.news' ) }}</option>
                             <option value="3">{{ __( 'announcement.event' ) }}</option>
                         </select>

@@ -12,7 +12,7 @@
 <div class="multiselect-action mb-3 d-flex hidden">
     <div>
         @if ( 1 == 2 )
-        <button id="multiselect_approve" type="button" class="btn btn-primary btn-icon-text"><i class="btn-icon-prepend" icon-name="check-circle-2"></i>{{ __( 'datatables.approve' ) }}</button>&nbsp;<button id="multiselect_reject" type="button" class="btn btn-danger btn-icon-text"><i class="btn-icon-prepend" icon-name="x-circle"></i>{{ __( 'datatables.reject' ) }}</button>
+        <button id="multiselect_approve" type="button" class="btn btn-primary btn-icon-text"><i class="btn-icon-prepend" data-lucide="check-circle-2"></i>{{ __( 'datatables.approve' ) }}</button>&nbsp;<button id="multiselect_reject" type="button" class="btn btn-danger btn-icon-text"><i class="btn-icon-prepend" data-lucide="x-circle"></i>{{ __( 'datatables.reject' ) }}</button>
         @endif
     </div>
 </div>

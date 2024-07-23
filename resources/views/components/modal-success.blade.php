@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-body modal-body-lg">
                 <div class="text-center mt-4">
-                    <i class="text-success" icon-name="check-circle-2" width="64" height="64" stroke-width="1.5"></i>
+                    <i class="text-success" data-lucide="check-circle-2" width="64" height="64" stroke-width="1.5"></i>
                     <h4 class="mt-2">{{ __( 'template.success' ) }}</h4>
                     <div class="caption-text"></div>
                 </div>

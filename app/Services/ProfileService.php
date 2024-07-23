@@ -23,7 +23,7 @@ use Carbon\Carbon;
 
 class ProfileService {
 
-    public function update( $request ) {
+    public static function update( $request ) {
 
         DB::beginTransaction();
 

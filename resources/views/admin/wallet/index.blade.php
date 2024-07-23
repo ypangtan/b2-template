@@ -317,7 +317,7 @@ if ( $multiSelect ) {
                         let html = 
                         `
                         <div class="dropdown">
-                            <i class="text-primary click-action" icon-name="more-horizontal" data-bs-toggle="dropdown"></i>
+                            <i class="text-primary click-action" data-lucide="more-horizontal" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu">
                             ` + edit + `
                             </ul>
@@ -325,7 +325,7 @@ if ( $multiSelect ) {
                         `;
                         return html;
                         @else
-                        return '<i class="text-secondary" icon-name="more-horizontal" data-bs-toggle="dropdown"></i>';
+                        return '<i class="text-secondary" data-lucide="more-horizontal" data-bs-toggle="dropdown"></i>';
                         @endcan
                     },
                 },

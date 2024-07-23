@@ -319,4 +319,40 @@ class AnnouncementService {
             'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.announcements' ) ) ] ),
         ] );
     }
+
+    public static function getAnnouncements( $request ) {
+
+        $announcements = UserNotification::where( 'status', 10 )
+            ->whereNull( 'user_id' )
+            ->orderBy( 'created_at', 'DESC' )
+            ->paginate( $request->per_page ? $request->per_page : 10 );
+
+        $announcements->each( function( $a ) {
+            $a->append( [
+                'path',
+                'encrypted_id',
+            ] );
+        } );
+
+        return $announcements;
+    }
+
+    public static function getAnnouncement( $request ) {
+
+        $request->merge( [
+            'id' => Helper::decode( $request->id ),
+        ] );
+
+        $announcement = UserNotification::whereNull( 'user_id' )
+            ->find( $request->id );
+
+        if ( $announcement ) {
+            $announcement->append( [
+                'path',
+                'encrypted_id',
+            ] );
+        }
+
+        return $announcement;
+    }
 }

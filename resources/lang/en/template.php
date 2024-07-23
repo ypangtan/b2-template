@@ -86,4 +86,18 @@ return [
     'meta_title' => 'Meta Title',
     'meta_description' => 'Meta Description',
     'gallery' => 'Gallery',
+    'remarks' => 'Remarks',
+
+    'jan' => 'January',
+    'feb' => 'February',
+    'mar' => 'March',
+    'apr' => 'April',
+    'may' => 'May',
+    'jun' => 'Jun',
+    'jul' => 'July',
+    'aug' => 'August',
+    'sep' => 'September',
+    'oct' => 'October',
+    'nov' => 'November',
+    'dec' => 'December',
 ];

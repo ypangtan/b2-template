@@ -133,8 +133,8 @@
                     <div class="ps-3">
                         <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0 d-flex align-items-center">
-                            <i class="align-middle feather" icon-name="sliders" style="color: #3461ff; width: 16px; height: 16px;"></i>
-                            <i class="align-middle feather" icon-name="chevron-right" style="width: 32px; height: 32px; stroke-width: 1.3;"></i>
+                            <i class="align-middle feather" data-lucide="sliders" style="color: #3461ff; width: 16px; height: 16px;"></i>
+                            <i class="align-middle feather" data-lucide="chevron-right" style="width: 32px; height: 32px; stroke-width: 1.3;"></i>
                             <li class="breadcrumb-item active" aria-current="page">{{ $breadcrumbs['title'] }}</li>
                         </ol>
                         </nav>

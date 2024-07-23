@@ -14,4 +14,11 @@ return [
     */
 
     'settings' => '设定',
+    'deposit_bank_details' => '充值银行信息',
+    'withdrawal_settings' => '提现设定',
+    'bank' => '银行',
+    'account_holder' => '帐号人',
+    'account_no' => '帐号',
+    'maintenance_settings' => '系统维护设定',
+    'enable_maintenance' => '启用系统维护',
 ];

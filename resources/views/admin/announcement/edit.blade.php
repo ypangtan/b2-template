@@ -25,7 +25,7 @@ $announcement_edit = 'announcement_edit';
                 <div class="mb-3 row">
                     <label for="{{ $announcement_edit }}_title" class="col-sm-4 col-form-label">{{ __( 'datatables.type' ) }}</label>
                     <div class="col-sm-8">
-                        <select class="form-control form-control-sm" id="{{ $announcement_edit }}_type">
+                        <select class="form-select form-select-sm" id="{{ $announcement_edit }}_type">
                             <option value="2">{{ __( 'announcement.news' ) }}</option>
                             <option value="3">{{ __( 'announcement.event' ) }}</option>
                         </select>

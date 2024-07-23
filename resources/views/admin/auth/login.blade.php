@@ -43,8 +43,8 @@
                                             <label class="form-label">{{ __('auth.password_') }}</label>
                                             <div class="password-wrapper">
                                                 <input id="password" class="form-control form-control-sm @error('password') is-invalid @enderror" type="password" name="password" placeholder="{{ __( 'auth.enter_your_x', [ 'type' => strtolower( __( 'auth.password_' ) ) ] ) }}" />
-                                                <i id="showPassword" onclick="showPassword(true)" icon-name="eye" stroke-width="1.5"></i>
-                                                <i id="hidePassword" onclick="showPassword(false)" icon-name="eye-off" stroke-width="1.5" class="hidden"></i>
+                                                <i id="showPassword" onclick="showPassword(true)" data-lucide="eye" stroke-width="1.5"></i>
+                                                <i id="hidePassword" onclick="showPassword(false)" data-lucide="eye-off" stroke-width="1.5" class="hidden"></i>
                                             </div>
                                             @error('password')
                                             <span class="invalid-feedback" role="alert">

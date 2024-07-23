@@ -260,7 +260,7 @@ class AdministratorService {
                 return response()->json( [
                     'message' => 'You don\'t have permission to update this Super Admin.',
                 ], 500 );
-            }                
+            }
 
             $updateAdministrator->id = $request->id;
             $updateAdministrator->username = strtolower( $request->username );
