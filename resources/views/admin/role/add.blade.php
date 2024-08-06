@@ -7,15 +7,15 @@ $role_create = 'role_create';
         <div class="row">
             <div class="col-md-6">
                 <div class="mb-3 row">
-                    <label for="{{ $role_create }}_role_name" class="col-sm-4 col-form-label">{{ __( 'role.role_name' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $role_create }}_role_name" class="col-sm-5 col-form-label">{{ __( 'role.role_name' ) }}</label>
+                    <div class="col-md-7">
                         <input type="text" class="form-control form-control-sm" id="{{ $role_create }}_role_name">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $role_create }}_guard_name" class="col-sm-4 col-form-label">{{ __( 'role.guard_name' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $role_create }}_guard_name" class="col-sm-5 col-form-label">{{ __( 'role.guard_name' ) }}</label>
+                    <div class="col-md-7">
                         <input type="text" class="form-control form-control-sm" id="{{ $role_create }}_guard_name">
                         <div class="invalid-feedback"></div>
                     </div>

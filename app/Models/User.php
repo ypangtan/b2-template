@@ -19,10 +19,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, LogsActivity;
 
-    public function referral() {
-        return $this->hasOne( User::class, 'id', 'referral_id' );
-    }
-
     /**
      * The attributes that are mass assignable.
      *
@@ -33,15 +29,26 @@ class User extends Authenticatable
         'referral_id',
         'username',
         'email',
+        'calling_code',
         'phone_number',
         'password',
-        'is_social_account',
         'invitation_code',
         'referral_structure',
-        'birthday',
+        'role',
         'status',
     ];
 
+    public function country() {
+        return $this->belongsTo( Country::class, 'country_id' );
+    }
+
+    public function userDetail() {
+        return $this->hasOne( UserDetail::class, 'user_id' );
+    }
+
+    public function referral() {
+        return $this->belongsTo( User::class, 'referral_id' );
+    }
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -74,12 +81,12 @@ class User extends Authenticatable
         'referral_id',
         'username',
         'email',
+        'calling_code',
         'phone_number',
         'password',
-        'is_social_account',
         'invitation_code',
         'referral_structure',
-        'birthday',
+        'role',
         'status',
     ];
 

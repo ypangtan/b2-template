@@ -12,12 +12,13 @@ use Illuminate\Support\Facades\{
 };
 use App\Models\{
     ApiLog,
-    Subscription,
-    SubscriptionHistory,
+    Country,
     TmpUser,
     User,
-    UserSocial,
+    UserDetail,
     UserDevice,
+    UserSocial,
+    UserStructure,
     UserWallet,
 };
 
@@ -27,11 +28,18 @@ use App\Rules\CheckASCIICharacter;
 
 use Helper;
 
+use Carbon\Carbon;
+
 class UserService {
 
     public static function allUsers( $request ) {
 
-        $user = User::select( 'users.*' );
+        $user = User::with( [
+            'country',
+            'referral',
+            'referral.userDetail',
+            'userDetail',
+        ] )->select( 'users.*' );
 
         $filterObject = self::filter( $request, $user );
         $user = $filterObject['model'];
@@ -43,15 +51,6 @@ class UserService {
                 case 1:
                     $user->orderBy( 'created_at', $dir );
                     break;
-                case 2:
-                    $user->orderBy( 'name', $dir );
-                    break;
-                case 3:
-                    $user->orderBy( 'email', $dir );
-                    break;
-                case 4:
-                    $user->orderBy( 'status', $dir );
-                    break;
             }
         }
 
@@ -62,22 +61,36 @@ class UserService {
 
         $users = $user->skip( $offset )->take( $limit )->get();
 
-        if ( $users ) {
-            $users->append( [
-                'encrypted_id',
-            ] );
-        }
+        $users->append( [
+            'encrypted_id',
+        ] );
 
-        $totalRecord = User::count();
+        $users->each( function( $u ) {
+            if ( $u->userDetail ) {
+                $u->userDetail->append( [
+                    'photo_path',
+                ] );
+            }
+        } );
+
+        $user = User::select(
+            DB::raw( 'COUNT(users.id) as total'
+        ) );
+
+        $filterObject = self::filter( $request, $user );
+        $user = $filterObject['model'];
+        $filter = $filterObject['filter'];
+
+        $user = $user->first();
 
         $data = [
             'users' => $users,
             'draw' => $request->draw,
-            'recordsFiltered' => $filter ? $userCount : $totalRecord,
-            'recordsTotal' => $totalRecord,
+            'recordsFiltered' => $filter ? $userCount : $user->total,
+            'recordsTotal' => $filter ? User::count() : $userCount,
         ];
 
-        return response()->json( $data );
+        return $data;
     }
 
     private static function filter( $request, $model ) {
@@ -94,7 +107,7 @@ class UserService {
                 $endDate = explode( '-', $dates[1] );
                 $end = Carbon::create( $endDate[0], $endDate[1], $endDate[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
 
-                $model->whereBetween( 'administrators.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
+                $model->whereBetween( 'users.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
             } else {
 
                 $dates = explode( '-', $request->registered_date );
@@ -102,23 +115,47 @@ class UserService {
                 $start = Carbon::create( $dates[0], $dates[1], $dates[2], 0, 0, 0, 'Asia/Kuala_Lumpur' );
                 $end = Carbon::create( $dates[0], $dates[1], $dates[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
 
-                $model->whereBetween( 'administrators.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
+                $model->whereBetween( 'users.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
             }
             $filter = true;
         }
 
-        if ( !empty( $request->username ) ) {
-            $model->where( 'name', $request->username );
+        if ( !empty( $request->user ) ) {
+            $model->where( function( $query ) use ( $request ) {
+                $query->where( 'users.email', 'LIKE', '%' . $request->user . '%' );
+                $query->orWhere( 'users.username', 'LIKE', '%' . $request->user , '%' );
+                // $query->orWhereHas( 'userDetail', function( $query ) use ( $request ) {
+                //     $query->where( 'user_details.fullname', 'LIKE', '%' . $request->user . '%' );
+                // } );
+            } );
             $filter = true;
         }
 
-        if ( !empty( $request->email ) ) {
-            $model->where( 'email', $request->email );
+        if ( !empty( $request->phone_number ) ) {
+            $model->where( function( $query ) use ( $request ) {
+                $query->where( 'users.phone_number', $request->phone_number );
+                $query->orWhere( DB::raw( "CONCAT( calling_code, phone_number )" ), 'LIKE', '%' . $request->phone_number );
+            } );
+            $filter = true;
+        }
+
+        if ( !empty( $request->referral ) ) {
+            $model->whereHas( 'referral', function( $query ) use ( $request ) {
+                $query->where( 'users.email', $request->referral );
+                $query->orWhereHas( 'userDetail', function( $query ) use ( $request ) {
+                    $query->where( 'user_details.fullname', 'LIKE', '%' . $request->referral . '%' );
+                } );
+            } );
+            $filter = true;
+        }
+
+        if ( !empty( $request->role ) ) {
+            $model->where( 'users.role', $request->role );
             $filter = true;
         }
 
         if ( !empty( $request->status ) ) {
-            $model->where( 'status', $request->status );
+            $model->where( 'users.status', $request->status );
             $filter = true;
         }
 
@@ -134,22 +171,44 @@ class UserService {
             'id' => Helper::decode( $request->id ),
         ] );
         
-        $user = User::find( $request->id );
+        $user = User::with( [
+            'userDetail'
+        ] )->find( $request->id );
 
-        return response()->json( $user );
+        return $user;
     }
 
     public static function createUserAdmin( $request ) {
 
+        DB::beginTransaction();
+
         $validator = Validator::make( $request->all(), [
-            'username' => [ 'required', 'unique:users,username', 'alpha_dash', new CheckASCIICharacter ],
+            'username' => [ 'required', 'unique:users,username', 'alpha_num', new CheckASCIICharacter ],
+            'fullname' => [ 'required' ],
             'email' => [ 'required', 'unique:users,email', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
+            'phone_number' => [ 'required', 'digits_between:8,15', function( $attribute, $value, $fail ) use ( $request ) {
+                
+                $exist = User::where( 'calling_code', $request->calling_code )
+                    ->where( 'phone_number', $value )
+                    ->first();
+
+                if ( $exist ) {
+                    $fail( __( 'validation.exists' ) );
+                    return false;
+                }
+            } ],
+            'invitation_code' => [ 'nullable', 'exists:users,invitation_code' ],
+            'role' => [ 'required', 'in:1,2' ],
             'password' => [ 'required', Password::min( 8 ) ],
         ] );
 
         $attributeName = [
             'username' => __( 'user.username' ),
+            'fullname' => __( 'user.fullname' ),
             'email' => __( 'user.email' ),
+            'phone_number' => __( 'user.phone_number' ),
+            'invitation_code' => __( 'user.invitation_code' ),
+            'role' => __( 'user.role' ),
             'password' => __( 'user.password' ),
         ];
 
@@ -159,26 +218,35 @@ class UserService {
 
         $validator->setAttributeNames( $attributeName )->validate();
 
-        DB::beginTransaction();
-
         try {
 
-            $createUser = User::create( [
+            $createUserObject['user'] = [
                 'country_id' => 136,
                 'username' => $request->username,
                 'email' => $request->email,
+                'calling_code' => $request->calling_code,
+                'phone_number' => $request->phone_number,
                 'password' => Hash::make( $request->password ),
-                'invitation_code' => strtoupper( \Str::random( 6 ) ),
-                'referral_structure' => '-',
+                'invitation_code' => strtoupper( Str::random( 6 ) ),
+                'role' => $request->role,
                 'status' => 10,
-            ] );
+            ];
 
-            for ( $i = 1; $i <= 2; $i++ ) { 
-                UserWallet::create( [
-                    'user_id' => $createUser->id,
-                    'type' => $i,
-                ] );
+            $createUserObject['user_detail'] = [
+                'fullname' => $request->fullname,
+            ];
+
+            $referral = User::where( 'invitation_code', $request->invitation_code )->first();
+
+            if ( $referral ) {
+                $createUserObject['user']['referral_id'] = $referral->id;
+                $createUserObject['user']['referral_structure'] = $referral->referral_structure . '|' . $referral->id;
+            } else {
+                $createUserObject['user']['referral_id'] = null;
+                $createUserObject['user']['referral_structure'] = '-';
             }
+
+            $createUser = self::create( $createUserObject );
 
             DB::commit();
 
@@ -188,7 +256,7 @@ class UserService {
 
             return response()->json( [
                 'message' => $th->getMessage() . ' in line: ' . $th->getLine()
-            ] );
+            ], 500 );
         }
 
         return response()->json( [
@@ -198,19 +266,39 @@ class UserService {
 
     public static function updateUserAdmin( $request ) {
 
+        DB::beginTransaction();
+
         $request->merge( [
             'id' => Helper::decode( $request->id ),
         ] );
 
         $validator = Validator::make( $request->all(), [
-            'username' => [ 'required', 'unique:users,username,' . $request->id, 'alpha_dash', new CheckASCIICharacter ],
+            'username' => [ 'required', 'unique:users,username,' . $request->id, 'alpha_num', new CheckASCIICharacter ],
+            'fullname' => [ 'required' ],
             'email' => [ 'required', 'unique:users,email,' . $request->id, 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
+            'phone_number' => [ 'required', 'digits_between:8,15', function( $attribute, $value, $fail ) use ( $request ) {
+                
+                $exist = User::where( 'calling_code', $request->calling_code )
+                    ->where( 'phone_number', $value )
+                    ->where( 'id', '!=', $request->id )
+                    ->first();
+
+                if ( $exist ) {
+                    $fail( __( 'validation.exists' ) );
+                    return false;
+                }
+            } ],
+            'role' => [ 'required', 'in:1,2' ],
             'password' => [ 'nullable', Password::min( 8 ) ],
         ] );
 
         $attributeName = [
             'username' => __( 'user.username' ),
+            'fullname' => __( 'user.fullname' ),
             'email' => __( 'user.email' ),
+            'phone_number' => __( 'user.phone_number' ),
+            'invitation_code' => __( 'user.invitation_code' ),
+            'role' => __( 'user.role' ),
             'password' => __( 'user.password' ),
         ];
 
@@ -218,19 +306,31 @@ class UserService {
             $attributeName[$key] = strtolower( $aName );
         }
 
-        $validator->setAttributeNames( $attributeName )->validate();
-
-        DB::beginTransaction();
+        $validator->setAttributeNames( $attributeName )->validate();    
 
         try {
 
-            $updateUser = User::find( $request->id );
-            $updateUser->username = $request->username;
+            $updateUser = User::with( [
+                'userDetail',
+            ] )->lockForUpdate()
+                ->find( $request->id );
+
+            $updateUser->username = $request->username;    
             $updateUser->email = $request->email;
+            $updateUser->calling_code = $request->calling_code;
+            $updateUser->phone_number = $request->phone_number;
+            $updateUser->role = $request->role;
             if ( !empty( $request->password ) ) {
                 $updateUser->password = Hash::make( $request->password );
             }
             $updateUser->save();
+
+            $updateUserDetail = UserDetail::where( 'user_id', $request->id )
+                ->lockForUpdate()
+                ->first();
+
+            $updateUserDetail->fullname = $request->fullname;
+            $updateUserDetail->save();
 
             DB::commit();
 
@@ -240,12 +340,48 @@ class UserService {
 
             return response()->json( [
                 'message' => $th->getMessage() . ' in line: ' . $th->getLine()
-            ] );
+            ], 500 );
         }
 
         return response()->json( [
             'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.users' ) ) ] ),
         ] );
+    }
+
+    public static function updateUserStatus( $request ) {
+
+        DB::beginTransaction();
+
+        $request->merge( [
+            'id' => Helper::decode( $request->id ),
+        ] );
+
+        $validator = Validator::make( $request->all(), [
+            'status' => 'required',
+        ] );
+        
+        $validator->validate();
+
+        try {
+
+            $updateUser = User::lockForUpdate()->find( $request->id );
+            $updateUser->status = $request->status;
+            $updateUser->save();
+
+            DB::commit();
+            
+            return response()->json( [
+                'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.users' ) ) ] ),
+            ] );
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollBack();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+            ], 500 );
+        }
     }
 
     public static function requestOtp( $request ) {
@@ -541,7 +677,7 @@ class UserService {
                 $createUserObject['referral_id'] = $referral->id;
                 $createUserObject['referral_structure'] = $referral->referral_structure . '|' . $referral->id;
             } else {
-                $createUserObject['referral'] = 0;
+                $createUserObject['referral_id'] = null;
                 $createUserObject['referral_structure'] = '-';
             }
 
@@ -789,9 +925,43 @@ class UserService {
 
     }
 
+    // Share
+    private static function create( $data ) {
+
+        $createUser = User::create( $data['user'] );
+
+        $data['user_detail']['user_id'] = $createUser->id;
+
+        $createUserDetail = UserDetail::create( $data['user_detail'] );
+
+        if ( $data['user']['referral_id'] ) {
+            $referralArray = explode( '|', $data['user']['referral_structure'] );
+            $referralLevel = count( $referralArray );
+            for ( $i = $referralLevel - 1; $i >= 0; $i-- ) {
+                if ( $referralArray[$i] != '-' ) {
+                    UserStructure::create( [
+                        'user_id' => $createUser->id,
+                        'referral_id' => $referralArray[$i],
+                        'level' => $referralLevel - $i
+                    ] );
+                }
+            }
+        }
+
+        for ( $i = 1; $i <= 2; $i++ ) { 
+            UserWallet::create( [
+                'user_id' => $createUser->id,
+                'type' => $i,
+                'balance' => 0,
+            ] );
+        }
+
+        return $createUser;
+    }
+
     private function registerOneSignal( $user_id, $device_type, $register_token ) {
         
-        UserDeviceOneSignal::updateOrCreate( 
+        UserDevice::updateOrCreate( 
             [ 'user_id' => $user_id, 'device_type' => 1 ],
             [ 'register_token' => $register_token ]
         );

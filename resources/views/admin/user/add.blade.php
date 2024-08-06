@@ -14,12 +14,37 @@ $user_create = 'user_create';
                     </div>
                 </div>
                 <div class="mb-3 row">
+                    <label for="{{ $user_create }}_fullname" class="col-sm-5 col-form-label">{{ __( 'user.fullname' ) }}</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control form-control-sm" id="{{ $user_create }}_fullname">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
                     <label for="{{ $user_create }}_email" class="col-sm-5 col-form-label">{{ __( 'user.email' ) }}</label>
                     <div class="col-sm-7">
                         <input type="text" class="form-control form-control-sm" id="{{ $user_create }}_email">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
+
+                <input type="hidden" id="{{ $user_create }}_calling_code" value="+60">
+
+                <div class="mb-3 row">
+                    <label for="{{ $user_create }}_phone_number" class="col-sm-5 col-form-label">{{ __( 'user.phone_number' ) }}</label>
+                    <div class="col-sm-7">
+                        <div class="input-group phone-number">
+                            <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: 1px solid #ced4da;">+60</button>
+                            <ul class="dropdown-menu" id="phone_number_country">
+                                <li class="dropdown-item" data-call-code="+60">+60</li>
+                                <li class="dropdown-item" data-call-code="+65">+65</li>
+                            </ul>
+                            <input type="text" class="form-control form-control-sm" id="{{ $user_create }}_phone_number">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="mb-3 row">
                     <label for="{{ $user_create }}_password" class="col-sm-5 col-form-label">{{ __( 'user.password' ) }}</label>
                     <div class="col-sm-7">
@@ -56,7 +81,10 @@ $user_create = 'user_create';
 
             let formData = new FormData();
             formData.append( 'username', $( uc + '_username' ).val() );
+            formData.append( 'fullname', $( uc + '_fullname' ).val() );
             formData.append( 'email', $( uc + '_email' ).val() );
+            formData.append( 'calling_code', $( uc + '_calling_code' ).val() );
+            formData.append( 'phone_number', $( uc + '_phone_number' ).val() );
             formData.append( 'password', $( uc + '_password' ).val() );
             formData.append( '_token', '{{ csrf_token() }}' );
 

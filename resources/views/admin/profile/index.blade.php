@@ -7,15 +7,15 @@ $profile = 'profile';
         <div class="card">
             <div class="card-body">
                 <div class="mb-3 row">
-                    <label for="{{ $profile }}_username" class="col-sm-4 col-form-label">{{ __( 'administrator.username' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $profile }}_username" class="col-sm-5 col-form-label">{{ __( 'administrator.username' ) }}</label>
+                    <div class="col-md-7">
                         <input type="text" class="form-control form-control-sm" id="{{ $profile }}_username" value="{{ auth()->user()->username }}">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $profile }}_email" class="col-sm-4 col-form-label">{{ __( 'administrator.email' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $profile }}_email" class="col-sm-5 col-form-label">{{ __( 'administrator.email' ) }}</label>
+                    <div class="col-md-7">
                         <input type="text" class="form-control form-control-sm" id="{{ $profile }}_email" value="{{ auth()->user()->email }}">
                         <div class="invalid-feedback"></div>
                     </div>
@@ -33,8 +33,8 @@ $profile = 'profile';
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <label for="{{ $profile }}_switch_language" class="col-sm-4 col-form-label">{{ __( 'profile.language' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $profile }}_switch_language" class="col-sm-5 col-form-label">{{ __( 'profile.language' ) }}</label>
+                    <div class="col-md-7">
                         <select class="form-control form-control-sm" id="{{ $profile }}_switch_language">
 @foreach( Config::get( 'languages' ) as $lang => $language )
 @if( $lang != App::getLocale() )
