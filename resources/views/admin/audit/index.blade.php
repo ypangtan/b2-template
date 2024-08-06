@@ -57,20 +57,20 @@ $columns = [
                 <div class="row">
                     <div class="col-md-12">
                         <div class="mb-3 row">
-                            <label for="{{ $audit_view }}_ip_address" class="col-sm-4 col-form-label">{{ __( 'audit.ip_address' ) }}</label>
-                            <div class="col-sm-8">
+                            <label for="{{ $audit_view }}_ip_address" class="col-sm-5 col-form-label">{{ __( 'audit.ip_address' ) }}</label>
+                            <div class="col-md-7">
                                 <input type="text" onfocus="this.blur()" class="form-control form-control-sm form-control-plaintext" id="{{ $audit_view }}_ip_address">
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <label for="{{ $audit_view }}_ip_address" class="col-sm-4 col-form-label">{{ __( 'audit.browser' ) }}</label>
-                            <div class="col-sm-8">
+                            <label for="{{ $audit_view }}_ip_address" class="col-sm-5 col-form-label">{{ __( 'audit.browser' ) }}</label>
+                            <div class="col-md-7">
                                 <input type="text" onfocus="this.blur()" class="form-control form-control-sm form-control-plaintext" id="{{ $audit_view }}_browser">
                             </div>
                         </div>
                         <div class="row">
-                            <label for="{{ $audit_view }}_ip_address" class="col-sm-4 col-form-label">{{ __( 'audit.operating_system' ) }}</label>
-                            <div class="col-sm-8">
+                            <label for="{{ $audit_view }}_ip_address" class="col-sm-5 col-form-label">{{ __( 'audit.operating_system' ) }}</label>
+                            <div class="col-md-7">
                                 <input type="text" onfocus="this.blur()" class="form-control form-control-sm form-control-plaintext" id="{{ $audit_view }}_operating_system">
                             </div>
                         </div>

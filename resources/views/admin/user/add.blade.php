@@ -7,6 +7,13 @@ $user_create = 'user_create';
         <div class="row">
             <div class="col-md-6">
                 <div class="mb-3 row">
+                    <label for="{{ $user_create }}_username" class="col-sm-5 col-form-label">{{ __( 'user.username' ) }}</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control form-control-sm" id="{{ $user_create }}_username">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
                     <label for="{{ $user_create }}_fullname" class="col-sm-5 col-form-label">{{ __( 'user.fullname' ) }}</label>
                     <div class="col-sm-7">
                         <input type="text" class="form-control form-control-sm" id="{{ $user_create }}_fullname">
@@ -85,6 +92,7 @@ $user_create = 'user_create';
             } );
 
             let formData = new FormData();
+            formData.append( 'username', $( uc + '_username' ).val() );
             formData.append( 'fullname', $( uc + '_fullname' ).val() );
             formData.append( 'email', $( uc + '_email' ).val() );
             formData.append( 'calling_code', $( uc + '_calling_code' ).val() );

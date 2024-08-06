@@ -19,18 +19,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, LogsActivity;
 
-    public function country() {
-        return $this->hasOne( Country::class, 'id', 'country_id' );
-    }
-
-    public function userDetail() {
-        return $this->hasOne( UserDetail::class, 'user_id' );
-    }
-
-    public function referral() {
-        return $this->hasOne( User::class, 'id', 'referral_id' );
-    }
-
     /**
      * The attributes that are mass assignable.
      *
@@ -39,8 +27,6 @@ class User extends Authenticatable
     protected $fillable = [
         'country_id',
         'referral_id',
-        'ranking_id',
-        'old_id',
         'username',
         'email',
         'calling_code',
@@ -48,11 +34,21 @@ class User extends Authenticatable
         'password',
         'invitation_code',
         'referral_structure',
-        'capital',
+        'role',
         'status',
-        'is_free',
     ];
 
+    public function country() {
+        return $this->belongsTo( Country::class, 'country_id' );
+    }
+
+    public function userDetail() {
+        return $this->hasOne( UserDetail::class, 'user_id' );
+    }
+
+    public function referral() {
+        return $this->belongsTo( User::class, 'referral_id' );
+    }
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -83,8 +79,6 @@ class User extends Authenticatable
     protected static $logAttributes = [
         'country_id',
         'referral_id',
-        'ranking_id',
-        'old_id',
         'username',
         'email',
         'calling_code',
@@ -92,9 +86,8 @@ class User extends Authenticatable
         'password',
         'invitation_code',
         'referral_structure',
-        'capital',
+        'role',
         'status',
-        'is_free'
     ];
 
     protected static $logName = 'users';

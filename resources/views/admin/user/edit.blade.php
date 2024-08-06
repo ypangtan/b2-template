@@ -7,6 +7,13 @@ $user_edit = 'user_edit';
         <div class="row">
             <div class="col-md-6">
                 <div class="mb-3 row">
+                    <label for="{{ $user_edit }}_username" class="col-sm-5 col-form-label">{{ __( 'user.username' ) }}</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control form-control-sm" id="{{ $user_edit }}_username">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
                     <label for="{{ $user_edit }}_fullname" class="col-sm-5 col-form-label">{{ __( 'user.fullname' ) }}</label>
                     <div class="col-sm-7">
                         <input type="text" class="form-control form-control-sm" id="{{ $user_edit }}_fullname">
@@ -81,6 +88,7 @@ $user_edit = 'user_edit';
 
             let formData = new FormData();
             formData.append( 'id', '{{ request( 'id' ) }}' );
+            formData.append( 'username', $( ue + '_username' ).val() );
             formData.append( 'fullname', $( ue + '_fullname' ).val() );
             formData.append( 'email', $( ue + '_email' ).val() );
             formData.append( 'calling_code', $( ue + '_calling_code' ).val() );
@@ -134,6 +142,7 @@ $user_edit = 'user_edit';
                 },
                 success: function( response ) {
 
+                    $( ue + '_username' ).val( response.username );
                     $( ue + '_fullname' ).val( response.user_detail?.fullname );
                     $( ue + '_email' ).val( response.email );
                     $( ue + '_calling_code' ).val( response.calling_code );

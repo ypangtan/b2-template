@@ -12,13 +12,11 @@ use Illuminate\Support\Facades\{
 };
 use App\Models\{
     ApiLog,
-    ManualManagementBonus,
     Country,
     TmpUser,
     User,
     UserDetail,
     UserDevice,
-    UserOld,
     UserSocial,
     UserStructure,
     UserWallet,
@@ -68,9 +66,11 @@ class UserService {
         ] );
 
         $users->each( function( $u ) {
-            $u->userDetail->append( [
-                'photo_path',
-            ] );
+            if ( $u->userDetail ) {
+                $u->userDetail->append( [
+                    'photo_path',
+                ] );
+            }
         } );
 
         $user = User::select(
@@ -122,17 +122,18 @@ class UserService {
 
         if ( !empty( $request->user ) ) {
             $model->where( function( $query ) use ( $request ) {
-                $query->where( 'users.email', $request->user );
-                $query->orWhereHas( 'userDetail', function( $query ) use ( $request ) {
-                    $query->where( 'user_details.fullname', 'LIKE', '%' . $request->user . '%' );
-                } );
+                $query->where( 'users.email', 'LIKE', '%' . $request->user . '%' );
+                $query->orWhere( 'users.username', 'LIKE', '%' . $request->user , '%' );
+                // $query->orWhereHas( 'userDetail', function( $query ) use ( $request ) {
+                //     $query->where( 'user_details.fullname', 'LIKE', '%' . $request->user . '%' );
+                // } );
             } );
             $filter = true;
         }
 
         if ( !empty( $request->phone_number ) ) {
             $model->where( function( $query ) use ( $request ) {
-                $query->where( 'phone_number', $request->phone_number );
+                $query->where( 'users.phone_number', $request->phone_number );
                 $query->orWhere( DB::raw( "CONCAT( calling_code, phone_number )" ), 'LIKE', '%' . $request->phone_number );
             } );
             $filter = true;
@@ -140,7 +141,7 @@ class UserService {
 
         if ( !empty( $request->referral ) ) {
             $model->whereHas( 'referral', function( $query ) use ( $request ) {
-                $query->where( 'email', $request->referral );
+                $query->where( 'users.email', $request->referral );
                 $query->orWhereHas( 'userDetail', function( $query ) use ( $request ) {
                     $query->where( 'user_details.fullname', 'LIKE', '%' . $request->referral . '%' );
                 } );
@@ -148,17 +149,15 @@ class UserService {
             $filter = true;
         }
 
-        if ( !empty( $request->email ) ) {
-            $model->whereHas( 'userDetail', function( $query ) use ( $request ) {
-                $query->where( 'email', 'LIKE', '%' . $request->email . '%' );
-            } );
+        if ( !empty( $request->role ) ) {
+            $model->where( 'users.role', $request->role );
             $filter = true;
         }
 
         if ( !empty( $request->status ) ) {
-            $model->where( 'status', $request->status );
+            $model->where( 'users.status', $request->status );
             $filter = true;
-        }
+        }     
 
         return [
             'filter' => $filter,
@@ -184,7 +183,7 @@ class UserService {
         DB::beginTransaction();
 
         $validator = Validator::make( $request->all(), [
-            // 'username' => [ 'required', 'unique:users,username', 'alpha_dash', new CheckASCIICharacter ],
+            'username' => [ 'required', 'unique:users,username', 'alpha_num', new CheckASCIICharacter ],
             'fullname' => [ 'required' ],
             'email' => [ 'required', 'unique:users,email', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
             'phone_number' => [ 'required', 'digits_between:8,15', function( $attribute, $value, $fail ) use ( $request ) {
@@ -199,13 +198,17 @@ class UserService {
                 }
             } ],
             'invitation_code' => [ 'nullable', 'exists:users,invitation_code' ],
+            'role' => [ 'required', 'in:1,2' ],
             'password' => [ 'required', Password::min( 8 ) ],
         ] );
 
         $attributeName = [
+            'username' => __( 'user.username' ),
             'fullname' => __( 'user.fullname' ),
             'email' => __( 'user.email' ),
             'phone_number' => __( 'user.phone_number' ),
+            'invitation_code' => __( 'user.invitation_code' ),
+            'role' => __( 'user.role' ),
             'password' => __( 'user.password' ),
         ];
 
@@ -219,11 +222,13 @@ class UserService {
 
             $createUserObject['user'] = [
                 'country_id' => 136,
+                'username' => $request->username,
                 'email' => $request->email,
                 'calling_code' => $request->calling_code,
                 'phone_number' => $request->phone_number,
                 'password' => Hash::make( $request->password ),
                 'invitation_code' => strtoupper( Str::random( 6 ) ),
+                'role' => $request->role,
                 'status' => 10,
             ];
 
@@ -268,7 +273,7 @@ class UserService {
         ] );
 
         $validator = Validator::make( $request->all(), [
-            // 'username' => [ 'required', 'unique:users,username,' . $request->id, 'alpha_dash', new CheckASCIICharacter ],
+            'username' => [ 'required', 'unique:users,username,' . $request->id, 'alpha_num', new CheckASCIICharacter ],
             'fullname' => [ 'required' ],
             'email' => [ 'required', 'unique:users,email,' . $request->id, 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
             'phone_number' => [ 'required', 'digits_between:8,15', function( $attribute, $value, $fail ) use ( $request ) {
@@ -283,13 +288,17 @@ class UserService {
                     return false;
                 }
             } ],
+            'role' => [ 'required', 'in:1,2' ],
             'password' => [ 'nullable', Password::min( 8 ) ],
         ] );
 
         $attributeName = [
+            'username' => __( 'user.username' ),
             'fullname' => __( 'user.fullname' ),
             'email' => __( 'user.email' ),
             'phone_number' => __( 'user.phone_number' ),
+            'invitation_code' => __( 'user.invitation_code' ),
+            'role' => __( 'user.role' ),
             'password' => __( 'user.password' ),
         ];
 
@@ -306,8 +315,11 @@ class UserService {
             ] )->lockForUpdate()
                 ->find( $request->id );
 
+            $updateUser->username = $request->username;    
             $updateUser->email = $request->email;
+            $updateUser->calling_code = $request->calling_code;
             $updateUser->phone_number = $request->phone_number;
+            $updateUser->role = $request->role;
             if ( !empty( $request->password ) ) {
                 $updateUser->password = Hash::make( $request->password );
             }
@@ -949,7 +961,7 @@ class UserService {
 
     private function registerOneSignal( $user_id, $device_type, $register_token ) {
         
-        UserDeviceOneSignal::updateOrCreate( 
+        UserDevice::updateOrCreate( 
             [ 'user_id' => $user_id, 'device_type' => 1 ],
             [ 'register_token' => $register_token ]
         );

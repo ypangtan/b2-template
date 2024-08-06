@@ -5,10 +5,10 @@ $announcement_edit = 'announcement_edit';
 <div class="card">
     <div class="card-body">
         <div class="row">
-            <div class="col-md-9">
+            <div class="col-md-6">
                 <div class="mb-3 row">
-                    <label for="{{ $announcement_edit }}_status" class="col-sm-4 col-form-label">{{ __( 'datatables.status' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $announcement_edit }}_status" class="col-sm-5 col-form-label">{{ __( 'datatables.status' ) }}</label>
+                    <div class="col-sm-7">
                         <input type="text" class="form-control-plaintext" id="{{ $announcement_edit }}_status">
                         <div class="invalid-feedback"></div>
                     </div>
@@ -23,8 +23,8 @@ $announcement_edit = 'announcement_edit';
                         <div class="invalid-feedback"></div>
                     </div>
                 <div class="mb-3 row">
-                    <label for="{{ $announcement_edit }}_title" class="col-sm-4 col-form-label">{{ __( 'datatables.type' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $announcement_edit }}_title" class="col-sm-5 col-form-label">{{ __( 'datatables.type' ) }}</label>
+                    <div class="col-sm-7">
                         <select class="form-select form-select-sm" id="{{ $announcement_edit }}_type">
                             <option value="2">{{ __( 'announcement.news' ) }}</option>
                             <option value="3">{{ __( 'announcement.event' ) }}</option>
@@ -33,15 +33,15 @@ $announcement_edit = 'announcement_edit';
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $announcement_edit }}_title" class="col-sm-4 col-form-label">{{ __( 'datatables.title' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $announcement_edit }}_title" class="col-sm-5 col-form-label">{{ __( 'datatables.title' ) }}</label>
+                    <div class="col-sm-7">
                         <input type="text" class="form-control form-control-sm" id="{{ $announcement_edit }}_title"">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $announcement_edit }}_content" class="col-sm-4 col-form-label">{{ __( 'announcement.content' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $announcement_edit }}_content" class="col-sm-5 col-form-label">{{ __( 'announcement.content' ) }}</label>
+                    <div class="col-sm-7">
                         <textarea class="form-control form-control-sm" id="{{ $announcement_edit }}_content" rows="10"></textarea>
                         <div class="invalid-feedback"></div>
                     </div>

@@ -5,7 +5,7 @@ $announcement_create = 'announcement_create';
 <div class="card">
     <div class="card-body">
         <div class="row">
-            <div class="col-md-9">
+            <div class="col-md-6">
                 <div class="mb-3">
                     <label class="mb-1">{{ __( 'announcement.image' ) }}</label>
                     <div class="dropzone" id="{{ $announcement_create }}_image" style="min-height: 0px;">
@@ -16,8 +16,8 @@ $announcement_create = 'announcement_create';
                     <div class="invalid-feedback"></div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $announcement_create }}_title" class="col-sm-4 col-form-label">{{ __( 'datatables.type' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $announcement_create }}_title" class="col-sm-5 col-form-label">{{ __( 'datatables.type' ) }}</label>
+                    <div class="col-sm-7">
                         <select class="form-select form-select-sm" id="{{ $announcement_create }}_type">
                             <option value="2">{{ __( 'announcement.news' ) }}</option>
                             <option value="3">{{ __( 'announcement.event' ) }}</option>
@@ -26,15 +26,15 @@ $announcement_create = 'announcement_create';
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $announcement_create }}_title" class="col-sm-4 col-form-label">{{ __( 'datatables.title' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $announcement_create }}_title" class="col-sm-5 col-form-label">{{ __( 'datatables.title' ) }}</label>
+                    <div class="col-sm-7">
                         <input type="text" class="form-control form-control-sm" id="{{ $announcement_create }}_title">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $announcement_create }}_content" class="col-sm-4 col-form-label">{{ __( 'announcement.content' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $announcement_create }}_content" class="col-sm-5 col-form-label">{{ __( 'announcement.content' ) }}</label>
+                    <div class="col-sm-7">
                         <textarea class="form-control form-control-sm" id="{{ $announcement_create }}_content" rows="10"></textarea>
                         <div class="invalid-feedback"></div>
                     </div>

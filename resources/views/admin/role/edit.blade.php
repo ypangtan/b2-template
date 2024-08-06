@@ -7,8 +7,8 @@ $role_edit = 'role_edit';
         <div class="row">
             <div class="col-md-6">
                 <div class="mb-3 row">
-                    <label for="{{ $role_edit }}_role_name" class="col-sm-4 col-form-label">{{ __( 'role.role_name' ) }}</label>
-                    <div class="col-sm-8">
+                    <label for="{{ $role_edit }}_role_name" class="col-sm-5 col-form-label">{{ __( 'role.role_name' ) }}</label>
+                    <div class="col-md-7">
                         <input type="text" class="form-control-plaintext" id="{{ $role_edit }}_role_name">
                         <div class="invalid-feedback"></div>
                     </div>
