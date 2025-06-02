@@ -105,6 +105,33 @@ Route::prefix( 'backoffice' )->group( function() {
                 Route::post( 'one-audit', [ AuditController::class, 'oneAudit' ] )->name( 'admin.audit.oneAudit' );
             } );
 
+            Route::prefix( 'mail_actions' )->group( function() {
+
+                Route::group( [ 'middleware' => [ 'permission:view mail_actions' ] ], function() {
+                    Route::get( '/', [ MailActionController::class, 'index' ] )->name( 'admin.module_parent.mail_action.index' );
+                } );
+                
+                Route::post( 'all-mail-actions', [ MailActionController::class, 'allMailActions' ] )->name( 'admin.mail_action.allMailActions' );
+                Route::post( 'one-mail-action', [ MailActionController::class, 'oneMailAction' ] )->name( 'admin.mail_action.oneMailAction' );
+                Route::post( 'resend-mail', [ MailActionController::class, 'resendMail' ] )->name( 'admin.mail_action.resendMail' );
+            } );
+            
+            Route::prefix( 'multi_language' )->group( function() {
+
+                Route::group( [ 'middleware' => [ 'permission: view multi_languages' ] ], function() {
+                    Route::get( '/', [ MultiLanguageController::class, 'index' ] )->name( 'admin.module_parent.multi_language.index' );
+                } );
+
+                Route::group( [ 'middleware' => [ 'permission: add multi_languages' ] ], function() {
+                    Route::get( '/add', [ MultiLanguageController::class, 'add' ] )->name( 'admin.multi_language.add' );
+                } );
+
+                Route::post( 'all-multi-languages', [ MultiLanguageController::class, 'allMultiLanguages' ] )->name( 'admin.multi_language.allMultiLanguages' );
+                Route::post( 'one-multi-language', [ MultiLanguageController::class, 'oneMultiLanguage' ] )->name( 'admin.multi_language.oneMultiLanguage' );
+                Route::post( 'create-multi-language-admin', [ MultiLanguageController::class, 'createMultiLanguageAdmin' ] )->name( 'admin.multi_language.createMultiLanguageAdmin' );
+                Route::post( 'update-multi-language-admin', [ MultiLanguageController::class, 'updateMultiLanguageAdmin' ] )->name( 'admin.multi_language.updateMultiLanguageAdmin' );
+            } );
+
             Route::prefix( 'users' )->group( function() {
 
                 Route::group( [ 'middleware' => [ 'permission:view users' ] ], function() {

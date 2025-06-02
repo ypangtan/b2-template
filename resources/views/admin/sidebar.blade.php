@@ -48,6 +48,25 @@
                         </a>
                     </li>
                     @endcan
+                    
+                    @can( 'view multi_languages' )
+                    <li class="{{ $controller == 'App\Http\Controllers\Admin\MultiLanguageController' ? 'mm-active' : '' }}">
+                        <a href="{{ route( 'admin.module_parent.multi_language.index' ) }}">
+                            <div class="parent-icon"><i class="align-middle feather" data-lucide="globe"></i></div>
+                            <div class="menu-title">{{ __( 'template.multi_languages' ) }}</div>
+                        </a>
+                    </li>
+                    @endcan
+
+                    @can( 'view mail_actions' )
+                    <li class="{{ $controller == 'App\Http\Controllers\Admin\MailActionController' ? 'mm-active' : '' }}">
+                        <a href="{{ route( 'admin.module_parent.mail_action.index' ) }}">
+                            <div class="parent-icon"><i class="align-middle feather" data-lucide="mail"></i></div>
+                            <div class="menu-title">{{ __( 'template.mail_actions' ) }}</div>
+                        </a>
+                    </li>
+                    @endcan
+
 
                     <li class="menu-label">{{ __( 'template.operations' ) }}</li>
                     @can( 'view users' )

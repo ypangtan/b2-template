@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call( [
             AdministratorSeeder::class,
             CountrySeeder::class,
+            CountryImageIconSeeder::class,
+            MultiLanguageSeeder::class,
         ] );
     }
 }
