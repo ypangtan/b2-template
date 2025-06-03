@@ -13,31 +13,31 @@ $columns = [
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'mail_action.user' ) ] ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'mail.user' ) ] ),
         'id' => 'user',
-        'title' => __( 'mail_action.user' ),
+        'title' => __( 'mail.user' ),
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'mail_action.subject' ) ] ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'mail.subject' ) ] ),
         'id' => 'subject',
-        'title' => __( 'mail_action.subject' ),
+        'title' => __( 'mail.subject' ),
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'mail_action.email' ) ] ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'mail.email' ) ] ),
         'id' => 'email',
-        'title' => __( 'mail_action.email' ),
+        'title' => __( 'mail.email' ),
     ],
     [
         'type' => 'select',
         'options' => [
             [ 'value' => '', 'title' => __( 'datatables.all_x', [ 'title' => __( 'datatables.status' ) ] ) ],
-            [ 'value' => 10, 'title' => __( 'mail_action.success' ) ],
-            [ 'value' => 20, 'title' => __( 'mail_action.fail' ) ],
+            [ 'value' => 10, 'title' => __( 'mail.success' ) ],
+            [ 'value' => 20, 'title' => __( 'mail.fail' ) ],
         ],
         'id' => 'status',
-        'title' => __( 'mail_action.status' ),
+        'title' => __( 'mail.status' ),
     ],
     [
         'type' => 'default',
@@ -61,7 +61,7 @@ $columns = [
             </div>
             <div class="modal-footer">
                 <div class="text-end">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">{{ __( 'mail_action.close' ) }}</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">{{ __( 'mail.close' ) }}</button>
                 </div>
             </div>
         </div>
@@ -83,11 +83,11 @@ $columns = [
         statusMapper = {
             '10': {
                 'color': 'badge rounded-pill bg-success',
-                'text': '{{ __( 'mail_action.success' ) }}'
+                'text': '{{ __( 'mail.success' ) }}'
             },
             '20': {
                 'color': 'badge rounded-pill bg-danger',
-                'text': '{{ __( 'mail_action.fail' ) }}'
+                'text': '{{ __( 'mail.fail' ) }}'
             },
         },
         dt_table,
@@ -194,10 +194,10 @@ $columns = [
                             detail = '';
 
                         @can( 'edit mail_actions' )
-                        edit += '<li class="dropdown-item click-action dt-resend" data-id="' + data + '">{{ __( 'mail_action.resend' ) }}</li>';
+                        edit += '<li class="dropdown-item click-action dt-resend" data-id="' + data + '">{{ __( 'mail.resend' ) }}</li>';
                         @endcan
                         @can( 'view mail_actions' )
-                        view += '<li class="dropdown-item click-action dt-view" data-id="' + data + '">{{ __( 'mail_action.view_mail' ) }}</li>';
+                        view += '<li class="dropdown-item click-action dt-view" data-id="' + data + '">{{ __( 'mail.view_mail' ) }}</li>';
                         @endcan
 
                         let html = 
