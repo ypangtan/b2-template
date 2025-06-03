@@ -19,6 +19,7 @@ class CreateMultiLanguageMessagesTable extends Migration
             $table->string( 'message_key' )->nullable();
             $table->text( 'text' )->nullable();
             $table->string( 'language' )->nullable();
+            $table->foreignId('last_update_by')->nullable()->constrained('administrators')->onUpdate('restrict')->onDelete('cascade');
             $table->timestamps();
         });
     }

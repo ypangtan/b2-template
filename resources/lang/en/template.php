@@ -27,6 +27,8 @@ return [
     'announcements' => 'Announcements',
     'reports' => 'Reports',
     'settings' => 'Settings',
+    'multi_languages' => 'Multi Languages',
+    'mail_actions' => 'Mail Actions',
 
     // Title
     'add_x' => 'Add :title',

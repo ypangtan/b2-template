@@ -245,14 +245,11 @@ class MultiLanguageService {
             ->first();
 
         if( !$message ) {
-            $message = MultiLanguageMessage::where( 'module', $module )
-                ->where( 'message_key', $message_key )
-                ->where( 'language', 'en' )
-                ->first();
+            $defaultText = Str::title( str_replace( '_', ' ', $message_key ) );
 
-            if( !$message ) {
-                $defaultText = Str::title( str_replace( '_', ' ', $message_key ) );
-    
+            if( $language != 'en' ) {
+                $defaultText = self::translateText( $defaultText, $language );
+
                 $message = MultiLanguageMessage::create( [
                     'module' => $module,
                     'message_key' => $message_key,
@@ -260,6 +257,13 @@ class MultiLanguageService {
                     'language' => $language,
                 ] );
             }
+            
+            $message = MultiLanguageMessage::create( [
+                'module' => $module,
+                'message_key' => $message_key,
+                'text' => $defaultText,
+                'language' => $language,
+            ] );
         }
 
         $rendered = $message->text;
@@ -268,5 +272,26 @@ class MultiLanguageService {
         }
 
         return $rendered;
+    }
+    protected static function translateText( $text, $lang ) {
+        $apiKey = config('service.google.api_key');
+
+        try {
+            $response = Http::post("https://translation.googleapis.com/language/translate/v2", [
+                'q' => $text,
+                'target' => $lang,
+                'format' => 'text',
+                'source' => 'en',
+                'key' => $apiKey,
+            ]);
+
+            if ($response->successful()) {
+                return $response->json()['data']['translations'][0]['translatedText'];
+            }
+        } catch (\Exception $e) {
+            \Log::error("Translation failed: " . $e->getMessage());
+        }
+
+        return $text;
     }
 }
