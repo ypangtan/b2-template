@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Services\{
-    DashboardService
+    DashboardService,
+    MultiLanguageService
 };
 
 use Helper;
@@ -16,6 +17,8 @@ use PragmaRX\Google2FAQRCode\Google2FA;
 class DashboardController extends Controller {
 
     public function index( Request $request ) {
+
+        dd( MultiLanguageService::test( 'testing', 'zh' ) );
 
         $this->data['header']['title'] = __( 'template.dashboard' );
         $this->data['content'] = 'admin.dashboard.index';

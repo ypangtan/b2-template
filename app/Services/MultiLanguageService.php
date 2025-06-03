@@ -248,7 +248,7 @@ class MultiLanguageService {
             $defaultText = Str::title( str_replace( '_', ' ', $message_key ) );
 
             if( $language != 'en' ) {
-                $defaultText = self::translateText( $defaultText, $language );
+                // $defaultText = self::translateText( $defaultText, $language );
 
                 $message = MultiLanguageMessage::create( [
                     'module' => $module,
@@ -273,6 +273,7 @@ class MultiLanguageService {
 
         return $rendered;
     }
+
     protected static function translateText( $text, $lang ) {
         $apiKey = config('service.google.api_key');
 
@@ -284,12 +285,12 @@ class MultiLanguageService {
                 'source' => 'en',
                 'key' => $apiKey,
             ]);
-
             if ($response->successful()) {
                 return $response->json()['data']['translations'][0]['translatedText'];
             }
         } catch (\Exception $e) {
             \Log::error("Translation failed: " . $e->getMessage());
+            return $e;
         }
 
         return $text;
