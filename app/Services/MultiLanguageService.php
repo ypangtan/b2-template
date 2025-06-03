@@ -275,6 +275,6 @@ class MultiLanguageService {
     }
 
     public static function translateText( $text, $lang ) {
-        
+        // TODO: translation api
     }
 }
