@@ -18,8 +18,6 @@ class DashboardController extends Controller {
 
     public function index( Request $request ) {
 
-        dd( MultiLanguageService::test( 'testing', 'zh' ) );
-
         $this->data['header']['title'] = __( 'template.dashboard' );
         $this->data['content'] = 'admin.dashboard.index';
 

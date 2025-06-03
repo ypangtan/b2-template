@@ -274,25 +274,7 @@ class MultiLanguageService {
         return $rendered;
     }
 
-    protected static function translateText( $text, $lang ) {
-        $apiKey = config('service.google.api_key');
-
-        try {
-            $response = Http::post("https://translation.googleapis.com/language/translate/v2", [
-                'q' => $text,
-                'target' => $lang,
-                'format' => 'text',
-                'source' => 'en',
-                'key' => $apiKey,
-            ]);
-            if ($response->successful()) {
-                return $response->json()['data']['translations'][0]['translatedText'];
-            }
-        } catch (\Exception $e) {
-            \Log::error("Translation failed: " . $e->getMessage());
-            return $e;
-        }
-
-        return $text;
+    public static function translateText( $text, $lang ) {
+        
     }
 }

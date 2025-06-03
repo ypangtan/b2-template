@@ -102,4 +102,8 @@ return [
     'oct' => 'October',
     'nov' => 'November',
     'dec' => 'December',
+    
+    // language
+    'en' => 'English',
+    'zh' => 'Mandarin',
 ];

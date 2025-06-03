@@ -27,6 +27,8 @@ return [
     'announcements' => '公告',
     'reports' => '报告',
     'settings' => '设定',
+    'multi_languages' => '语言设置',
+    'mail_actions' => '邮件日志',
 
     // Title
     'add_x' => '新增:title',
@@ -86,4 +88,8 @@ return [
     'meta_title' => '元标题',
     'meta_description' => '元描述',
     'gallery' => '相册',
+
+    // language
+    'en' => '英语',
+    'zh' => '中文',
 ];
