@@ -182,11 +182,17 @@ class UserService {
 
         DB::beginTransaction();
 
+        if( !empty( $request->referral ) ) { 
+            $request->merge( [
+                'referral' => \Helper::decode( $request->referral )
+            ] );
+        }
+
         $validator = Validator::make( $request->all(), [
             'username' => [ 'required', 'unique:users,username', 'alpha_num', new CheckASCIICharacter ],
-            'fullname' => [ 'required' ],
             'email' => [ 'required', 'unique:users,email', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
-            'phone_number' => [ 'required', 'digits_between:8,15', function( $attribute, $value, $fail ) use ( $request ) {
+            'calling_code' => [ 'nullable' ],
+            'phone_number' => [ 'nullable', 'digits_between:8,15', function( $attribute, $value, $fail ) use ( $request ) {
                 
                 $exist = User::where( 'calling_code', $request->calling_code )
                     ->where( 'phone_number', $value )
@@ -197,18 +203,18 @@ class UserService {
                     return false;
                 }
             } ],
-            'invitation_code' => [ 'nullable', 'exists:users,invitation_code' ],
-            'role' => [ 'required', 'in:1,2' ],
+            'referral' => [ 'nullable', 'exists:users,id' ],
+            'secuirty_pin' => [ 'required', 'numeric', 'digits:6' ],
             'password' => [ 'required', Password::min( 8 ) ],
         ] );
 
         $attributeName = [
             'username' => __( 'user.username' ),
-            'fullname' => __( 'user.fullname' ),
             'email' => __( 'user.email' ),
+            'calling_code' => __( 'user.calling_code' ),
             'phone_number' => __( 'user.phone_number' ),
-            'invitation_code' => __( 'user.invitation_code' ),
-            'role' => __( 'user.role' ),
+            'referral' => __( 'user.referral' ),
+            'security_pin' => __( 'user.security_pin' ),
             'password' => __( 'user.password' ),
         ];
 
@@ -227,18 +233,21 @@ class UserService {
                 'calling_code' => $request->calling_code,
                 'phone_number' => $request->phone_number,
                 'password' => Hash::make( $request->password ),
+                'secuirty_pin' => Hash::make( $request->secuirty_pin ),
                 'invitation_code' => strtoupper( Str::random( 6 ) ),
                 'role' => $request->role,
                 'status' => 10,
             ];
 
             $createUserObject['user_detail'] = [
-                'fullname' => $request->fullname,
+                'fullname' => $request->username,
             ];
 
-            $referral = User::where( 'invitation_code', $request->invitation_code )->first();
+            if( !empty( $request->refferal ) ) {
+                $referral = User::find( $request->referral );
+            }
 
-            if ( $referral ) {
+            if ( isset( $referral ) ) {
                 $createUserObject['user']['referral_id'] = $referral->id;
                 $createUserObject['user']['referral_structure'] = $referral->referral_structure . '|' . $referral->id;
             } else {
@@ -272,11 +281,17 @@ class UserService {
             'id' => Helper::decode( $request->id ),
         ] );
 
+        if( !empty( $request->referral ) ) { 
+            $request->merge( [
+                'referral' => \Helper::decode( $request->referral )
+            ] );
+        }
+
         $validator = Validator::make( $request->all(), [
             'username' => [ 'required', 'unique:users,username,' . $request->id, 'alpha_num', new CheckASCIICharacter ],
-            'fullname' => [ 'required' ],
             'email' => [ 'required', 'unique:users,email,' . $request->id, 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
-            'phone_number' => [ 'required', 'digits_between:8,15', function( $attribute, $value, $fail ) use ( $request ) {
+            'calling_code' => [ 'nullable' ],
+            'phone_number' => [ 'nullable', 'digits_between:8,15', function( $attribute, $value, $fail ) use ( $request ) {
                 
                 $exist = User::where( 'calling_code', $request->calling_code )
                     ->where( 'phone_number', $value )
@@ -288,17 +303,18 @@ class UserService {
                     return false;
                 }
             } ],
-            'role' => [ 'required', 'in:1,2' ],
+            'referral' => [ 'nullable', 'exists:users,id' ],
+            'security_pin' => [ 'nullable', 'numeric', 'digits:6' ],
             'password' => [ 'nullable', Password::min( 8 ) ],
         ] );
 
         $attributeName = [
             'username' => __( 'user.username' ),
-            'fullname' => __( 'user.fullname' ),
             'email' => __( 'user.email' ),
+            'calling_code' => __( 'user.calling_code' ),
             'phone_number' => __( 'user.phone_number' ),
-            'invitation_code' => __( 'user.invitation_code' ),
-            'role' => __( 'user.role' ),
+            'referral' => __( 'user.referral' ),
+            'security_pin' => __( 'user.security_pin' ),
             'password' => __( 'user.password' ),
         ];
 
@@ -315,21 +331,120 @@ class UserService {
             ] )->lockForUpdate()
                 ->find( $request->id );
 
-            $updateUser->username = $request->username;    
+            $updateUser->username = $request->username;
             $updateUser->email = $request->email;
             $updateUser->calling_code = $request->calling_code;
             $updateUser->phone_number = $request->phone_number;
             $updateUser->role = $request->role;
+            
             if ( !empty( $request->password ) ) {
                 $updateUser->password = Hash::make( $request->password );
+            }
+            if ( !empty( $request->security_pin ) ) {
+                $updateUser->security_pin = Hash::make( $request->security_pin );
+            }
+            
+            if( !empty( $request->referral ) ) {
+                $referral = User::find( $request->referral );
+            }
+
+            if ( isset( $referral ) ) {
+                if( $updateUser->referral_id != $referral->id ){
+                    $updated_referral_structure = $referral->referral_structure . '|' . $referral->id;
+                    $before_referral_structure = $updateUser->referral_structure . '|' . $updateUser->id;
+
+                    $downlines = User::where( 'referral_structure', 'like', $before_referral_structure . '%' )->get();
+                    foreach( $downlines as $downline ){
+                        
+                        $updateUserStructures = UserStructure::where( 'user_id', $downline->id )
+                            ->get();
+                        foreach( $updateUserStructures as $updateUserStructure ){
+                            $updateUserStructure->delete();
+                        }
+
+                        $downline->referral_structure = str_replace( $before_referral_structure, $updated_referral_structure . '|' . $updateUser->id, $downline->referral_structure );
+                        $downline->save();
+
+                        $referralArray = explode( '|', $downline->referral_structure );
+                        $referralLevel = count( $referralArray );
+                        for ( $i = $referralLevel - 1; $i >= 0; $i-- ) {
+                            if ( $referralArray[$i] != '-' ) {
+                                UserStructure::create( [
+                                    'user_id' => $downline->id,
+                                    'referral_id' => $referralArray[$i],
+                                    'level' => $referralLevel - $i
+                                ] );
+                            }
+                        }
+                    }
+
+                    $updateUser->referral_id = $referral->id;
+                    $updateUser->referral_structure = $updated_referral_structure;
+                    
+                    $updateUserStructures = UserStructure::where( 'user_id', $updateUser->id )
+                        ->get();
+                        
+                    foreach( $updateUserStructures as $updateUserStructure ){
+                        $updateUserStructure->delete();
+                    }
+                    
+                    $referralArray = explode( '|', $updateUser->referral_structure );
+                    $referralLevel = count( $referralArray );
+                    for ( $i = $referralLevel - 1; $i >= 0; $i-- ) {
+                        if ( $referralArray[$i] != '-' ) {
+                            UserStructure::create( [
+                                'user_id' => $updateUser->id,
+                                'referral_id' => $referralArray[$i],
+                                'level' => $referralLevel - $i
+                            ] );
+                        }
+                    }
+                }
+            } else {
+                $updated_referral_structure = '-';
+                $before_referral_structure = $updateUser->referral_structure . '|' . $updateUser->id;
+
+                $downlines = User::where( 'referral_structure', 'like', $before_referral_structure . '%' )->get();
+                foreach( $downlines as $downline ){
+                    
+                    $updateUserStructures = UserStructure::where( 'user_id', $downline->id )
+                        ->get();
+                    foreach( $updateUserStructures as $updateUserStructure ){
+                        $updateUserStructure->delete();
+                    }
+
+                    $downline->referral_structure = str_replace( $before_referral_structure, $updated_referral_structure . '|' . $updateUser->id, $downline->referral_structure );
+                    $downline->save();
+
+                    $referralArray = explode( '|', $downline->referral_structure );
+                    $referralLevel = count( $referralArray );
+                    for ( $i = $referralLevel - 1; $i >= 0; $i-- ) {
+                        if ( $referralArray[$i] != '-' ) {
+                            UserStructure::create( [
+                                'user_id' => $downline->id,
+                                'referral_id' => $referralArray[$i],
+                                'level' => $referralLevel - $i
+                            ] );
+                        }
+                    }
+                }
+                
+                $updateUser->referral_id = null;
+                $updateUser->referral_structure = $updated_referral_structure;
+                
+                $updateUserStructures = UserStructure::where( 'user_id', $updateUser->id )
+                    ->get();
+                    
+                foreach( $updateUserStructures as $updateUserStructure ){
+                    $updateUserStructure->delete();
+                }
             }
             $updateUser->save();
 
             $updateUserDetail = UserDetail::where( 'user_id', $request->id )
                 ->lockForUpdate()
                 ->first();
-
-            $updateUserDetail->fullname = $request->fullname;
+            $updateUserDetail->fullname = $request->username;
             $updateUserDetail->save();
 
             DB::commit();
@@ -401,27 +516,21 @@ class UserService {
         $validator->setAttributeNames( $attributeName )->validate();
 
         if ( $request->request_type == 1 ) {
-
             $validator = Validator::make( $request->all(), [
-                // 'phone_number' => [ 'required', 'integer', function( $attributes, $value, $fail ) {
-                //     // $user = User::where( 'country_id', request( 'country' ) )->where( 'phone_number', $value )->first();
-                //     $user = User::where( 'phone_number', $value )->first();
-                //     if ( $user ) {
-                //         $fail( __( 'api.phone_number_is_taken' ) );
-                //     }
-                // } ],
-                'email' => [ 'required', 'bail', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter, function( $attribute, $value, $fail ) {
-                    $exist = User::where( 'email', $value )->where( 'status', 10 )->count();
-                    if ( $exist > 0 ) {
-                        $fail( __( 'validation.exists' ) );
+                'calling_code' => [ 'nullable' ],
+                'phone_number' => [ 'nullable', 'digits_between:8,15', function( $attributes, $value, $fail ) use ( $request ) {
+                    $user = User::where( 'phone_number', $value )->where( 'calling_code', $request->calling_code )->first();
+                    if ( $user ) {
+                        $fail( __( 'api.phone_number_is_taken' ) );
                     }
                 } ],
-                'request_type' => [ 'required', 'in:1,2' ],
+                'email' => [ 'required', 'bail', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter, 'unique:users,email' ],
             ] );
     
             $attributeName = [
+                'calling_code' => __( 'user.calling_code' ),
+                'phone_number' => __( 'user.phone_number' ),
                 'email' => __( 'user.email' ),
-                'request_type' => __( 'user.request_type' ),
             ];
     
             foreach ( $attributeName as $key => $aName ) {
@@ -437,8 +546,9 @@ class UserService {
     
             try {
                 $createTmpUser = TmpUser::create( [
-                    'country_id' => 136,
-                    'email' => $request->email,
+                    'phone_number' => isset( $request->phone_number ) ? $request->phone_number : null,
+                    'calling_code' => isset( $request->calling_code ) ? $request->calling_code : null,
+                    'email' => isset( $request->email ) ? $request->email : null,
                     'otp_code' => mt_rand( 100000, 999999 ),
                     'status' => 1,
                     'expire_on' => $date->format( 'Y-m-d H:i:s' ),
@@ -447,7 +557,7 @@ class UserService {
                 \DB::commit();
     
                 return response()->json( [
-                    'message' => $createTmpUser->email,
+                    'message' => __( 'api.request_otp_success' ),
                     'message_key' => 'request_otp_success',
                     'data' => [
                         'otp_code' => '#DEBUG - ' . $createTmpUser->otp_code,
@@ -458,7 +568,9 @@ class UserService {
             } catch ( \Throwable $th ) {
     
                 \DB::rollBack();
-                abort( 500, $th->getMessage() . ' in line: ' . $th->getLine() );
+                return response()->json( [
+                    'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+                ], 500 );
             }
         } else {
 
@@ -485,12 +597,6 @@ class UserService {
                         $fail( __( 'api.invalid_request' ) );
                         return false;
                     }
-    
-                    $exist = TmpUser::where( 'email', $current->email )->where( 'status', 1 )->count();
-                    if ( $exist == 0 ) {
-                        $fail( __( 'api.invalid_request' ) );
-                        return false;
-                    }
                 } ],
             ] );
 
@@ -513,7 +619,7 @@ class UserService {
             $updateTmpUser->save();
 
             return response()->json( [
-                'message' => $updateTmpUser->email,
+                'message' => __( 'api.request_resend_otp_success' ),
                 'message_key' => 'request_resend_otp_success',
                 'data' => [
                     'otp_code' => '#DEBUG - ' . $updateTmpUser->otp_code,
@@ -570,12 +676,6 @@ class UserService {
                         $fail( __( 'api.otp_code_invalid' ) );
                         return false;
                     }
-    
-                    $exist = TmpUser::where( 'email', $current->email )->where( 'status', 10 )->count();
-                    if ( $exist > 1 ) {
-                        $fail( __( 'validation.unique', strtolower( __( 'user.email' ) ) ) );
-                        return false;
-                    }
                 } ],
             ] );
 
@@ -590,8 +690,9 @@ class UserService {
     
             $validator->setAttributeNames( $attributeName )->validate();
 
-        } else {
-
+            $current = TmpUser::find( $request->tmp_user );
+            $current->status = 2;
+            $current->save();
         }
     }
 
@@ -627,23 +728,23 @@ class UserService {
                     return false;
                 }
 
-                $exist = TmpUser::where( 'email', $current->email )->where( 'status', 10 )->count();
-                if ( $exist > 1 ) {
-                    $fail( __( 'validation.unique', strtolower( __( 'user.email' ) ) ) );
-                    return false;
-                }
+                // if ( $current->status == 2 ) {
+                //     $fail( __( 'api.otp_code_invalid' ) );
+                //     return false;
+                // }
             } ],
             'username' => [ 'required', 'alpha_dash', 'unique:users,username' ],
             'email' => [ 'required', 'unique:users,email', 'min:8', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
             'password' => [ 'required', Password::min( 8 ) ],
-            // 'country' => [ 'required', 'exists:countries,id' ],
-            // 'phone_number' => [ 'required', 'integer', function( $attributes, $value, $fail ) {
-            //     // $user = User::where( 'country_id', request( 'country' ) )->where( 'phone_number', $value )->first();
-            //     $user = User::where( 'phone_number', $value )->first();
-            //     if ( $user ) {
-            //         $fail( __( 'validation.unique', [ 'attribute' => 'phone number' ] ) );
-            //     }
-            // } ],
+            'security_pin' => [ 'required', 'numbic' ],
+            'calling_code' => [ 'nullable' ],
+            'phone_number' => [ 'nullable', 'digits_between:8,15', function( $attributes, $value, $fail ) {
+                // $user = User::where( 'country_id', request( 'country' ) )->where( 'phone_number', $value )->first();
+                $user = User::where( 'phone_number', $value )->first();
+                if ( $user ) {
+                    $fail( __( 'validation.unique', [ 'attribute' => 'phone number' ] ) );
+                }
+            } ],
             'invitation_code' => [ 'sometimes', 'exists:users,invitation_code' ],
             'device_type' => [ 'required', 'in:1,2,3' ],
         ] );

@@ -32,6 +32,7 @@ class User extends Authenticatable
         'calling_code',
         'phone_number',
         'password',
+        'secuirty_pin',
         'invitation_code',
         'referral_structure',
         'role',
