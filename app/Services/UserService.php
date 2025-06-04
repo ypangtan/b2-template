@@ -8,11 +8,13 @@ use Illuminate\Support\Facades\{
     DB,
     Hash,
     Http,
+    Storage,
     Validator,
 };
 use App\Models\{
     ApiLog,
     Country,
+    OtpAction,
     TmpUser,
     User,
     UserDetail,
@@ -499,6 +501,292 @@ class UserService {
         }
     }
 
+    public static function getTeamAjax( $request ) {
+
+        if( !empty( $request->email ) ){
+            $request->merge( [
+                'email' => Helper::decode( $request->email )
+            ] );
+        }
+
+        $searcher = [];
+
+        if ( $request->id == '#' ) {
+            if ( $request->email ) {
+                $username = $request->email;
+            } else {
+                $username = User::first()->value( 'id' );
+            }
+        } else {
+            $username = $request->email == 0 ? User::first()->value( 'id' ) : $request->email;
+            $searcher = User::find( $request->id );
+        }
+
+        $user = User::where( 'id', $username )->first();
+
+        if ( !$user ) {
+            return [];
+        }
+
+        if ( !$searcher ) {
+            $searcher = $user;
+        }
+
+        $downlines = UserStructure::with( [
+            'user',
+            'user.downlines',
+            'user.overriding',
+        ] )->where( 'referral_id', $searcher ? $searcher->id : $user->id )
+            ->where('level', 1)->get();
+
+        $data = [];
+
+        foreach ( $downlines as $downline ) {
+
+            $downline->user->append( [ 'total_group_sale', 'direct_sponsors', 'ranking_path' ] );
+
+            if ( count( $downline->user->groups->pluck( 'user_id' ) ) == 0 ) {
+                $groupMember = 0;
+            } else {
+                $groupMember = count( $downline->user->groups->pluck( 'user_id' ) );
+            }
+
+            $ranking_path = $downline->user->ranking_path;
+            $html = '';
+
+            $html .= '
+            <div class="flex flex-col gap-y-4 rounded-[10px] border-[2px] border-l-[5px] border-[#ECECEC] !border-l-[#FFCA05] sm:w-[180px] md:w-[800px] my-2 px-3 py-3 relative">
+                <div class="flex justify-between items-center gap-x-2 ">
+                    <div class="flex gap-x-8 items-center">
+                        <div>
+                            <div class="flex gap-x-2">
+                                <h4 class="text-[14px] md:text-[16px] font-bold text-[#212121] mb-1">' . ( $downline->user->userDetail != null ? $downline->user->userDetail->fullname : $downline->user->email ) . '</h4>
+                            </div>
+                            <div class="flex gap-x-2">
+                                <h4 class="text-[10px] md:text-[14px] font-bold text-[#212121] mb-1">' . $downline->user->email . '</h4>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-center items-center">
+                                ' .  ( $ranking_path == null ? '<h4 class="ranking"> - </h4>' : ( '<img src="' . $ranking_path . '" class="ranking_img" />' ) ) . '
+                            </div>
+                        </div>
+                    </div>'.
+                    ( $groupMember >= 1 ? '<i class="bi bi-caret-down-fill"></i>' : '' ).'
+                </div>
+                <div class="flex justify-around items-center">
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $downline->user->direct_sponsors[ 'downlineCount' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1">'. __( 'user.direct_sponsors' ) .'</h4>
+                    </div>
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $downline->user->direct_sponsors[ 'total_sale' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1"> '. __( 'user.direct_sponsors_sales' ) .' </h4>
+                    </div>
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $downline->user->total_group_sale[ 'downlineCount' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1">'. __( 'user.total_members' ) .'</h4>
+                    </div>
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $downline->user->total_group_sale[ 'total_sale' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1">'. __( 'user.total_team_sales' ) .'</h4>
+                    </div>
+                </div>
+            </div>
+            ';
+
+            $data[] = [
+                'id' => $downline->user->id,
+                'name' => $downline->user->id,
+                'text' => $html,
+                'children' => count( $downline->user->downlines ) > 0,
+            ];
+        }
+        
+        return $data;
+    }
+
+    public static function getTeamData( $request ) {
+
+        if( !empty( $request->email ) ){
+            $request->merge( [
+                'email' => Helper::decode( $request->email )
+            ] );
+        }
+
+        $users = User::with( [
+            'overriding',
+            'userDetail',
+        ] );
+
+        if ( $request->id !== '0' ) {
+            $users = $users->where( 'id', Helper::decode( $request->id ) );
+        } else {
+            $users = $users->where( 'referral_id', null )
+            ->orderBy( 'id', 'DESC' );
+        }
+
+        $users = $users->get();
+
+        $users->append( [ 'total_group_sale', 'direct_sponsors', 'ranking_path' ] );
+
+        $html = '';
+
+
+        foreach ( $users as $user ) {
+
+            if ( count( $user->groups->pluck( 'user_id' ) ) == 0 ) {
+                $groupMember = 0;
+            } else {
+                $groupMember = count( $user->groups->pluck( 'user_id' ) );
+            }
+
+            $ranking_path = $user->ranking_path;
+
+            $html .= '
+            <div class="flex flex-col gap-y-4 rounded-[10px] border-[2px] border-l-[5px] border-[#ECECEC] !border-l-[#FFCA05] sm:w-[180px] md:w-[800px] my-2 px-3 py-3 relative">
+                <div class="flex justify-between items-center gap-x-2 ">
+                    <div class="flex gap-x-8 items-center">
+                        <div>
+                            <div class="flex gap-x-2">
+                                <h4 class="text-[14px] md:text-[16px] font-bold text-[#212121] mb-1">' . ( $user->userDetail != null ? $user->userDetail->fullname : $user->email ) . '</h4>
+                            </div>
+                            <div class="flex gap-x-2">
+                                <h4 class="text-[10px] md:text-[14px] font-bold text-[#212121] mb-1">' . $user->email . '</h4>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-center items-center">
+                                ' .  ( $ranking_path == null ? '<h4 class="ranking"> - </h4>' : ( '<img src="' . $ranking_path . '" class="ranking_img" />' ) ) . '
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-around items-center">
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $user->direct_sponsors[ 'downlineCount' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1">'. __( 'user.direct_sponsors' ) .'</h4>
+                    </div>
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $user->direct_sponsors[ 'total_sale' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1"> '. __( 'user.direct_sponsors_sales' ) .' </h4>
+                    </div>
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $user->total_group_sale[ 'downlineCount' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1">'. __( 'user.total_members' ) .'</h4>
+                    </div>
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $user->total_group_sale[ 'total_sale' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1">'. __( 'user.total_team_sales' ) .'</h4>
+                    </div>
+                </div>
+            </div>
+            ';
+        }
+
+        return [
+            'html' => $html,
+        ];
+    }
+
+    public static function getUplineData( $request ) {
+
+        if( !empty( $request->email ) ){
+            $request->merge( [
+                'email' => Helper::decode( $request->email )
+            ] );
+        }
+
+        $users = User::with( [
+            'upline',
+            'upline.overriding',
+            'upline.userDetail',
+        ] );
+
+        if ( $request->id !== '0' ) {
+            $users = $users->where( 'id', Helper::decode( $request->id ) );
+        }
+
+        $users = $users->first();
+
+        $html = '';
+        if( !$users->upline ){
+            return [
+                'html' => $html,
+            ];
+        }
+        $users = $users->upline;
+
+        $users->append( [ 'total_group_sale', 'direct_sponsors', 'ranking_path' ] );
+
+        $ranking_path = $users->ranking_path;
+        $html .= '
+            <div class="flex flex-col gap-y-4 rounded-[10px] border-[2px] border-l-[5px] border-[#ECECEC] !border-l-[#FFCA05] sm:w-[180px] md:w-[800px] my-2 px-3 py-3 relative">
+                <div class="flex justify-between items-center gap-x-2 ">
+                    <div class="flex gap-x-8 items-center">
+                        <div>
+                            <div class="flex gap-x-2">
+                                <h4 class="text-[14px] md:text-[16px] font-bold text-[#212121] mb-1">' . ( $users->userDetail != null ? $users->userDetail->fullname : $users->email ) . '</h4>
+                            </div>
+                            <div class="flex gap-x-2">
+                                <h4 class="text-[10px] md:text-[14px] font-bold text-[#212121] mb-1">' . $users->email . '</h4>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-center items-center">
+                                ' .  ( $ranking_path == null ? '<h4 class="ranking"> - </h4>' : ( '<img src="' . $ranking_path . '" class="ranking_img" />' ) ) . '
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-around items-center">
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $users->direct_sponsors[ 'downlineCount' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1">'. __( 'user.direct_sponsors' ) .'</h4>
+                    </div>
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $users->direct_sponsors[ 'total_sale' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1"> '. __( 'user.direct_sponsors_sales' ) .' </h4>
+                    </div>
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $users->total_group_sale[ 'downlineCount' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1">'. __( 'user.total_members' ) .'</h4>
+                    </div>
+                    <div class="flex flex-col justify-center items-center">
+                        <h4 class="text-[10px] md:text-[14px] font-bold text-[#977200] mb-1">' . $users->total_group_sale[ 'total_sale' ] . '</h4>
+                        <h4 class="text-[10px] md:text-[14px] text-[#8D8D8D] mb-1">'. __( 'user.total_team_sales' ) .'</h4>
+                    </div>
+                </div>
+            </div>
+            ';
+
+        return [
+            'html' => $html,
+        ];
+    }
+
+    public static function getTeamLeader( $request ) {
+        $user = UserStructure::where( 'user_id', \Helper::decode( $request->id ) )
+            ->orderBy( 'level', 'desc' )
+            ->first();
+
+        $leader = '';
+
+        if( $user ) {
+            $leader = User::with( [
+                'overriding',
+            ] )->find( $user->referral_id );
+
+            if( $leader ){
+                $leader->append( 'total_group_sale' );
+            }
+        }
+
+        return [
+            'data' => $leader
+        ];
+    }
+
     public static function requestOtp( $request ) {
 
         $validator = Validator::make( $request->all(), [
@@ -727,20 +1015,14 @@ class UserService {
                     $fail( __( 'api.otp_code_invalid' ) );
                     return false;
                 }
-
-                // if ( $current->status == 2 ) {
-                //     $fail( __( 'api.otp_code_invalid' ) );
-                //     return false;
-                // }
             } ],
-            'username' => [ 'required', 'alpha_dash', 'unique:users,username' ],
+            'username' => [ 'required', 'alpha_dash', 'unique:users,username', new CheckASCIICharacter ],
             'email' => [ 'required', 'unique:users,email', 'min:8', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
             'password' => [ 'required', Password::min( 8 ) ],
             'security_pin' => [ 'required', 'numbic' ],
             'calling_code' => [ 'nullable' ],
-            'phone_number' => [ 'nullable', 'digits_between:8,15', function( $attributes, $value, $fail ) {
-                // $user = User::where( 'country_id', request( 'country' ) )->where( 'phone_number', $value )->first();
-                $user = User::where( 'phone_number', $value )->first();
+            'phone_number' => [ 'nullable', 'digits_between:8,15', function( $attributes, $value, $fail ) use ( $request ) {
+                $user = User::where( 'phone_number', $value )->where( 'calling_code', $request->calling_code )->first();
                 if ( $user ) {
                     $fail( __( 'validation.unique', [ 'attribute' => 'phone number' ] ) );
                 }
@@ -762,43 +1044,33 @@ class UserService {
         \DB::beginTransaction();
 
         try {
-
-            $createUserObject = [
+            $createUserObject['user'] = [
                 'username' => $request->username,
                 'email' => $request->email,
                 'country_id' => 136,
-                // 'phone_number' => $request->phone_number,
+                'calling_code' => $request->calling_code,
+                'phone_number' => $request->phone_number,
                 'password' => Hash::make( $request->password ),
                 'invitation_code' => strtoupper( \Str::random( 6 ) ),
             ];
 
-            $referral = User::where( 'invitation_code', $request->invitation_code )->first();
+            $createUserObject['user_detail'] = [
+                'fullname' => $request->username,
+            ];
 
-            if ( $referral ) {
-                $createUserObject['referral_id'] = $referral->id;
-                $createUserObject['referral_structure'] = $referral->referral_structure . '|' . $referral->id;
+            if( !empty( $request->invitation_code ) ) {
+                $referral = User::where( 'invitation_code', $request->invitation_code )->first();
+            }
+
+            if ( isset( $referral ) ) {
+                $createUserObject['user']['referral_id'] = $referral->id;
+                $createUserObject['user']['referral_structure'] = $referral->referral_structure . '|' . $referral->id;
             } else {
-                $createUserObject['referral_id'] = null;
-                $createUserObject['referral_structure'] = '-';
+                $createUserObject['user']['referral_id'] = null;
+                $createUserObject['user']['referral_structure'] = '-';
             }
 
-            $createUser = User::create( $createUserObject );
-
-            $updateTmpUser = TmpUser::find( $request->tmp_user );
-            $updateTmpUser->status = 10;
-            $updateTmpUser->save();
-
-            // Register OneSignal
-            if ( !empty( $request->register_token ) ) {
-                self::registerOneSignal( $createUser->id, $request->device_type, $request->register_token );
-            }
-
-            for ( $i = 1; $i <= 2; $i++ ) { 
-                UserWallet::create( [
-                    'user_id' => $createUser->id,
-                    'type' => $i,
-                ] );
-            }
+            $createUser = self::create( $createUserObject );
 
             \DB::commit();
 
@@ -824,7 +1096,7 @@ class UserService {
             'password' => 'required',
             'account' => [ 'sometimes', function( $attributes, $value, $fail ) {
 
-                $user = User::where( 'username', request( 'username' ) )->first();
+                $user = User::where( 'email', request( 'email' ) )->first();
                 if ( !$user ) {
                     $fail( __( 'api.user_wrong_user_password' ) );
                     return 0;
@@ -838,7 +1110,7 @@ class UserService {
             'device_type' => 'required|in:1,2,3',
         ] );
 
-        $user = User::where( 'username', $request->username )->first();
+        $user = User::where( 'email', $request->email )->first();
 
         // Register OneSignal
         if ( !empty( $request->register_token ) ) {
@@ -948,27 +1220,28 @@ class UserService {
     public static function updateUser( $request ) {
 
         $request->validate( [
-            // 'country' => 'required|exists:countries,id',
             'username' => 'required|unique:users,username,' . auth()->user()->id,
-            'email' => 'required|unique:users,email,' . auth()->user()->id . '|min:8',
-            'phone_number' => [ 'required', function( $attributes, $value, $fail ) {
-                // $user = User::where( 'country_id', request( 'country' ) )->where( 'phone_number', $value )->first();
-                $user = User::where( 'phone_number', $value )->first();
+            'email' => 'nullable|unique:users,email,' . auth()->user()->id . '|min:8',
+            'calling_code' => [ 'nullable' ],
+            'phone_number' => [ 'nullable', function( $attributes, $value, $fail ) use ( $request ) {
+                $user = User::where( 'phone_number', $value )->where( 'calling_code', $request->calling_code )->first();
                 if ( $user ) {
                     if ( $user->id != auth()->user()->id ) {
                         $fail( __( 'validation.unique', [ 'attribute' => 'phone number' ] ) );
                     }
                 }
             } ],
-            'birthday' => 'required',
         ] );
 
         $updateUser = User::find( auth()->user()->id );
-        // $updateUser->country_id = $request->country;
         $updateUser->username = $request->username;
-        $updateUser->email = $request->email;
-        $updateUser->phone_number = $request->phone_number;
-        $updateUser->birthday = $request->birthday;
+        if( isset( $request->email ) ) {
+            $updateUser->email = $request->email;
+        }
+        if( isset( $request->calling_code ) ) {
+            $updateUser->calling_code = $request->calling_code;
+            $updateUser->phone_number = $request->phone_number;
+        }
 
         if ( $updateUser->isDirty() ) {
             $updateUser->save();    
@@ -980,50 +1253,393 @@ class UserService {
         ] );
     }
 
+    public static function updateUserPhoto( $request ) {
+        DB::beginTransaction();
+
+        $validator = Validator::make($request->all(), [
+            'photo' => [ 'required', 'file', 'mimes:jpg,png' ],
+        ]);    
+    
+        $attributeNames = [
+            'photo' => __('user.photo'),
+        ];
+    
+        $validator->setAttributeNames($attributeNames)->validate();
+        try {
+
+            if( $request->hasFile( 'photo' ) ){
+                $updateUser = UserDetail::where( 'user_id', auth()->user()->id )->first();
+                if( $updateUser ){
+                    if( $updateUser->photo ){
+                        Storage::disk('public')->delete($updateUser->photo);
+                    }
+                    $updateUser->photo = $request->file('photo')->store('users', ['disk' => 'public']);
+                    if( $updateUser->save() ){
+                        $updateUser->append( 'photo_path' );
+                    }
+                }
+                
+                DB::commit();
+                
+                return response()->json( [
+                    'message_key' => __( 'api.user_photo_updated' ),
+                    'message' => __( 'api.user_photo_updated' ),
+                    'data' => $updateUser,
+                ] );
+            }
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'message_key' => __( 'api.user_photo_updated_fail' ),
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+            ], 500);
+        }
+    }
+
     public static function updateUserPassword( $request ) {
 
-        $request->validate( [
+        $validator = Validator::make( $request->all(), [
             'old_password' => [ 'required', 'min:8', function( $attributes, $value, $fail ) {
                 if ( !Hash::check( $value, auth()->user()->password ) ) {
                     $fail( __( 'api.old_password_not_match' ) );
                 }
             } ],
-            'password' => 'required|min:8|confirmed',
+            'password' => [ 'required', Password::min( 8 ), 'confirmed' ],
         ] );
+
+        $attributeName = [
+            'password' => __( 'user.password' ),
+            'confirm_password' => __( 'user.confirm_password' ),
+        ];
+
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();
 
         $updateUser = User::find( auth()->user()->id );
         $updateUser->password = Hash::make( $request->password );
         $updateUser->save();
 
         return response()->json( [
+            'message_key' => __( 'api.user_password_updated' ),
             'message' => __( 'api.user_password_updated' ),
             'data' => '',
         ] );
     }
 
-    public static function deleteUser( $request ) {
+    public static function updateSecurityPin( $request ) {
 
-        $user = User::find( request()->user()->id );
-        $user->delete();
+        if( auth()->user()->security_pin != null ){
+            $validator = Validator::make( $request->all(), [
+                'old_security_pin' => [ 'required', function( $attributes, $value, $fail ) {
+                    if ( !Hash::check( $value, auth()->user()->security_pin ) ) {
+                        $fail( __( 'api.old_security_pin_not_match' ) );
+                    }
+                } ],
+                'security_pin' => [ 'required', 'confirmed', 'digits:6', 'numeric' ],
+            ] );
+        }else{
+            $validator = Validator::make( $request->all(), [
+                'security_pin' => [ 'required', 'confirmed', 'digits:6', 'numeric' ],
+            ] );
+        }
+
+        $attributeName = [
+            'old_security_pin' => __( 'user.old_security_pin' ),
+            'security_pin' => __( 'user.security_pin' ),
+            'confirm_security_pin' => __( 'user.confirm_security_pin' ),
+        ];
+
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();
+
+        $updateUser = User::find( auth()->user()->id );
+        $updateUser->security_pin = Hash::make( $request->security_pin );
+        $updateUser->save();
 
         return response()->json( [
-            'message' => __( 'api.user_deleted' ),
+            'message_key' => __( 'api.user_security_pin_updated' ),
+            'message' => __( 'api.user_security_pin_updated' ),
+            'data' => '',
         ] );
     }
 
     public static function forgotPassword( $request ) {
 
-        $request->validate( [
-            'email' => [ 'required', 'exists:users,email', function( $attributes, $value, $fail ) {
-                if ( User::find( auth()->user()->id )->is_social_account == 1 ) {
-                    $fail( __( 'api.cannot_reset_social_account' ) );
-                }
-            } ]
+        $validator = Validator::make( $request->all(), [
+            'request_type' => [ 'required', 'in:1,2' ],
         ] );
+
+        $attributeName = [
+            'request_type' => __( 'user.request_type' ),
+        ];
+
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();
+
+        if ( $request->request_type == 1 ) {
+
+            $validator = Validator::make( $request->all(), [
+                'email' => [ 'required', 'unique:users,email', 'min:8', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
+                'calling_code' => [ 'nullable' ],
+                'phone_number' => [ 'nullable', 'integer', function( $attributes, $value, $fail ) {
+                    $user = User::where( 'calling_code', request( 'calling_code' ) )->where( 'phone_number', $value )->first();
+                    if ( $user ) {
+                        $fail( __( 'validation.unique', [ 'attribute' => 'phone number' ] ) );
+                    }
+                } ],
+            ] );
+    
+            $attributeName = [
+                'email' => __( 'user.email' ),
+                'calling_code' => __( 'user.calling_code' ),
+                'phone_number' => __( 'user.phone_number' ),
+            ];
+    
+            foreach ( $attributeName as $key => $aName ) {
+                $attributeName[$key] = strtolower( $aName );
+            }
+    
+            $validator->setAttributeNames( $attributeName )->validate();
+    
+            $date = new \DateTime( date( 'Y-m-d H:i:s' ) );
+            $date->add( new \DateInterval( 'PT10M' ) );
+    
+            \DB::beginTransaction();
+    
+            try {
+                $createTmpUser = OtpAction::create( [
+                    'email' => $request->email,
+                    'calling_code' => $request->calling_code,
+                    'phone_number' => $request->phone_number,
+                    'otp_code' => mt_rand( 100000, 999999 ),
+                    'status' => 1,
+                    'expire_on' => $date->format( 'Y-m-d H:i:s' ),
+                ] );
+                    
+                // TODO: send mail
+
+                \DB::commit();
+
+                return response()->json( [
+                    'message' => $createTmpUser->email,
+                    'message_key' => __( 'api.request_otp_success' ),
+                    'data' => [
+                        'otp_code' => '#DEBUG - ' . $createTmpUser->otp_code,
+                        'tmp_user' => Crypt::encryptString( $createTmpUser->id ),
+                    ]
+                ] );
+    
+            } catch ( \Throwable $th ) {
+    
+                \DB::rollBack();
+                abort( 500, $th->getMessage() . ' in line: ' . $th->getLine() );
+            }
+        }
+        else if ( $request->request_type == 2 ) {
+
+            try {
+                $request->merge( [
+                    'tmp_user' => Crypt::decryptString( $request->tmp_user ),
+                ] );
+            } catch ( \Throwable $th ) {
+                return response()->json( [
+                    'message' => __( 'validation.header_message' ),
+                    'errors' => [
+                        'tmp_user' => [
+                            __( 'api.otp_code_invalid' ),
+                        ],
+                    ]
+                ], 422 );
+            }
+
+            $validator = Validator::make( $request->all(), [
+                'tmp_user' => [ 'required', function( $attributes, $value, $fail ) {
+    
+                    $current = TmpUser::find( $value );
+                    if ( !$current ) {
+                        $fail( __( 'api.invalid_request' ) );
+                        return false;
+                    }
+                } ],
+            ] );
+
+            $attributeName = [
+                'tmp_user' => __( 'user.otp_code' ),
+            ];
+    
+            foreach ( $attributeName as $key => $aName ) {
+                $attributeName[$key] = strtolower( $aName );
+            }
+    
+            $validator->setAttributeNames( $attributeName )->validate();
+
+            $date = new \DateTime( date( 'Y-m-d H:i:s' ) );
+            $date->add( new \DateInterval( 'PT10M' ) );
+
+            $updateTmpUser = OtpAction::find( $request->tmp_user );
+            $updateTmpUser->otp_code = mt_rand( 100000, 999999 );
+            $updateTmpUser->expire_on = $date->format( 'Y-m-d H:i:s' );
+            $updateTmpUser->save();
+
+            // TODO: send mail
+
+            return response()->json( [
+                'message' => $updateTmpUser->email,
+                'message_key' => __( 'api.request_resend_otp_success' ),
+                'data' => [
+                    'otp_code' => '#DEBUG - ' . $updateTmpUser->otp_code,
+                    'tmp_user' => Crypt::encryptString( $updateTmpUser->id ),
+                ]
+            ] );
+        }
     }
 
     public static function resetPassword( $request ) {
 
+        DB::beginTransaction();
+
+        try {
+            $request->merge( [
+                'identifier' => Crypt::decryptString( $request->identifier ),
+            ] );
+        } catch ( \Throwable $th ) {
+            return response()->json( [
+                'message' =>  __( 'api.invalid_otp' ),
+            ], 500 );
+        }
+
+        $validator = Validator::make( $request->all(), [
+            'identifier' => [ 'required', function( $attribute, $value, $fail ) use ( $request, &$currentOtpAction ) {
+
+                $currentOtpAction = OtpAction::lockForUpdate()
+                    ->find( $value );
+                if ( !$currentOtpAction ) {
+                    $fail( __( 'api.invalid_otp' ) );
+                    return false;
+                }
+
+                if ( $currentOtpAction->status != 11 ) {
+                    $fail( __( 'api.invalid_otp' ) );
+                    return false;
+                }
+                
+            } ],
+            'password' => [ 'required', Password::min( 8 ), 'confirmed' ],
+        ] );
+
+        $attributeName = [
+            'password' => __( 'user.password' ),
+            'confirm_password' => __( 'user.confirm_password' ),
+        ];
+
+        foreach ( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();
+
+        try {
+
+            $updateUser = User::where( 'email', $currentOtpAction->email )->first();
+            $updateUser->password = Hash::make( $request->password );
+            $updateUser->save();
+
+            $currentOtpAction->status = 10;
+            $currentOtpAction->save();
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollBack();
+
+            return response()->json( [
+            'message_key' => __( 'api.reset_password_fail' ),
+            'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+            ], 500 );
+        }
+
+        return response()->json( [
+            'message_key' => __( 'api.reset_password_success' ),
+            'data' => [],
+        ] );
+    }
+
+    public static function myTeamAjax( $request ){
+
+        $downlines = User::select( [
+            'users.id',
+            'users.username',
+            'users.email',
+        ] );
+
+        if( !empty( $request->id ) ){
+            $downlines = $downlines->where( 'referral_id', \Helper::decode( $request->id ) );
+        }else{
+            $downlines = $downlines->where( 'referral_id', auth()->user()->id );
+        }
+
+        $downlines = $downlines->get();
+
+        if( $downlines ){
+            $downlines->append( [
+                'encrypted_id',
+            ] );
+        }
+
+        return response()->json( [
+            'data' => $downlines,
+        ] );
+    }
+
+    public static function initMyTeam( $request ){
+
+        if( !empty( $request->id ) ){
+            $id = Helper::decode( $request->id );
+        }else{
+            $id = auth()->user()->id;
+        }
+
+        $user = User::select( [
+            'users.id',
+            'users.username',
+            'users.email',
+        ] )->find( $id );
+
+        $user->append( [
+            'encrypted_id',
+        ] );
+
+        return $user;
+    }
+
+    public static function searchMyTeam( $request ) {
+
+        $user = auth()->user();
+        $team = $user->team();
+        
+        if (!empty($request->user)) {
+            $team->where(function ($query) use ($request) {
+                $query->where('username', 'like', '%' . $request->user . '%')
+                      ->orWhere('email', 'like', '%' . $request->user . '%');
+            });
+        }
+    
+        $teamMembers = $team->get();
+
+        $teamMembers->append( 'encrypted_id' );
+        
+        return response()->json($teamMembers);
     }
 
     // Share
@@ -1049,10 +1665,11 @@ class UserService {
             }
         }
 
-        for ( $i = 1; $i <= 2; $i++ ) { 
+        $wallets = \Helper::wallets();
+        foreach ( $wallets as $key => $value ) { 
             UserWallet::create( [
                 'user_id' => $createUser->id,
-                'type' => $i,
+                'type' => $key,
                 'balance' => 0,
             ] );
         }

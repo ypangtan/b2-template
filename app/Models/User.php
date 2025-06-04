@@ -38,6 +38,56 @@ class User extends Authenticatable
         'role',
         'status',
     ];
+    
+    public function getAssetAttribute() {
+        $balances = $this->wallet()->where('type', 1)->first();
+        $balances = $balances->balance;
+        return \Helper::numberFormat($balances, 2, true);
+    }
+
+    public function allDownlines(){
+        $downlines = $this->groups()->with('user')->get()->pluck('user'); 
+        $downlines = $downlines->flatten()->filter();
+
+        return $downlines;
+    }
+
+    public function downlines() {
+        return $this->hasMany( User::class, 'referral_id' )
+            ->where( 'status', 10 );
+    }
+    
+    public function groups() {
+        return $this->hasMany( UserStructure::class, 'referral_id' );
+    }
+
+    public function upline() {
+        return $this->belongsTo( User::class, 'referral_id' );
+    }
+
+    public function wallet() {
+        return $this->hasMany( UserWallet::class, 'user_id' );
+    }
+
+    public function kyc() {
+        return $this->hasOne( UserKyc::class, 'user_id' );
+    }
+
+    public function team() {
+
+        $referralArray = !empty( $this->attributes['referral_structure'] ) 
+            ? explode( '|', $this->attributes['referral_structure'] ) 
+            : [];
+    
+        $downlinesArray = $this->allDownlines()->pluck('id')->toArray(); 
+    
+        $idArray = array_merge($referralArray, $downlinesArray); 
+        
+        $member = User::whereIn('id', $idArray);
+
+        return $member;
+    }
+
 
     public function country() {
         return $this->belongsTo( Country::class, 'country_id' );

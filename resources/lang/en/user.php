@@ -16,6 +16,7 @@ return [
     'username' => 'Username',
     'email' => 'Email',
     'password' => 'Password',
+    'confirm_password' => 'Confirm Password',
     'request_type' => 'Request Type',
     'user' => 'User',
     'fullname' => 'Fullname',
@@ -23,4 +24,5 @@ return [
     'invitation_code' => 'Invitation Code',
     'capital' => 'Capital',
     'referral' => 'Referral',
+    'otp_code' => 'OTP Code',
 ];
