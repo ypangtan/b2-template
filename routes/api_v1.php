@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\{
     CategoryController,
+    NotificationController,
     ProductController,
     UserController,
 };
@@ -30,24 +31,33 @@ Route::prefix( 'users' )->group( function() {
     // Social Login
     Route::post( 'social', [ UserController::class, 'createTokenSocial' ] );
 } );
-
-Route::prefix( 'products' )->group( function() {
-    Route::get( '/', [ ProductController::class, 'getProducts' ] );
-    Route::get( 'detail', [ ProductController::class, 'getProduct' ] );
-} );
-Route::prefix( 'categories' )->group( function() {
-    Route::get( '/', [ CategoryController::class, 'getCategories' ] );
-} );
 /* End Public route */
 
 /* Start Protected route */
 Route::middleware( 'auth:sanctum' )->group( function() {
 
     Route::prefix( 'users' )->group( function() {
-
         Route::get( '/', [ UserController::class, 'getUser' ] );
-        // Route::post( '/', [ UserController::class, 'updateUser' ] );
-        // Route::post( 'password', [ UserController::class, 'updateUserPassword' ] );
-        // Route::delete( '/', [ UserController::class, 'deleteUser' ] );
+        Route::get( '/kyc-status', [ UserController::class, 'kycStatus' ] );
+        Route::get( '/wallet-infos', [ UserController::class, 'walletInfos' ] );
+        Route::get( '/all-users', [ UserController::class, 'allUsers' ] );
+        Route::get( '/all-downlines', [ UserController::class, 'allDownlines' ] );
+
+        Route::post( '/', [ UserController::class, 'updateUser' ] );
+        Route::post( '/search-my-team', [ UserController::class, 'searchMyTeam' ] );
+        Route::post( '/update-password', [ UserController::class, 'updateUserPassword' ] );
+        Route::post( '/update-security-pin', [ UserController::class, 'updateSecurityPin' ] );
+        Route::post( '/update-user-photo', [ UserController::class, 'updateUserPhoto' ] );
+    } );
+
+    Route::prefix( 'my-team' )->group( function() {
+        Route::post( '/init-my-team', [ UserController::class, 'initMyTeam' ] );
+        Route::post( '/my-team-ajax', [ UserController::class, 'myTeamAjax' ] );
+    } );
+
+    Route::prefix( 'notification' )->group( function() {
+        Route::get( '/all-notification', [ NotificationController::class, 'allNotification' ] );
+        Route::post( '/one-notification', [ NotificationController::class, 'oneNotification' ] );
+        Route::post( '/all-read-notification', [ NotificationController::class, 'allReadNotification' ] );
     } );
 } );

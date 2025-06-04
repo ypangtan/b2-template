@@ -1019,7 +1019,7 @@ class UserService {
             'username' => [ 'required', 'alpha_dash', 'unique:users,username', new CheckASCIICharacter ],
             'email' => [ 'required', 'unique:users,email', 'min:8', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
             'password' => [ 'required', Password::min( 8 ) ],
-            'security_pin' => [ 'required', 'numbic' ],
+            'security_pin' => [ 'required', 'numeric' ],
             'calling_code' => [ 'nullable' ],
             'phone_number' => [ 'nullable', 'digits_between:8,15', function( $attributes, $value, $fail ) use ( $request ) {
                 $user = User::where( 'phone_number', $value )->where( 'calling_code', $request->calling_code )->first();
@@ -1640,6 +1640,60 @@ class UserService {
         $teamMembers->append( 'encrypted_id' );
         
         return response()->json($teamMembers);
+    }
+
+    public static function _allUsers( $request ) {
+
+        $referral_structure = explode( '|', auth()->user()->referral_structure );
+
+        $users = User::with(['userDetail'])
+            ->select('users.id', 'users.username', 'users.email')
+            ->where( function ($a) use ( $referral_structure ) {
+                $a->where( 'referral_structure', 'like', '%' . auth()->user()->id . '%' )
+                    ->orWhereIn( 'id', $referral_structure );
+            } )
+            ->where( function ($query) use ($request) {
+                $query->where('users.email', $request->user );
+            })
+            ->get();
+
+        foreach( $users as $user ){
+            $user->append( [
+                'encrypted_id',
+            ] );
+        }
+
+        $data = [
+            'users' => $users,
+        ];
+
+        return $data;
+    }
+
+    public static function allDownlines( $request ) {
+
+        $users = User::with(['userDetail'])
+            ->select('users.id', 'users.username', 'users.email')
+            ->where( function ($a) {
+                $a->where( 'referral_structure', 'like', '%' . auth()->user()->id . '%' );
+            } )
+            ->where( function ($query) use ($request) {
+                $query->where('users.email', 'like', '%'. $request->user .'%' )
+                    ->orWhere( 'users.username', 'like', '%'. $request->user .'%' );
+            })
+            ->get();
+
+        foreach( $users as $user ){
+            $user->append( [
+                'encrypted_id',
+            ] );
+        }
+
+        $data = [
+            'users' => $users,
+        ];
+
+        return $data;
     }
 
     // Share

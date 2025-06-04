@@ -15,9 +15,7 @@ use Illuminate\Support\Facades\{
 };
 
 use App\Services\{
-    SymbolService,
-    UserService,
-    WalletService,
+    NotificationService,
 };
 
 use App\Models\{
@@ -37,7 +35,7 @@ class NotificationController extends Controller {
      * 
      */
     public function allNotification(){
-        return \Helper::userNotifications();
+        return NotificationService::userNotifications();
     }
     
     /**
@@ -50,7 +48,7 @@ class NotificationController extends Controller {
      * 
      */
     public function oneNotification( Request $request ){
-        return UserService::oneUserNotification( $request );
+        return NotificationService::oneUserNotification( $request );
     }
 
     /**
@@ -62,6 +60,6 @@ class NotificationController extends Controller {
      * 
      */
     public function allReadNotification( Request $request ){
-        return UserService::allReadNotification( $request );
+        return NotificationService::allReadNotification( $request );
     }
 }
