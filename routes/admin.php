@@ -118,6 +118,18 @@ Route::prefix( 'backoffice' )->group( function() {
                 Route::post( 'resend-mail', [ MailActionController::class, 'resendMail' ] )->name( 'admin.mail_action.resendMail' );
             } );
             
+            Route::prefix( 'country' )->group( function() {
+
+                Route::group( [ 'middleware' => [ 'permission: view countries' ] ], function() {
+                    Route::get( '/', [ CountryController::class, 'index' ] )->name( 'admin.module_parent.country.index' );
+                } );
+
+                Route::post( 'all-countries', [ CountryController::class, 'allCountries' ] )->name( 'admin.country.allCountries' );
+                Route::post( 'one-country', [ CountryController::class, 'oneCountry' ] )->name( 'admin.country.oneCountry' );
+                Route::post( 'update-country-status', [ CountryController::class, 'updateCountryStatus' ] )->name( 'admin.country.updateCountryStatus' );
+                Route::post( 'update-country-status-multiple', [ CountryController::class, 'updateCountryStatusMultiple' ] )->name( 'admin.country.updateCountryStatusMultiple' );
+            } );
+            
             Route::prefix( 'multi_language' )->group( function() {
 
                 Route::group( [ 'middleware' => [ 'permission: view multi_languages' ] ], function() {
