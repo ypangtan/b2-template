@@ -24,7 +24,7 @@
             @if ( $key == 0 && @$column->multi_select == 'yes' )
             <th><input class="select-all" type="checkbox" style="width: 100%"></th>
             @else
-            <th>{{ $column->title }}</th>
+            <th @if( isset( $column->info ) ) class="tooltip_{{ $column->id }}" @foreach( $column->info as $value) {{ $value->attribute }}="{{ $value->value }}" @endforeach @endIf>{{ $column->title }}</th>
             @endif
             @endforeach
         </tr>
