@@ -26,7 +26,8 @@ class CountryImageIconSeeder extends Seeder
     {
         $countries = Country::all();
         foreach( $countries as $c ) {
-            $c->country_icon = 'country-' . $c->iso_alpha2_code . '.svg';
+            $code = Str::lower( $c->iso_alpha2_code );
+            $c->country_icon = 'country-' . $code . '.svg';
             $c->country_image = $c->iso_alpha2_code . '.png';
             $c->save();
         }

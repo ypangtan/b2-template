@@ -67,6 +67,14 @@
                     </li>
                     @endcan
 
+                    @can( 'view countries' )
+                    <li class="{{ $controller == 'App\Http\Controllers\Admin\CountryController' ? 'mm-active' : '' }}">
+                        <a href="{{ route( 'admin.module_parent.country.index' ) }}">
+                            <div class="parent-icon"><i class="align-middle feather" data-lucide="globe"></i></div>
+                            <div class="menu-title">{{ __( 'template.countries' ) }}</div>
+                        </a>
+                    </li>
+                    @endcan
 
                     <li class="menu-label">{{ __( 'template.operations' ) }}</li>
                     @can( 'view users' )
