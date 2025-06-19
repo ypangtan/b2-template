@@ -191,7 +191,7 @@ class UserService {
         }
 
         $validator = Validator::make( $request->all(), [
-            'username' => [ 'required', 'unique:users,username', 'alpha_num', new CheckASCIICharacter ],
+            'username' => [ 'nullable', 'unique:users,username', 'alpha_num', new CheckASCIICharacter ],
             'email' => [ 'required', 'unique:users,email', 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
             'calling_code' => [ 'nullable' ],
             'phone_number' => [ 'nullable', 'digits_between:8,15', function( $attribute, $value, $fail ) use ( $request ) {
@@ -206,7 +206,7 @@ class UserService {
                 }
             } ],
             'referral' => [ 'nullable', 'exists:users,id' ],
-            'security_pin' => [ 'required', 'numeric', 'digits:6' ],
+            'security_pin' => [ 'nullable', 'numeric', 'digits:6' ],
             'password' => [ 'required', Password::min( 8 ) ],
         ] );
 
@@ -289,7 +289,7 @@ class UserService {
         }
 
         $validator = Validator::make( $request->all(), [
-            'username' => [ 'required', 'unique:users,username,' . $request->id, 'alpha_num', new CheckASCIICharacter ],
+            'username' => [ 'nullable', 'unique:users,username,' . $request->id, 'alpha_num', new CheckASCIICharacter ],
             'email' => [ 'required', 'unique:users,email,' . $request->id, 'email', 'regex:/(.+)@(.+)\.(.+)/i', new CheckASCIICharacter ],
             'calling_code' => [ 'nullable' ],
             'phone_number' => [ 'nullable', 'digits_between:8,15', function( $attribute, $value, $fail ) use ( $request ) {
