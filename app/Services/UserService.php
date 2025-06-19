@@ -237,7 +237,6 @@ class UserService {
                 'password' => Hash::make( $request->password ),
                 'security_pin' => Hash::make( $request->security_pin ),
                 'invitation_code' => strtoupper( Str::random( 6 ) ),
-                'role' => $request->role,
                 'status' => 10,
             ];
 
@@ -337,7 +336,6 @@ class UserService {
             $updateUser->email = $request->email;
             $updateUser->calling_code = $request->calling_code;
             $updateUser->phone_number = $request->phone_number;
-            $updateUser->role = $request->role;
             
             if ( !empty( $request->password ) ) {
                 $updateUser->password = Hash::make( $request->password );
