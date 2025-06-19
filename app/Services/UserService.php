@@ -206,7 +206,7 @@ class UserService {
                 }
             } ],
             'referral' => [ 'nullable', 'exists:users,id' ],
-            'secuirty_pin' => [ 'required', 'numeric', 'digits:6' ],
+            'security_pin' => [ 'required', 'numeric', 'digits:6' ],
             'password' => [ 'required', Password::min( 8 ) ],
         ] );
 
@@ -235,7 +235,7 @@ class UserService {
                 'calling_code' => $request->calling_code,
                 'phone_number' => $request->phone_number,
                 'password' => Hash::make( $request->password ),
-                'secuirty_pin' => Hash::make( $request->secuirty_pin ),
+                'security_pin' => Hash::make( $request->security_pin ),
                 'invitation_code' => strtoupper( Str::random( 6 ) ),
                 'role' => $request->role,
                 'status' => 10,
