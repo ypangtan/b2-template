@@ -7,16 +7,15 @@ $user_create = 'user_create';
         <div class="row">
             <div class="col-md-6">
                 <div class="mb-3 row">
-                    <label for="{{ $user_create }}_username" class="col-sm-5 col-form-label">{{ __( 'user.username' ) }}</label>
+                    <label for="{{ $user_create }}_referral" class="col-sm-5 col-form-label">{{ __( 'user.referral' ) }}</label>
                     <div class="col-sm-7">
-                        <input type="text" class="form-control form-control-sm" id="{{ $user_create }}_username">
-                        <div class="invalid-feedback"></div>
+                        <select class="form-control select2" id="{{ $user_create }}_referral" data-placeholder="{{ __( 'datatables.search_x', [ 'title' => __( 'template.users' ) ] ) }}"></select>
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $user_create }}_fullname" class="col-sm-5 col-form-label">{{ __( 'user.fullname' ) }}</label>
+                    <label for="{{ $user_create }}_username" class="col-sm-5 col-form-label">{{ __( 'user.username' ) }}</label>
                     <div class="col-sm-7">
-                        <input type="text" class="form-control form-control-sm" id="{{ $user_create }}_fullname">
+                        <input type="text" class="form-control form-control-sm" id="{{ $user_create }}_username">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
@@ -45,16 +44,16 @@ $user_create = 'user_create';
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $user_create }}_invitation_code" class="col-sm-5 col-form-label">{{ __( 'user.invitation_code' ) }}</label>
+                    <label for="{{ $user_create }}_password" class="col-sm-5 col-form-label">{{ __( 'user.password' ) }}</label>
                     <div class="col-sm-7">
-                        <input type="text" class="form-control form-control-sm" id="{{ $user_create }}_invitation_code">
+                        <input type="password" class="form-control form-control-sm" id="{{ $user_create }}_password" autocomplete="new-password">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="{{ $user_create }}_password" class="col-sm-5 col-form-label">{{ __( 'user.password' ) }}</label>
+                    <label for="{{ $user_create }}_security_pin" class="col-sm-5 col-form-label">{{ __( 'user.security_pin' ) }}</label>
                     <div class="col-sm-7">
-                        <input type="password" class="form-control form-control-sm" id="{{ $user_create }}_password" autocomplete="new-password">
+                        <input type="text" class="form-control form-control-sm" id="{{ $user_create }}_security_pin">
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
@@ -92,13 +91,13 @@ $user_create = 'user_create';
             } );
 
             let formData = new FormData();
+            formData.append( 'referral', $( uc + '_referral' ).val() ?? '' );
             formData.append( 'username', $( uc + '_username' ).val() );
-            formData.append( 'fullname', $( uc + '_fullname' ).val() );
             formData.append( 'email', $( uc + '_email' ).val() );
             formData.append( 'calling_code', $( uc + '_calling_code' ).val() );
             formData.append( 'phone_number', $( uc + '_phone_number' ).val() );
-            formData.append( 'invitation_code', $( uc + '_invitation_code' ).val() );
             formData.append( 'password', $( uc + '_password' ).val() );
+            formData.append( 'security_pin', $( uc + '_security_pin' ).val() );
             formData.append( '_token', '{{ csrf_token() }}' );
 
             $.ajax( {
@@ -131,5 +130,53 @@ $user_create = 'user_create';
                 }
             } );
         } );
+        
+        $( uc + '_referral' ).select2({
+
+            theme: 'bootstrap-5',
+            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
+            placeholder: $( this ).data( 'placeholder' ),
+            closeOnSelect: true,
+
+            ajax: { 
+                url: '{{ route( 'admin.user.allUsers' ) }}',
+                type: "post",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        name: params.term, // search term
+                        no_user: '{{ Request( 'id' ) }}',
+                        no_downline: '{{ Request( 'id' ) }}',
+                        designation: 1,
+                        start: ( ( params.page ? params.page : 1 ) - 1 ) * 10,
+                        length: 10,
+                        _token: '{{ csrf_token() }}',
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+
+                    let processedResult = [];
+
+                    data.users.map( function( v, i ) {
+                        processedResult.push( {
+                            id: v.encrypted_id,
+                            text: v.username,
+                        } );
+                    } );
+
+                    return {
+                        results: processedResult,
+                        pagination: {
+                            more: ( params.page * 10 ) < data.recordsFiltered
+                        }
+                    };
+
+                },
+                cache: true
+            }
+
+        });
     } );
 </script>
