@@ -1191,7 +1191,10 @@ class UserService {
 
         $userID = auth()->user()->id;
 
-        $user = User::find( $userID );
+        $user = User::with( [
+            'country',
+            'userDetail',
+        ] )->find( $userID );
 
         if ( $user ) {
             $user->makeHidden( [
@@ -1206,6 +1209,10 @@ class UserService {
                 'status',
                 'updated_at',
             ] );
+            
+            if( $user->userDetail ) {
+                $user->userDetail->append( 'photo_path' );
+            }
         }
 
         return response()->json( [

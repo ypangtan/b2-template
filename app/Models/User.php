@@ -32,7 +32,7 @@ class User extends Authenticatable
         'calling_code',
         'phone_number',
         'password',
-        'secuirty_pin',
+        'security_pin',
         'invitation_code',
         'referral_structure',
         'role',
@@ -107,6 +107,7 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'security_pin',
         'remember_token',
     ];
 
