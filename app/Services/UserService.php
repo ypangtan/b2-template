@@ -1463,7 +1463,7 @@ class UserService {
             $validator = Validator::make( $request->all(), [
                 'tmp_user' => [ 'required', function( $attributes, $value, $fail ) {
     
-                    $current = TmpUser::find( $value );
+                    $current = OtpAction::find( $value );
                     if ( !$current ) {
                         $fail( __( 'api.invalid_request' ) );
                         return false;
