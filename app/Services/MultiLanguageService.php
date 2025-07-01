@@ -2,27 +2,20 @@
 
 namespace App\Services;
 
-use App\Jobs\SendOTP;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\{
-    Crypt,
     DB,
-    Hash,
-    Http,
     Validator,
 };
 use App\Models\{
     MultiLanguageMessage,
-    MultiLanguage,
 };
 
-use Illuminate\Validation\Rules\Password;
-
-use App\Rules\CheckASCIICharacter;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Translation\FileLoader;
+use Illuminate\Translation\Translator;
 
 use Helper;
-
-use Carbon\Carbon;
 
 class MultiLanguageService {
 
@@ -245,23 +238,30 @@ class MultiLanguageService {
             ->first();
 
         if( !$message ) {
-            $defaultText = Str::title( str_replace( '_', ' ', $message_key ) );
+            $loader = new FileLoader(new Filesystem, resource_path('lang'));
+            $translator = new Translator( $loader, $language );
 
-            if( $language != 'en' ) {
-                // $defaultText = self::translateText( $defaultText, $language );
+            $fileKey = $module . '.' . $message_key;
+            $textFromLangFile = $translator->get($fileKey);
 
-                $message = MultiLanguageMessage::create( [
-                    'module' => $module,
-                    'message_key' => $message_key,
-                    'text' => $defaultText,
-                    'language' => $language,
-                ] );
+            $text = $textFromLangFile !== $fileKey
+                ? $textFromLangFile
+                : null;
+
+            if( !$text ) {
+                $message = MultiLanguageMessage::where( 'module', $module )
+                    ->where( 'message_key', $message_key )
+                    ->where( 'language', 'en' )
+                    ->first();
+
+                if( !$message ) {
+                    $text = Str::title( str_replace( '_', ' ', $message_key ) );
+                }
             }
-            
             $message = MultiLanguageMessage::create( [
                 'module' => $module,
                 'message_key' => $message_key,
-                'text' => $defaultText,
+                'text' => $text,
                 'language' => $language,
             ] );
         }
