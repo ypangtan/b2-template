@@ -17,9 +17,9 @@ class TranslationServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(Loader::class, function ($app) {
-            return new FileLoader(new Filesystem, $app['path.lang']);
-        });
+        // $this->app->singleton(Loader::class, function ($app) {
+        //     return new FileLoader(new Filesystem, $app['path.lang']);
+        // });
     
         // Bind your custom Translator
         $this->app->singleton('translator', function ($app) {
