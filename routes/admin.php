@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\{
     AdministratorController,
     AnnouncementController,
     AuditController,
+    CountryController,
     DashboardController,
     MailActionController,
     MFAController,
@@ -124,8 +125,13 @@ Route::prefix( 'backoffice' )->group( function() {
                     Route::get( '/', [ CountryController::class, 'index' ] )->name( 'admin.module_parent.country.index' );
                 } );
 
+                Route::group( [ 'middleware' => [ 'permission: edit countries' ] ], function() {
+                    Route::get( '/edit', [ CountryController::class, 'edit' ] )->name( 'admin.country.edit' );
+                } );
+
                 Route::post( 'all-countries', [ CountryController::class, 'allCountries' ] )->name( 'admin.country.allCountries' );
                 Route::post( 'one-country', [ CountryController::class, 'oneCountry' ] )->name( 'admin.country.oneCountry' );
+                Route::post( 'update-country', [ CountryController::class, 'updateCountry' ] )->name( 'admin.country.updateCountry' );
                 Route::post( 'update-country-status', [ CountryController::class, 'updateCountryStatus' ] )->name( 'admin.country.updateCountryStatus' );
                 Route::post( 'update-country-status-multiple', [ CountryController::class, 'updateCountryStatusMultiple' ] )->name( 'admin.country.updateCountryStatusMultiple' );
             } );

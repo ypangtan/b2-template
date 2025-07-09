@@ -124,11 +124,79 @@ class CountryService {
 
         if ( $country ) {
             $country->append( [
-                'encrypted_id'
+                'encrypted_id',
             ] );
         }
 
         return response()->json( $country );
+    }
+
+    public static function updateCountry ( $request ) {
+
+        DB::beginTransaction();
+
+        $request->merge( [
+            'id' => Helper::decode( $request->id ),
+        ] );
+
+        $validator = Validator::make( $request->all(), [
+            'country_name' => [ 'required' ],
+            'country_image' => [ 'required' ],
+            'country_icon' => [ 'required' ],
+            'currency_name' => [ 'required' ],
+            'currency_symbol' => [ 'required' ],
+            'iso_currency' => [ 'required' ],
+            'iso_alpha2_code' => [ 'required' ],
+            'iso_alpha3_code' => [ 'nullable' ],
+            'call_code' => [ 'required' ],
+        ] );
+
+        $attributeName = [
+            'country_name' => __( 'country.country_name' ),
+            'country_image' => __( 'country.country_image' ),
+            'country_icon' => __( 'country.country_icon' ),
+            'currency_name' => __( 'country.currency_name' ),
+            'currency_symbol' => __( 'country.currency_symbol' ),
+            'iso_currency' => __( 'country.iso_currency' ),
+            'iso_alpha2_code' => __( 'country.iso_alpha2_code' ),
+            'iso_alpha3_code' => __( 'country.iso_alpha3_code' ),
+            'call_code' => __( 'country.call_code' ),
+        ];
+
+        foreach( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();    
+
+        try {
+
+            $country = Country::lockForUpdate()->find( $request->id );
+            $country->country_name = $request->country_name;
+            $country->country_image = $request->country_image;
+            $country->country_icon = $request->country_icon;
+            $country->currency_name = $request->currency_name;
+            $country->currency_symbol = $request->currency_symbol;
+            $country->iso_currency = $request->iso_currency;
+            $country->iso_alpha2_code = $request->iso_alpha2_code;
+            $country->iso_alpha3_code = $request->iso_alpha3_code;
+            $country->call_code = $request->call_code;
+            $country->save();
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollBack();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+            ], 500 );
+        }
+
+        return response()->json( [
+            'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.countries' ) ) ] ),
+        ] );
     }
 
     public static function updateCountryStatus( $request ) {
@@ -225,7 +293,7 @@ class CountryService {
             ->when( $request->name != '', function( $query ) use ( $request ) {
                 $query->where( 'country_name', 'LIKE', '%' . $request->name . '%' );
             } )
-            ->orderBy( 'iso_alpha2_code', 'ASC' )
+            ->orderBy( 'country_name', 'ASC' )
             ->get();
 
         return response()->json( [

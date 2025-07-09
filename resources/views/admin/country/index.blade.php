@@ -11,6 +11,11 @@ $columns = [
         'title' => 'No.',
     ],
     [
+        'type' => 'default',
+        'id' => 'image',
+        'title' => __( 'country.image' ),
+    ],
+    [
         'type' => 'input',
         'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'template.countries' ) ] ),
         'id' => 'country_name',
@@ -42,6 +47,12 @@ if ( $multiSelect ) {
     ] );
 }
 ?>
+
+<style>
+    .country_image{
+        width: 200px;
+    }
+</style>
 
 <div class="card">
     <div class="card-body">
@@ -104,6 +115,7 @@ if ( $multiSelect ) {
             order: false,
             columns: [
                 { data: null },
+                { data: 'image_path' },
                 { data: 'country_name' },
                 { data: 'status' },
                 { data: 'encrypted_id' },
@@ -124,6 +136,19 @@ if ( $multiSelect ) {
                     },
                 },
                 {
+                    targets: parseInt( '{{ Helper::columnIndex( $columns, "image" ) }}' ),
+                    orderable: false,
+                    render: function( data, type, row, meta ) {
+                        html = '-';
+
+                        if( data ) {
+                            html = `<img class="country_image" src="${data}" alt="country_image">`;
+                        }
+
+                        return html;
+                    },
+                },
+                {
                     targets: parseInt( '{{ Helper::columnIndex( $columns, "status" ) }}' ),
                     orderable: false,
                     className: 'text-end',
@@ -141,11 +166,13 @@ if ( $multiSelect ) {
                         @can( 'edit countrys' )
 
                         let status = '';
+                            edit = '';
 
                         @can( 'edit counties' )
                         status = row.status == 10 ? 
                         '<li class="dropdown-item click-action dt-suspend" data-id="' + data + '">{{ __( 'datatables.suspend' ) }}</li>':
                         '<li class="dropdown-item click-action dt-activate" data-id="' + data + '">{{ __( 'datatables.activate' ) }}</li>' ;
+                        edit += '<li class="dropdown-item click-action dt-edit" data-id="' + data + '">{{ __( 'datatables.edit' ) }}</li>';
                         @endcan
 
                         let html = 
@@ -153,6 +180,7 @@ if ( $multiSelect ) {
                         <div class="dropdown">
                             <i class="text-primary click-action" data-lucide="more-horizontal" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu">
+                            ` + edit + `
                             ` + status + `
                             </ul>
                         </div>
@@ -327,6 +355,10 @@ if ( $multiSelect ) {
                     } );    
                     break;
             }
+        } );
+
+        $( document ).on( 'click', '.dt-edit', function() {
+            window.location.href = '{{ route( 'admin.country.edit' ) }}?id=' + $( this ).data( 'id' );
         } );
 
     } );
