@@ -10,25 +10,80 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-use App\Traits\HasTranslations;
+// use App\Traits\HasTranslations;
 
 use Helper;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 
 class UserNotification extends Model
 {
-    use HasFactory, LogsActivity, HasTranslations;
-
+    use HasFactory, LogsActivity;
+    
     protected $fillable = [
         'user_id',
         'title',
         'content',
         'system_title',
         'system_content',
+        'platform_type',
         'meta_data',
         'url_slug',
         'image',
         'type',
     ];
+    
+    public function setTitleAttribute( $value ) {
+        $translationKey = $value['key'];
+        $data = $value['data'] ?? [];
+
+        $nowLocale = App::getLocale();
+        $languages = array_keys(Config::get('languages'));
+
+        $translations = [];
+        foreach ($languages as $lang) {
+            App::setLocale($lang);
+            $translations[$lang] = __( $translationKey, $data );
+        }
+        App::setLocale( $nowLocale );
+        $this->attributes['title'] = json_encode($translations);
+    }
+
+    public function setContentAttribute( $value ) {
+        $translationKey = $value['key'];
+        $data = $value['data'] ?? [];
+
+        $nowLocale = App::getLocale();
+        $languages = array_keys(Config::get('languages'));
+        $translations = [];
+        foreach ($languages as $lang) {
+            App::setLocale($lang);
+            $translations[$lang] = __( $translationKey, $data );
+        }
+
+        App::setLocale( $nowLocale );
+        $this->attributes['content'] = json_encode($translations);
+    }
+
+    public function getTitleAttribute() {
+        $nowLocale = App::getLocale();
+        $data = json_decode($this->attributes['title'], true);
+        return isset( $data[ $nowLocale ] ) ? $data[ $nowLocale ] : array_values($data)[0];
+    }
+
+    public function getContentAttribute() {
+        $nowLocale = App::getLocale();
+        $data = json_decode($this->attributes['content'], true);
+        return isset( $data[ $nowLocale ] ) ? $data[ $nowLocale ] : array_values($data)[0];
+    }
+    
+    public function userNotificationUsers() {
+        return $this->hasMany( UserNotificationUser::class, 'user_notification_id' );
+    }
+
+    public function UserNotificationSeens() {
+        return $this->hasMany( UserNotificationSeen::class, 'user_notification_id' );
+    }
 
     public function user() {
         return $this->belongsTo( User::class, 'user_id' )->withTrashed();
@@ -63,7 +118,7 @@ class UserNotification extends Model
     //     return __( $this->attributes['system_content'], $metaData ? $metaData : [] );
     // }
 
-    public $translatable = [ 'title', 'content' ];
+    // public $translatable = [ 'title', 'content' ];
 
     protected function serializeDate(DateTimeInterface $date) {
         return $date->timezone( 'Asia/Kuala_Lumpur' )->format( 'Y-m-d H:i:s' );
@@ -75,6 +130,7 @@ class UserNotification extends Model
         'content',
         'system_title',
         'system_content',
+        'platform_type',
         'meta_data',
         'url_slug',
         'image',
