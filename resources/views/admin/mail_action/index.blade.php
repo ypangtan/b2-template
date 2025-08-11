@@ -13,21 +13,15 @@ $columns = [
     ],
     [
         'type' => 'input',
-        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'mail.user' ) ] ),
-        'id' => 'user',
-        'title' => __( 'mail.user' ),
+        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'mail.email' ) ] ),
+        'id' => 'email',
+        'title' => __( 'mail.email' ),
     ],
     [
         'type' => 'input',
         'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'mail.subject' ) ] ),
         'id' => 'subject',
         'title' => __( 'mail.subject' ),
-    ],
-    [
-        'type' => 'input',
-        'placeholder' =>  __( 'datatables.search_x', [ 'title' => __( 'mail.email' ) ] ),
-        'id' => 'email',
-        'title' => __( 'mail.email' ),
     ],
     [
         'type' => 'select',
@@ -119,9 +113,8 @@ $columns = [
             columns: [
                 { data: null },
                 { data: 'created_at' },
-                { data: 'user' },
-                { data: 'subject' },
                 { data: 'email' },
+                { data: 'subject' },
                 { data: 'status' },
                 { data: 'encrypted_id' },
             ],
@@ -134,34 +127,14 @@ $columns = [
                     },
                 },
                 {
-                    targets: parseInt( '{{ Helper::columnIndex( $columns, "user" ) }}' ),
-                    orderable: false,
-                    render: function( data, type, row, meta ) {
-
-                        let email = data?.email ?? '-';
-                            fullname = data?.username ?? '-',
-                            html = '';
-
-                        html +=
-                        `
-                        <span>
-                        <strong  class="name">` + fullname + `</strong><br>
-                        <strong>{{ __( 'user.email' ) }}</strong>: ` + email + `<br>
-                        </span>
-                        `;
-
-                        return html;
-                    },
-                },
-                {
-                    targets: parseInt( '{{ Helper::columnIndex( $columns, "subject" ) }}' ),
+                    targets: parseInt( '{{ Helper::columnIndex( $columns, "email" ) }}' ),
                     orderable: false,
                     render: function( data, type, row, meta ) {
                         return data ?? '-';
                     },
                 },
                 {
-                    targets: parseInt( '{{ Helper::columnIndex( $columns, "email" ) }}' ),
+                    targets: parseInt( '{{ Helper::columnIndex( $columns, "subject" ) }}' ),
                     orderable: false,
                     render: function( data, type, row, meta ) {
                         return data ?? '-';
