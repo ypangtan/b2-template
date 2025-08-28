@@ -4,6 +4,7 @@ namespace App\Translation;
 
 use Illuminate\Translation\Translator;
 use App\Services\MultiLanguageService;
+use Hamcrest\Arrays\IsArray;
 
 class TranslationLoader extends Translator
 {
@@ -19,22 +20,30 @@ class TranslationLoader extends Translator
     // Custom method to get translations from the database using MultiLanguageService
     public function get( $key, array $replace = [], $locale = null, $fallback = true )
     {
-        
-        $language = $locale ? $locale : app()->getLocale();
+        try {
+            $language = $locale ? $locale : app()->getLocale();
+            if ( str_contains( $key, '.' ) ) {
+                if (str_contains( $key, 'validation.custom' ) ) {
+                    $parts = explode( '.', $key );
+                    $module = $parts[0];
+                    $message_key = implode( '.', array_slice( $parts, 3 ) );
+                } else if ( str_contains( $key, 'validation.values' ) ) {
+                    return $key;
+                } else {
+                    [$module, $message_key] = explode( '.', $key, 2 );
+                }
 
-        if ( str_contains( $key, '.' ) ) {
-            if (str_contains( $key, 'validation.custom' ) ) {
-                $parts = explode( '.', $key );
-                $module = $parts[0];
-                $message_key = implode( '.', array_slice( $parts, 3 ) );
-            } else {
-                [$module, $message_key] = explode( '.', $key, 2 );
-            }
+                if( is_array($message_key) || !$message_key ) {
+                    return $key;
+                }
 
-            $text = MultiLanguageService::getText( $module, $message_key, $language, $replace );
-            if ( $text ) {
-                return $text;
+                $text = MultiLanguageService::getText( $module, $message_key, $language, $replace );
+                if ( $text ) {
+                    return $text;
+                }
             }
+        } catch ( \Throwable $th ) {
+            return $key;
         }
 
         return $key;

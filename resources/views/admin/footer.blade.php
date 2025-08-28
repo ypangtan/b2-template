@@ -101,6 +101,13 @@
                 }
             } );
 
+            $( document ).on( 'focus', '.select2-selection', function() {
+                let $select = $( this ).closest( '.select2-container' ).prev( 'select' );
+                if ( $select.hasClass( 'is-invalid' ) ) {
+                    $select.removeClass( 'is-invalid' ).nextAll( 'div.invalid-feedback' ).text( '' );
+                }
+            });
+
             $( document ).on( 'hidden.bs.offcanvas', '.offcanvas-right', function() {
                 $( '.offcanvas-body .form-control' ).removeClass( 'is-invalid' ).val( '' );
                 $( '.invalid-feedback' ).text( '' );
