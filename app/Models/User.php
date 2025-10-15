@@ -38,6 +38,17 @@ class User extends Authenticatable
         'role',
         'status',
     ];
+    public static $showAttribute = [
+        'created_at',
+        'country_id',
+        'referral_id',
+        'username',
+        'email',
+        'calling_code',
+        'phone_number',
+        'invitation_code',
+        'status',
+    ];
     
     public function getAssetAttribute() {
         $balances = $this->wallet()->where('type', 1)->first();

@@ -1,4 +1,6 @@
 <?php
+$enableReorder = 1; // if table have priority attribute
+
 $columns = [
     [
         'type' => 'default',
@@ -55,7 +57,22 @@ $columns = [
         'title' => __( 'datatables.action' ),
     ],
 ];
+
+if ( $enableReorder == 1 ) {
+    array_unshift( $columns,  [
+        'type' => 'default',
+        'id' => 'dt_reorder',
+        'title' => '',
+        'reorder' => 'yes',
+    ] );
+}
 ?>
+
+<style>
+    .dt-rowReorder-float-parent{
+        background-color: white;
+    }
+</style>
 
 <div class="card">
     <div class="card-body">
@@ -253,7 +270,33 @@ $columns = [
         table_no = 0,
         timeout = null;
 
+    if ( parseInt( '{{ $enableReorder }}' ) == 1 ) {
+
+        dt_table_config.rowReorder = {
+            selector: '.dt-reorder',
+            dataSrc: 'id',
+            snapX: true,
+            update: false,
+        };
+
+        dt_table_config.order[0] = [ 2, 'desc' ],
+        dt_table_config.columns.unshift( {
+            data: 'encrypted_id'
+        } );
+        dt_table_config.columnDefs.unshift( {
+            targets: 0,
+            orderable: false,
+            className: 'reorder-handle',
+            render: function( data, type, row, meta ) {
+                return `<div class="dt-reorder"style="width: 100%" data-id="${data}" />
+                    <i data-lucide="grip-vertical" class="align-middle" style="color: #5f5f5f;"></i>
+                </div>`;
+            },
+        } );
+    }
+
     document.addEventListener( 'DOMContentLoaded', function() {
+       lucide.createIcons();
        
         $( document ).on( 'click', '.dt-edit', function() {
             window.location.href = '{{ route( 'admin.user.edit' ) }}?id=' + $( this ).data( 'id' );

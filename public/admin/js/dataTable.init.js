@@ -16,6 +16,7 @@ document.addEventListener( 'DOMContentLoaded', function() {
         lengthMenu: dt_table_config.lengthMenu,
         processing: true,
         serverSide: true,
+        rowReorder: dt_table_config.rowReorder ? dt_table_config.rowReorder : false,
         order: dt_table_config.order,
         ordering: true,
         scrollX: true,
@@ -25,6 +26,8 @@ document.addEventListener( 'DOMContentLoaded', function() {
         select: dt_table_config.select,
         initComplete: function() {
             $( dt_table_name + '_filter' ).remove();
+
+            lucide.createIcons();
         },
         drawCallback: function( response ) {
             
@@ -171,4 +174,29 @@ document.addEventListener( 'DOMContentLoaded', function() {
 
         window.open(newExportPath + '?' + url, '_blank');
     } );
+
+    // Reorder
+    $( dt_table_name ).on( 'row-reorder.dt', function( e, diff, edit ) {
+        const updates = diff.map(change => {
+            const id = $(change.node).find('.dt-reorder').data('id');
+            const position = change.newPosition;
+
+            return { id, position };
+        });
+
+        if ( updates.length ) {
+            $.ajax( {
+                url: reorderPath,
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    updates: updates
+                },
+                success: function( res ) {
+                    dt_table.draw( false );
+                }
+            } );
+        }
+    });
+    
 } );

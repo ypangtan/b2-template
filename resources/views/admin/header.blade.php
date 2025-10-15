@@ -30,6 +30,8 @@
 
         <link href="{{ asset( 'admin/css/select2.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
         <link href="{{ asset( 'admin/css/select2-bootstrap-5-theme.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
+
+        <link href="{{ asset( 'admin/css/rowReorder.datatable.min.css' ) . Helper::assetVersion() }}" rel="stylesheet">
         <style>
         /* montserrat-regular - latin */
         @font-face {

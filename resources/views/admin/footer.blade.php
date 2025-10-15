@@ -14,6 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
     <script src="{{ asset( 'admin/js/select2.min.js' ) . Helper::assetVersion() }}"></script>
     <script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>
+    <script src="{{ asset( 'admin/js/rowReorder.datatable.min.js' ) . Helper::assetVersion() }}"></script>
     
     <script>
         lucide.createIcons();

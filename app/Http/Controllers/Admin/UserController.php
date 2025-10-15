@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 use App\Services\{
@@ -14,7 +15,7 @@ class UserController extends Controller
     public function index( Request $request ) {
 
         $this->data['header']['title'] = __( 'template.users' );
-        $this->data['content'] = 'admin.user.index';
+        $this->data['content'] = 'admin.template.index';
         $this->data['breadcrumbs'] = [
             'enabled' => true,
             'main_title' => __( 'template.users' ),
@@ -22,6 +23,19 @@ class UserController extends Controller
             'mobile_title' => __( 'template.users' ),
         ];
 
+        $this->data['data']['model'] = User::class;
+        $this->data['data']['status'] = [
+            10 => [
+                'color' => 'badge rounded-pill bg-success',
+                'value' => '10',
+                'title' => __( 'datatables.activated' ),
+            ],
+            20 => [
+                'color' => 'badge rounded-pill bg-danger',
+                'value' => '20',
+                'title' => __( 'datatables.suspended' ),
+            ],
+        ];
         return view( 'admin.main' )->with( $this->data );
     }
 

@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->string('calling_code', 5)->nullable();
             $table->string('phone_number',20)->nullable();
             $table->string('password')->nullable();
-            $table->string('secuirty_pin')->nullable();
+            $table->string('security_pin')->nullable();
             $table->string('invitation_code',20);
             $table->text('referral_structure')->nullable();
             $table->decimal('capital',20,2)->default(0);
