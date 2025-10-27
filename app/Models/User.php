@@ -38,6 +38,7 @@ class User extends Authenticatable
         'role',
         'status',
     ];
+
     public static $showAttribute = [
         'created_at',
         'country_id',
@@ -48,6 +49,17 @@ class User extends Authenticatable
         'phone_number',
         'invitation_code',
         'status',
+    ];
+
+    public static $showEditableAttribute = [
+        'country_id',
+        'referral_id',
+        'username',
+        'email',
+        'calling_code',
+        'phone_number',
+        'password',
+        'security_pin',
     ];
     
     public function getAssetAttribute() {

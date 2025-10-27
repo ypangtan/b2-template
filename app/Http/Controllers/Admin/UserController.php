@@ -42,13 +42,14 @@ class UserController extends Controller
     public function add( Request $request ) {
 
         $this->data['header']['title'] = __( 'template.users' );
-        $this->data['content'] = 'admin.user.add';
+        $this->data['content'] = 'admin.template.add';
         $this->data['breadcrumbs'] = [
             'enabled' => true,
             'main_title' => __( 'template.users' ),
             'title' => __( 'template.add_x', [ 'title' => \Str::singular( __( 'template.users' ) ) ] ),
             'mobile_title' => __( 'template.add_x', [ 'title' => \Str::singular( __( 'template.users' ) ) ] ),
         ];
+        $this->data['data']['model'] = User::class;
 
         return view( 'admin.main' )->with( $this->data );
     }

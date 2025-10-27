@@ -1,0 +1,235 @@
+<?php
+
+namespace App\Services\{{ class }};
+
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\{
+    Crypt,
+    DB,
+    Hash,
+    Http,
+    Storage,
+    Validator,
+};
+
+use App\Models\{
+    {{ Modal }},
+};
+
+use Helper;
+
+use Carbon\Carbon;
+
+class {{ class }}Service {
+
+    public static function all{{ Modals }}( $request ) {
+
+        ${{ modal }} = {{ Modal }}::with( [
+        ] )->select( '{{ table }}.*' );
+
+        $filterObject = self::filter( $request, ${{ modal }} );
+        ${{ modal }} = $filterObject['model'];
+        $filter = $filterObject['filter'];
+
+        if ( $request->input( 'order.0.column' ) != 0 ) {
+            $dir = $request->input( 'order.0.dir' );
+            switch ( $request->input( 'order.0.column' ) ) {
+                case 1:
+                    ${{ modal }}->orderBy( 'created_at', $dir );
+                    break;
+            }
+        }
+
+        ${{ modal }}Count = ${{ modal }}->count();
+
+        $limit = $request->length;
+        $offset = $request->start;
+
+        ${{ modals }} = ${{ modal }}->skip( $offset )->take( $limit )->get();
+
+        ${{ modals }}->append( [
+            'encrypted_id',
+        ] );
+
+        $data = [
+            '{{ modals }}' => ${{ modals }},
+            'draw' => $request->draw,
+            'recordsFiltered' => $filter ? ${{ modal }}Count : {{ Modal }}::count(),
+            'recordsTotal' => {{ Modal }}::count(),
+        ];
+
+        return $data;
+    }
+
+    private static function filter( $request, $model ) {
+
+        $filter = false;
+
+        if ( !empty( $request->registered_date ) ) {
+            if ( str_contains( $request->registered_date, 'to' ) ) {
+                $dates = explode( ' to ', $request->registered_date );
+
+                $startDate = explode( '-', $dates[0] );
+                $start = Carbon::create( $startDate[0], $startDate[1], $startDate[2], 0, 0, 0, 'Asia/Kuala_Lumpur' );
+                
+                $endDate = explode( '-', $dates[1] );
+                $end = Carbon::create( $endDate[0], $endDate[1], $endDate[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
+
+                $model->whereBetween( '{{ table }}.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
+            } else {
+
+                $dates = explode( '-', $request->registered_date );
+
+                $start = Carbon::create( $dates[0], $dates[1], $dates[2], 0, 0, 0, 'Asia/Kuala_Lumpur' );
+                $end = Carbon::create( $dates[0], $dates[1], $dates[2], 23, 59, 59, 'Asia/Kuala_Lumpur' );
+
+                $model->whereBetween( '{{ table }}.created_at', [ date( 'Y-m-d H:i:s', $start->timestamp ), date( 'Y-m-d H:i:s', $end->timestamp ) ] );
+            }
+            $filter = true;
+        }
+
+        if ( !empty( $request->status ) ) {
+            $model->where( '{{ table }}.status', $request->status );
+            $filter = true;
+        }     
+
+        return [
+            'filter' => $filter,
+            'model' => $model,
+        ];
+    }
+
+    public static function one{{ Modal }}( $request ) {
+
+        $request->merge( [
+            'id' => Helper::decode( $request->id ),
+        ] );
+        
+        ${{ modal }} = {{ Modal }}::with( [
+        ] )->find( $request->id );
+
+        return ${{ modal }};
+    }
+
+    public static function create{{ Modal }}( $request ) {
+
+        DB::beginTransaction();
+
+        $validator = Validator::make( $request->all(), [
+            'name' => [ 'required' ],
+        ] );
+
+        $attributeName = [
+            'name' => __( '{{ modal }}.name' ),
+        ];
+
+        foreach( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();
+
+        try {
+
+            $create{{ Modal }}Object['{{ Modal }}'] = [
+                'name' => $request->name,
+                'status' => 10,
+            ];
+            $create{{ Modal }} = {{ Modal }}::create( $create{{ Modal }}Object );
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollBack();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+            ], 500 );
+        }
+
+        return response()->json( [
+            'message' => __( 'template.new_x_created', [ 'title' => Str::singular( __( 'template.{{ modals }}' ) ) ] ),
+        ] );
+    }
+
+    public static function update{{ Modal }}( $request ) {
+
+        DB::beginTransaction();
+
+        $request->merge( [
+            'id' => Helper::decode( $request->id ),
+        ] );
+
+        $validator = Validator::make( $request->all(), [
+            'name' => [ 'nullable' ],
+        ] );
+
+        $attributeName = [
+            'name' => __( '{{ modal }}.name' ),
+        ];
+
+        foreach( $attributeName as $key => $aName ) {
+            $attributeName[$key] = strtolower( $aName );
+        }
+
+        $validator->setAttributeNames( $attributeName )->validate();    
+
+        try {
+
+            $update{{ Modal }} = {{ Modal }}::lockForUpdate()
+                ->find( $request->id );
+            $update{{ Modal }}->save();
+
+            DB::commit();
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollBack();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+            ], 500 );
+        }
+
+        return response()->json( [
+            'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.{{ modals }}' ) ) ] ),
+        ] );
+    }
+
+    public static function update{{ Modal }}Status( $request ) {
+
+        DB::beginTransaction();
+
+        $request->merge( [
+            'id' => Helper::decode( $request->id ),
+        ] );
+
+        $validator = Validator::make( $request->all(), [
+            'status' => 'required',
+        ] );
+        
+        $validator->validate();
+
+        try {
+
+            $update{{ Modal }} = {{ Modal }}::lockForUpdate()->find( $request->id );
+            $update{{ Modal }}->status = $request->status;
+            $update{{ Modal }}->save();
+
+            DB::commit();
+            
+            return response()->json( [
+                'message' => __( 'template.x_updated', [ 'title' => Str::singular( __( 'template.{{ modals }}' ) ) ] ),
+            ] );
+
+        } catch ( \Throwable $th ) {
+
+            DB::rollBack();
+
+            return response()->json( [
+                'message' => $th->getMessage() . ' in line: ' . $th->getLine()
+            ], 500 );
+        }
+    }
+}

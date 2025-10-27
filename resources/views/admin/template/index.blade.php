@@ -3,7 +3,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
-$modelClass = $data['model'] ?? \App\Models\User::class;
+$modelClass = $data['model'];
 $model = new $modelClass();
 $table = $model->getTable();
 $columns = $modelClass::$showAttribute;
@@ -72,7 +72,6 @@ $autoColumns[] = [
 ];
 
 $routeName = 'admin.' . Str::singular($table) . '.all' . Str::studly($table);
-
 ?>
 
 <div class="card">
